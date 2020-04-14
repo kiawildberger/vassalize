@@ -1,0 +1,25 @@
+{
+  "name": "rubber",
+  "version": "0.0.1",
+  "description": "epic bot",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kiawildberger/Rubber.git"
+  },
+  "author": "kia",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kiawildberger/Rubber/issues"
+  },
+  "homepage": "https://github.com/kiawildberger/Rubber#readme",
+  "dependencies": {
+    "discord.js": "^12.1.1",
+    "dotenv": "^8.2.0",
+    "electron": "^8.2.2"
+  }
+}
