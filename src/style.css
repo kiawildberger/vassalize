@@ -5,4 +5,7 @@ body {  }
     width:20em;
     height:20em;
     margin:auto;
+    overflow-y: scroll;
+    position:relative;
+    bottom:0;
 }
