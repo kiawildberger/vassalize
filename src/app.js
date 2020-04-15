@@ -19,5 +19,7 @@ function createWindow() {
 
 app.whenReady().then(() => {
   createWindow()
-  ps.init(win, process.env.TOKEN)
+  ipcMain.on("startbot", (event, tok) => {
+    ps.init(win, tok)
+  })
 })

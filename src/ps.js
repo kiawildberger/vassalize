@@ -12,6 +12,8 @@ let lastmessage;
 let isLoggedIn = false
 let gids = []
 let cids = []
+let tagx = /.*#[0-9]{4}/
+let uidx = /<@!\d+>/
 
 exports.init = function(win, tok) {
     window = win;
@@ -29,6 +31,13 @@ exports.init = function(win, tok) {
     });
     client.login(tok);
     ipcMain.on("msgin", (event, arg) => {
+        if(arg.msg.toString().match(tagx)) {
+            // is ping
+            let un = arg.msg.toString().match(tagx)[0].toString().split("#")[0].replace("@", '')
+            let g = client.channels.cache.get(arg.channel).guild.members.cache.filter(x => x.user.username === un).array()
+            arg.msg = arg.msg.replace(tagx, g[0].user)
+        }
+        if(arg.msg.toString().includes("/shrug")) arg.msg = arg.msg.replace("/shrug", "¯\_(ツ)_/¯")
         client.channels.cache.get(arg.channel).send(arg.msg)
     })
     // channels.cache.filter(c => c.type === "text")
@@ -44,8 +53,16 @@ exports.init = function(win, tok) {
 
 function process(msg) {
     if(settings.mode === "user") {
+        let ct = msg.content
+        if(msg.mentions) {
+            let mts = msg.mentions.users.array()
+            mts.forEach(e => {
+                let i = `@${e.username}#${e.discriminator}`
+                ct = ct.replace(uidx, i)
+            })
+        }
         let m = {
-            content: msg.content,
+            content: ct,
             author: msg.author,
             channel: msg.channel.id
         }

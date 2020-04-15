@@ -4,7 +4,18 @@ function id(e) { return document.getElementById(e) }
 ipcRenderer.on("msg", (event, arg) => {
     let ul = document.createElement("ul")
     ul.classList.add("msg")
-    ul.textContent = arg.msg.author.username + "#" + arg.msg.author.discriminator + ": " + arg.msg.content
+    let ct = arg.msg.content
+    let mt = ct.match(/.*#[0-9]{4}/)
+    if(mt) {
+        mt = mt[0]
+        mt = mt.split("@")
+        let sp = []
+        mt.forEach(e => {
+            if(e) sp.push(`<span class="png">@${e}</span>`)
+        })
+        ct = ct.replace(/@.*#\d{4}/, sp.join(" "))
+    }
+    ul.innerHTML = arg.msg.author.username + "#" + arg.msg.author.discriminator + ": " + ct
     ul.setAttribute("data-channel", arg.msg.channel)
     id("msgdisplay").appendChild(ul)
     id('msgdisplay').scrollTop = id('msgdisplay').scrollHeight
@@ -12,6 +23,10 @@ ipcRenderer.on("msg", (event, arg) => {
 
 let gids, gna = [], ccids = [], cna = [];
 ipcRenderer.on("gids", (event, arg) => {
+    let nn = document.createElement('option')
+    nn.setAttribute("value", "none")
+    nn.innerText = "none"
+    id('guilds').appendChild(nn)
     arg.forEach(e => {
         let opt = document.createElement("option")
         opt.setAttribute("value", e.name)
@@ -20,17 +35,20 @@ ipcRenderer.on("gids", (event, arg) => {
         gna.push(e.name)
     })
     gids = arg
-    console.log(gna)
 })
 let currentchannel;
 id('guilds').addEventListener('change', e => {
-    // let r = e.target.innerText.split("\n")
-    // let guild = gids[r.indexOf(e.target.value)] // is guild ig
-    // let guild = gids[gna.indexOf(e.target.value)].id
+    if(e.target.value === "none") {
+        id('channels').innerHTML = '<option>none</option>'
+        id('msgdisplay').innerText = ''
+        return;
+    }
+    id('msgdisplay').innerText = ''
     let idx = gna.indexOf(e.target.value)
     ipcRenderer.send("rcids", idx)
 })
 
+id('channels').addEventListener("change", () => id('msgdisplay').innerText = '')
 
 ipcRenderer.on("cids", (event, arg) => {
     id('channels').innerHTML = ''
@@ -44,8 +62,16 @@ ipcRenderer.on("cids", (event, arg) => {
     })
 })
 
+id('bot-secret').addEventListener("keypress", e => {
+    if(e.keyCode != 13) return;
+    ipcRenderer.send("startbot", e.target.value)
+    id('bs').style.display = "none"
+    document.querySelector('.container').style.display = "block"
+})
+
 id("msgin").addEventListener("keypress", e => {
     if (e.keyCode !== 13) return;
+    if(id("channels").value === "")
     currentchannel = ccids[cna.indexOf(id('channels').value)]
     ipcRenderer.send("msgin", {
         msg: id("msgin").value,
