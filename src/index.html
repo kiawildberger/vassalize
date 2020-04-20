@@ -1,13 +1,15 @@
 <head>
     <title>Rubber</title>
+    <link rel="stylesheet" href="https://unpkg.com/chota@latest">
     <link rel="stylesheet" href="style.css">
-    <!-- first get functionality tho, worry about styles when its functionally complete -->
 </head>
 
 <body>
     <div id="bs">
-        <label for="bot-secret">bot secret: </label>
-        <input id="bot-secret" type="password">
+        <label for="bot-secret" style="display:inline;">bot secret: </label>
+        <input id="bot-secret" type="password" style="width:25em; display:inline-block;">
+        <div id="bs-helper" style="margin-left:5em;margin-top:1em;"></div><br><br>
+        <div id="cached"></div>
     </div>
     <div class="container" style="display:none;">
         <div id="guild-container">
@@ -18,8 +20,9 @@
             <label for="channels">active channel:</label>
             <select id="channels"></select>
         </div>
-        <div id="msgdisplay"></div>
+        <div id="msgdisplay" class="collection"></div>
         <input id="msgin" type="text">
+        <div id="userd"></div>
     </div>
     <script src="index.js"></script>
 </body>

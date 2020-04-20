@@ -1,17 +1,21 @@
 const { ipcRenderer } = require("electron")
+let conf = require('./config.json')
 function id(e) { return document.getElementById(e) }
+
+let loggedin = false;
 
 ipcRenderer.on("msg", (event, arg) => {
     let ul = document.createElement("ul")
     ul.classList.add("msg")
+    ul.classList.add("collection-item")
     let ct = arg.msg.content
     let mt = ct.match(/.*#[0-9]{4}/)
-    if(mt) {
+    if (mt) {
         mt = mt[0]
         mt = mt.split("@")
         let sp = []
         mt.forEach(e => {
-            if(e) sp.push(`<span class="png">@${e}</span>`)
+            if (e) sp.push(`<span class="png">@${e}</span>`)
         })
         ct = ct.replace(/@.*#\d{4}/, sp.join(" "))
     }
@@ -22,7 +26,8 @@ ipcRenderer.on("msg", (event, arg) => {
 })
 
 let gids, gna = [], ccids = [], cna = [];
-ipcRenderer.on("gids", (event, arg) => {
+function dGids(arg) {
+    if (!loggedin) return;
     let nn = document.createElement('option')
     nn.setAttribute("value", "none")
     nn.innerText = "none"
@@ -35,10 +40,12 @@ ipcRenderer.on("gids", (event, arg) => {
         gna.push(e.name)
     })
     gids = arg
-})
+    id('bs').style.display = "none"
+    document.querySelector('.container').style.display = "block"
+}
 let currentchannel;
 id('guilds').addEventListener('change', e => {
-    if(e.target.value === "none") {
+    if (e.target.value === "none") {
         id('channels').innerHTML = '<option>none</option>'
         id('msgdisplay').innerText = ''
         return;
@@ -62,17 +69,49 @@ ipcRenderer.on("cids", (event, arg) => {
     })
 })
 
+ipcRenderer.on("valid-token", (event, arg) => {
+    id('bs-helper').innerText = "success!"
+    id("bs-helper").style.color = "green"
+    loggedin = true;
+    setTimeout(() => {
+        id('userd').innerText = arg.user
+        dGids(arg.gids)
+    }, 1000)
+})
+ipcRenderer.on("invalid-token", (event, arg) => { // arg should be "invalid"
+    id('bs-helper').innerText = "client could not log in, try again"
+    id('bs-helper').style.color = "red"
+})
+ipcRenderer.on("cached", (event, arg) => {
+    console.log(arg)
+})
+
+if(conf) {
+    for(let i in conf) {
+        let r = document.createElement("ul")
+        r.classList.add("tcache")
+        r.innerText = i;
+        r.addEventListener("click", () => {
+            ipcRenderer.send("startbot", conf[i])
+        })
+        id('cached').appendChild(r)
+        console.log(conf[i])
+    }
+}
+
 id('bot-secret').addEventListener("keypress", e => {
-    if(e.keyCode != 13) return;
+    if (e.keyCode != 13) return;
+    if (!e.target.value) return;
     ipcRenderer.send("startbot", e.target.value)
-    id('bs').style.display = "none"
-    document.querySelector('.container').style.display = "block"
 })
 
 id("msgin").addEventListener("keypress", e => {
     if (e.keyCode !== 13) return;
-    if(id("channels").value === "")
+    if (!e.target.value) return;
+    id('bs-helper').innerText = ''
     currentchannel = ccids[cna.indexOf(id('channels').value)]
+    if(!id('channels').value) currentchannel = ccids[0]
+    console.log(currentchannel)
     ipcRenderer.send("msgin", {
         msg: id("msgin").value,
         channel: currentchannel

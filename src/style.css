@@ -1,7 +1,6 @@
-body {  }
+/* body {  } */
 
 #msgdisplay {
-    border:1px solid black;
     width:20em;
     height:20em;
     margin:auto;
@@ -11,3 +10,14 @@ body {  }
 }
 
 .png { color:red; }
+
+input[type="dropdown"]
+
+#bot-secret { width:25em !important; margin-left:5em; }
+
+.tcache {
+    font-size:18px;
+    padding:8px;
+    border:1px solid grey;
+    cursor:pointer;
+}

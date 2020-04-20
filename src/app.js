@@ -1,5 +1,13 @@
+/* TODO:
+  - messages show up only for current channel
+  - better guild/channel selection
+  - images???
+  - better UI in general
+*/
+
 const { app, BrowserWindow, ipcMain } = require('electron')
 let ps = require("./ps.js")
+const conf = require('./config.json')
 let win;
 
 function createWindow() {
@@ -22,4 +30,5 @@ app.whenReady().then(() => {
   ipcMain.on("startbot", (event, tok) => {
     ps.init(win, tok)
   })
+  if(conf) window.webContents.send("cached", conf)
 })

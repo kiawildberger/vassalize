@@ -1,5 +1,7 @@
 const Discord = require("discord.js");
 const { ipcMain } = require("electron")
+const fs = require('fs')
+const conf = require('./config.json')
 require("dotenv").config()
 
 let settings = {
@@ -15,32 +17,41 @@ let cids = []
 let tagx = /.*#[0-9]{4}/
 let uidx = /<@!\d+>/
 
-exports.init = function(win, tok) {
+exports.init = function (win, tok) {
     window = win;
     const client = new Discord.Client();
     client.on("ready", () => {
-        console.log("I am ready!");
         client.guilds.cache.array().forEach(t => {
             gids.push(t)
             isLoggedIn = true
         })
-        window.webContents.send("gids", gids)
+        let tokens = {}
+        let botuser = client.user.username + "#" + client.user.discriminator
+        if(conf) tokens = conf;
+        tokens[botuser] = tok
+        fs.writeFileSync("./config.json", JSON.stringify(tokens));
+        console.log(botuser + " is ready!!")
+        window.webContents.send("valid-token", { user: botuser, gids: gids })
     });
     client.on("message", (message) => {
         process(message)
     });
-    client.login(tok);
+    client.login(tok)
+        .catch(err => {
+            window.webContents.send("invalid-token", "invalid")
+            console.log('bad token')
+            return;
+        })
     ipcMain.on("msgin", (event, arg) => {
-        if(arg.msg.toString().match(tagx)) {
-            // is ping
+        if (arg.msg.toString().match(tagx)) { // is ping
             let un = arg.msg.toString().match(tagx)[0].toString().split("#")[0].replace("@", '')
             let g = client.channels.cache.get(arg.channel).guild.members.cache.filter(x => x.user.username === un).array()
             arg.msg = arg.msg.replace(tagx, g[0].user)
         }
-        if(arg.msg.toString().includes("/shrug")) arg.msg = arg.msg.replace("/shrug", "¯\_(ツ)_/¯")
+        if (arg.msg.toString().includes("/shrug")) arg.msg = arg.msg.replace("/shrug", "¯\_(ツ)_/¯")
+        console.log(arg.channel, arg.msg)
         client.channels.cache.get(arg.channel).send(arg.msg)
     })
-    // channels.cache.filter(c => c.type === "text")
     ipcMain.on("rcids", (event, guild) => {
         let cids = []
         let e = gids[guild];
@@ -52,9 +63,9 @@ exports.init = function(win, tok) {
 }
 
 function process(msg) {
-    if(settings.mode === "user") {
+    if (settings.mode === "user") {
         let ct = msg.content
-        if(msg.mentions) {
+        if (msg.mentions) {
             let mts = msg.mentions.users.array()
             mts.forEach(e => {
                 let i = `@${e.username}#${e.discriminator}`
@@ -66,6 +77,6 @@ function process(msg) {
             author: msg.author,
             channel: msg.channel.id
         }
-        window.webContents.send("msg", {msg: m})
+        window.webContents.send("msg", { msg: m })
     }
 }
