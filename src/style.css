@@ -11,13 +11,31 @@
 
 .png { color:red; }
 
-input[type="dropdown"]
+input[type="dropdown"] {
+    width:50%;
+}
 
-#bot-secret { width:25em !important; margin-left:5em; }
+#bs { width:25em !important; margin-left:5em; }
+label[for="bot-secret"], #bot-secret { display:inline; }
+#bs-helper { margin-left:5em;margin-top:1em; }
+#msgdisplay { border:1px solid grey; margin:0.8em; }
+#userd { margin-top:1em; }
+#errout{ color:red; font-size:14px; }
+
+.user-img {
+    width:150px;
+    margin-left:1em;
+    border-left:2px solid green;
+    padding-left:4px;
+}
 
 .tcache {
     font-size:18px;
     padding:8px;
+    padding-right:2em;
     border:1px solid grey;
     cursor:pointer;
+    width:fit-content;
+    margin:0 3em 0 3em;
+    margin-bottom:0.5em;
 }

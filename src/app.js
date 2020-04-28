@@ -1,7 +1,6 @@
 /* TODO:
-  - better guild/channel selection
   - images (no video though)
-  - better UI in general
+  - decrease width of cached token <ul> and guild/channel selects
   - mess around with guild invites, see if i can get client to join when user sends invite link /shrug
 */
 

@@ -61,31 +61,46 @@ exports.init = function (win, tok) {
         window.webContents.send("cids", cids)
     })
     ipcMain.on("cachedmessages", (event, arg) => {
-        let b = client.channels.cache.get(arg).messages.fetch().then((resp) => {
-            let t = resp.array()
-            t.length = 10
-            t = t.reverse()
-            t.forEach(msg => {
-                let ct = msg.content
-                if (msg.mentions) {
-                    let mts = msg.mentions.users.array()
-                    mts.forEach(e => {
-                        let i = `@${e.username}#${e.discriminator}`
-                        ct = ct.replace(uidx, i)
-                    })
+        let b = client.channels.cache.get(arg)
+        if (b) {
+            b.messages.fetch().then((resp) => {
+                let t = resp.array()
+                t.length = 10
+                t = t.reverse()
+                t.forEach(msg => {
+                    let ct = msg.content
+                    if (msg.mentions) {
+                        let mts = msg.mentions.users.array()
+                        mts.forEach(e => {
+                            let i = `@${e.username}#${e.discriminator}`
+                            ct = ct.replace(uidx, i)
+                        })
+                    }
+                    let m = {
+                        content: ct,
+                        author: msg.author,
+                        channel: msg.channel.id
+                    }
+                    if (t.indexOf(msg) === t.length - 1) {
+                        if (msg.attachments) {
+                            m.images = []
+                            msg.attachments.array().forEach(e => {
+                                m.images.push(e.url)
+                            })
+                        }
+                    }
+                    setTimeout(() => {
+                        window.webContents.send("msg", { msg: m })
+                    }, 100)
+                })
+            }).catch(shit => {
+                if (shit.name === "DiscordAPIError" && shit.message === "Missing Access") {
+                    window.webContents.send("apierror", "missing access")
                 }
-                let m = {
-                    content: ct,
-                    author: msg.author,
-                    channel: msg.channel.id
-                }
-                setTimeout(() => {
-                    window.webContents.send("msg", { msg: m })
-                }, 100)
             })
-        }).catch(shit => {
-            console.log(shit)
-        })
+        } else { // could not fetch messages for some unknown reason
+            window.webContents.send("apierror", {custom: "could not fetch messages ¯\_(ツ)_/¯"})
+        }
     })
 }
 

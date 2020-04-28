@@ -6,9 +6,9 @@
 
 <body>
     <div id="bs">
-        <label for="bot-secret" style="display:inline;">bot secret: </label>
-        <input id="bot-secret" type="password" style="width:25em; display:inline-block;">
-        <div id="bs-helper" style="margin-left:5em;margin-top:1em;"></div><br><br>
+        <label for="bot-secret">bot secret: </label>
+        <input id="bot-secret" type="password">
+        <div id="bs-helper"></div><br><br>
         <div id="cached"></div>
     </div>
     <div class="container" style="display:none;">
@@ -20,6 +20,7 @@
             <label for="channels">active channel:</label>
             <select id="channels"></select>
         </div>
+        <span id="errout"></span>
         <div id="msgdisplay" class="collection"></div>
         <input id="msgin" type="text">
         <div id="userd"></div>

@@ -23,10 +23,21 @@ ipcRenderer.on("msg", (event, arg) => {
                 })
                 ct = ct.replace(/@.*#\d{4}/, sp.join(" "))
             }
+            let isimg = false;
             ul.innerHTML = arg.msg.author.username + "#" + arg.msg.author.discriminator + ": " + ct
+            if(arg.msg.images) {
+                isimg = true;
+                arg.msg.images.forEach(q => {
+                    let img = document.createElement("img")
+                    img.classList.add("user-img")
+                    img.src = q
+                    ul.appendChild(img)
+                    img.addEventListener("load", () => id('msgdisplay').scrollTop = id('msgdisplay').scrollHeight)
+                })
+            }
             ul.setAttribute("data-channel", arg.msg.channel)
             id("msgdisplay").appendChild(ul)
-            id('msgdisplay').scrollTop = id('msgdisplay').scrollHeight
+            if(!isimg) { id('msgdisplay').scrollTop = id('msgdisplay').scrollHeight }
         }
     })
 })
@@ -64,7 +75,7 @@ id('channels').addEventListener("change", () => {
     id('msgdisplay').innerText = ''
     currentchannel = ccids[cna.indexOf(id('channels').value)]
     ipcRenderer.send("cachedmessages", currentchannel)
-
+    id('errout').innerHTML = ''
 })
 
 ipcRenderer.on("cids", (event, arg) => {
@@ -89,11 +100,21 @@ ipcRenderer.on("valid-token", (event, arg) => {
         dGids(arg.gids)
     }, 1000)
 })
+
+ipcRenderer.on("apierror", (event, arg) => {
+    if(arg.custom) {
+        id('errout').innerHTML = arg.custom
+    }
+    if(arg === "missing access") {
+        id('errout').innerHTML = "cannot read message history - missing permissions"
+    }
+})
+
 ipcRenderer.on("invalid-token", (event, arg) => { // arg should be "invalid"
     id('bs-helper').innerText = "client could not log in, try again"
     id('bs-helper').style.color = "red"
 })
-ipcRenderer.on("cached", (event, arg) => {
+ipcRenderer.on("logpls", (event, arg) => {
     console.log(arg)
 })
 
