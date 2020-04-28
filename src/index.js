@@ -4,28 +4,33 @@ function id(e) { return document.getElementById(e) }
 
 let loggedin = false;
 
-ipcRenderer.on("msg", (event, arg) => {
-    let ul = document.createElement("ul")
-    ul.classList.add("msg")
-    ul.classList.add("collection-item")
-    let ct = arg.msg.content
-    let mt = ct.match(/.*#[0-9]{4}/)
-    if (mt) {
-        mt = mt[0]
-        mt = mt.split("@")
-        let sp = []
-        mt.forEach(e => {
-            if (e) sp.push(`<span class="png">@${e}</span>`)
-        })
-        ct = ct.replace(/@.*#\d{4}/, sp.join(" "))
-    }
-    ul.innerHTML = arg.msg.author.username + "#" + arg.msg.author.discriminator + ": " + ct
-    ul.setAttribute("data-channel", arg.msg.channel)
-    id("msgdisplay").appendChild(ul)
-    id('msgdisplay').scrollTop = id('msgdisplay').scrollHeight
-})
 
 let gids, gna = [], ccids = [], cna = [];
+ipcRenderer.on("msg", (event, arg) => {
+    ccids.forEach(e => {
+        if (e == arg.msg.channel) {
+            let ul = document.createElement("ul")
+            ul.classList.add("msg")
+            ul.classList.add("collection-item")
+            let ct = arg.msg.content
+            let mt = ct.match(/.*#[0-9]{4}/)
+            if (mt) {
+                mt = mt[0]
+                mt = mt.split("@")
+                let sp = []
+                mt.forEach(e => {
+                    if (e) sp.push(`<span class="png">@${e}</span>`)
+                })
+                ct = ct.replace(/@.*#\d{4}/, sp.join(" "))
+            }
+            ul.innerHTML = arg.msg.author.username + "#" + arg.msg.author.discriminator + ": " + ct
+            ul.setAttribute("data-channel", arg.msg.channel)
+            id("msgdisplay").appendChild(ul)
+            id('msgdisplay').scrollTop = id('msgdisplay').scrollHeight
+        }
+    })
+})
+
 function dGids(arg) {
     if (!loggedin) return;
     let nn = document.createElement('option')
@@ -55,7 +60,12 @@ id('guilds').addEventListener('change', e => {
     ipcRenderer.send("rcids", idx)
 })
 
-id('channels').addEventListener("change", () => id('msgdisplay').innerText = '')
+id('channels').addEventListener("change", () => {
+    id('msgdisplay').innerText = ''
+    currentchannel = ccids[cna.indexOf(id('channels').value)]
+    ipcRenderer.send("cachedmessages", currentchannel)
+
+})
 
 ipcRenderer.on("cids", (event, arg) => {
     id('channels').innerHTML = ''
@@ -67,6 +77,7 @@ ipcRenderer.on("cids", (event, arg) => {
         ccids.push(e.id)
         cna.push(e.name)
     })
+    id("channels").dispatchEvent(new Event("change"))
 })
 
 ipcRenderer.on("valid-token", (event, arg) => {
@@ -86,8 +97,8 @@ ipcRenderer.on("cached", (event, arg) => {
     console.log(arg)
 })
 
-if(conf) {
-    for(let i in conf) {
+if (conf) {
+    for (let i in conf) {
         let r = document.createElement("ul")
         r.classList.add("tcache")
         r.innerText = i;
@@ -95,7 +106,6 @@ if(conf) {
             ipcRenderer.send("startbot", conf[i])
         })
         id('cached').appendChild(r)
-        console.log(conf[i])
     }
 }
 
@@ -110,7 +120,7 @@ id("msgin").addEventListener("keypress", e => {
     if (!e.target.value) return;
     id('bs-helper').innerText = ''
     currentchannel = ccids[cna.indexOf(id('channels').value)]
-    if(!id('channels').value) currentchannel = ccids[0]
+    if (!id('channels').value) currentchannel = ccids[0]
     console.log(currentchannel)
     ipcRenderer.send("msgin", {
         msg: id("msgin").value,

@@ -27,7 +27,7 @@ exports.init = function (win, tok) {
         })
         let tokens = {}
         let botuser = client.user.username + "#" + client.user.discriminator
-        if(conf) tokens = conf;
+        if (conf) tokens = conf;
         tokens[botuser] = tok
         fs.writeFileSync("./config.json", JSON.stringify(tokens));
         console.log(botuser + " is ready!!")
@@ -59,6 +59,33 @@ exports.init = function (win, tok) {
             cids.push(r)
         })
         window.webContents.send("cids", cids)
+    })
+    ipcMain.on("cachedmessages", (event, arg) => {
+        let b = client.channels.cache.get(arg).messages.fetch().then((resp) => {
+            let t = resp.array()
+            t.length = 10
+            t = t.reverse()
+            t.forEach(msg => {
+                let ct = msg.content
+                if (msg.mentions) {
+                    let mts = msg.mentions.users.array()
+                    mts.forEach(e => {
+                        let i = `@${e.username}#${e.discriminator}`
+                        ct = ct.replace(uidx, i)
+                    })
+                }
+                let m = {
+                    content: ct,
+                    author: msg.author,
+                    channel: msg.channel.id
+                }
+                setTimeout(() => {
+                    window.webContents.send("msg", { msg: m })
+                }, 100)
+            })
+        }).catch(shit => {
+            console.log(shit)
+        })
     })
 }
 
