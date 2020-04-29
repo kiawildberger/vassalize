@@ -5,6 +5,12 @@
 </head>
 
 <body>
+    <div id="options" style="display:none;">
+        <input type="button" id="clearcache" value="clear cache"><br>
+        <label for="clearcache" style="display:none;">cache cleared!</label>
+
+        <br><input type="button" id="leaveopts" value="back">
+    </div>
     <div id="bs">
         <label for="bot-secret">bot secret: </label>
         <input id="bot-secret" type="password">
@@ -13,6 +19,7 @@
         <div id="cached"></div>
     </div>
     <div class="container" style="display:none;">
+        <div id="topt">options</div>
         <div id="guild-container">
             <label for="guilds">active guild:</label>
             <select id="guilds"></select>

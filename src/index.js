@@ -1,4 +1,5 @@
 const { ipcRenderer } = require("electron")
+const fs = require('fs')
 let conf = require('./config.json')
 function id(e) { return document.getElementById(e) }
 
@@ -154,4 +155,16 @@ id("msgin").addEventListener("keypress", e => {
         channel: currentchannel
     })
     id('msgin').value = ""
+})
+
+id('topt').addEventListener('click', () => {
+    id('options').style.display = "block"
+})
+id("leaveopts").addEventListener("click", () => {
+    id('options').style.display = "none"
+})
+id('clearcache').addEventListener("click", () => {
+    fs.writeFileSync("./config.json", "{ }")
+    document.querySelector("label[for='clearcache']").style.display = 'block'
+    setTimeout(() => document.querySelector("label[for='clearcache']").style.display = 'none', 1500)
 })
