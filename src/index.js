@@ -7,6 +7,7 @@ let loggedin = false;
 
 let gids, gna = [], ccids = [], cna = [];
 ipcRenderer.on("msg", (event, arg) => {
+    console.log(arg)
     ccids.forEach(e => {
         if (e == arg.msg.channel) {
             let ul = document.createElement("ul")
@@ -96,9 +97,10 @@ ipcRenderer.on("valid-token", (event, arg) => {
     id("bs-helper").style.color = "green"
     loggedin = true;
     setTimeout(() => {
-        id('userd').innerText = arg.user
+        id('userd').innerHTML = `acting as <b>${arg.user}</b>`
+        document.title = arg.user
         dGids(arg.gids)
-    }, 1000)
+    }, 800)
 })
 
 ipcRenderer.on("apierror", (event, arg) => {
@@ -134,6 +136,10 @@ id('bot-secret').addEventListener("keypress", e => {
     if (e.keyCode != 13) return;
     if (!e.target.value) return;
     ipcRenderer.send("startbot", e.target.value)
+})
+id('bs-btn').addEventListener("click", e => {
+    if (!e.target.value) return;
+    ipcRenderer.send("startbot", id("bot-secret").value)
 })
 
 id("msgin").addEventListener("keypress", e => {

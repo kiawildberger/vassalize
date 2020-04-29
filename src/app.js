@@ -1,9 +1,3 @@
-/* TODO:
-  - images (no video though)
-  - decrease width of cached token <ul> and guild/channel selects
-  - mess around with guild invites, see if i can get client to join when user sends invite link /shrug
-*/
-
 const { app, BrowserWindow, ipcMain } = require('electron')
 let ps = require("./ps.js")
 const conf = require('./config.json')
@@ -13,7 +7,7 @@ function createWindow() {
   win = new BrowserWindow({
     width: 800,
     height: 600,
-    icon: "./rbr.jpg",
+    icon: "./icon.png",
     webPreferences: {
       nodeIntegration: true
     }
@@ -21,7 +15,7 @@ function createWindow() {
   win.loadFile('index.html')
   win.setMenu(null)
   win.webContents.send("gal-data", {a:'b'})
-  win.webContents.openDevTools()
+  // win.webContents.openDevTools()
 }
 
 app.whenReady().then(() => {

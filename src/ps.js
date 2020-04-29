@@ -16,6 +16,7 @@ let gids = []
 let cids = []
 let tagx = /.*#[0-9]{4}/
 let uidx = /<@!\d+>/
+let cmessagelength = 15;
 
 exports.init = function (win, tok) {
     window = win;
@@ -65,7 +66,7 @@ exports.init = function (win, tok) {
         if (b) {
             b.messages.fetch().then((resp) => {
                 let t = resp.array()
-                t.length = 10
+                t.length = cmessagelength
                 t = t.reverse()
                 t.forEach(msg => {
                     let ct = msg.content
@@ -120,5 +121,8 @@ function process(msg) {
             channel: msg.channel.id
         }
         window.webContents.send("msg", { msg: m })
+        if(msg.content.includes("discord.gg")) {
+            console.log(msg)
+        }
     }
 }

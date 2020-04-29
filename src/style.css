@@ -1,33 +1,25 @@
-/* body {  } */
+body { width:100%; height:100%; overflow:hidden; }
 
 #msgdisplay {
-    width:20em;
+    width:100%;
     height:20em;
     margin:auto;
-    overflow-y: scroll;
+    overflow-y: auto;
     position:relative;
     bottom:0;
 }
-
 .png { color:red; }
-
-input[type="dropdown"] {
-    width:50%;
-}
-
-#bs { width:25em !important; margin-left:5em; }
+input[type="dropdown"] { width:50%; }
+#bs { width:25em !important; margin-left:5em; margin-top:2em; }
 label[for="bot-secret"], #bot-secret { display:inline; }
 #bs-helper { margin-left:5em;margin-top:1em; }
 #msgdisplay { border:1px solid grey; margin:0.8em; }
 #userd { margin-top:1em; }
 #errout{ color:red; font-size:14px; }
-
-.user-img {
-    width:150px;
-    margin-left:1em;
-    border-left:2px solid green;
-    padding-left:4px;
-}
+#bs-btn { outline: none; position:fixed; margin-left:0.5em; }
+#cached { overflow-y:auto; }
+select { width:10em; }
+.user-img { width:150px; margin-left:1em; border-left:2px solid green; padding-left:4px; }
 
 .tcache {
     font-size:18px;
