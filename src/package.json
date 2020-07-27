@@ -21,6 +21,6 @@
   "dependencies": {
     "discord.js": "^12.1.1",
     "dotenv": "^8.2.0",
-    "electron": "^8.2.2"
+    "electron": "^8.2.4"
   }
 }
