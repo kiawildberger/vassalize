@@ -6,10 +6,13 @@
 
 <body>
     <div id="options" style="display:none;">
-        <input type="button" id="clearcache" value="clear cache"><br>
-        <label for="clearcache" style="display:none;">cache cleared!</label>
+        <label for="cachedlength" style="display:inline;">messages initially loaded from a channel:  </label>
+        <input type="number" id="cachedlength" value="15" style="display:inline; width:5em;" min="5" max="50">
 
-        <br><input type="button" id="leaveopts" value="back">
+
+        <br><br><input type="button" id="clearcache" value="clear cache"><br>
+        <label for="clearcache" style="display:none;">cache cleared!</label>
+        <br><input type="button" id="leaveopts" value="save & return">
     </div>
     <div id="bs">
         <label for="bot-secret">bot secret: </label>

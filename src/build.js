@@ -8,8 +8,8 @@ const options = {
   arch: 'x64',
   name: 'rubber',
   dir: '.',
-  icon: "rbr.jpg",
-  out: '../build/',
+  icon: "icon.ico",
+  out: '../',
   overwrite: true,
   asar: true,
   prune: true,
@@ -18,7 +18,8 @@ const options = {
     "src/ps.js",
     "src/index.html",
     "src/index.js",
-    "src/style.css"
+    "src/style.css",
+    // "src/config.json"
   ]
 }
 

@@ -26,6 +26,11 @@ select { width:10em; }
 #leaveopts { position:absolute; right:0; bottom:0; }
 label[for="clearcache"] { color:coral; font-size:14px; margin-left:1em; }
 
+#options {
+    margin-left:2.5em;
+    margin-top:1em;
+}
+
 #options > input[type="button"] {
     margin:0.5em;
     outline:none;

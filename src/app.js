@@ -15,7 +15,7 @@ function createWindow() {
   win.loadFile('index.html')
   win.setMenu(null)
   win.webContents.send("gal-data", {a:'b'})
-  // win.webContents.openDevTools()
+  win.webContents.openDevTools()
 }
 
 app.whenReady().then(() => {
@@ -25,3 +25,24 @@ app.whenReady().then(() => {
   })
   if(conf) window.webContents.send("cached", conf)
 })
+
+/*
+TODO:
+ - general polish
+ - images display from cached messages
+ - better styling/fonts
+ - make pings for other users less POP and pings for bot actor very noticeable
+ - display embeds (yt videos, webpage metadata, just straight embeds)
+ - 
+
+MAYBE:
+  - pfps
+  - full discord styling
+  - typing indicator (can enable/disable)
+  - status updater
+  - minimize to tray to keep bot hosting and online but window closed
+  - scripts (user provides a js file with commands/event handlers)
+  - sending embeds
+  - brute force fucker for bot tokens lmao
+  - search
+*/

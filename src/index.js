@@ -1,14 +1,27 @@
 const { ipcRenderer } = require("electron")
 const fs = require('fs')
 let conf = require('./config.json')
+let confp = require.resolve('./config.json')
+let Rsettings = require("./settings.json")
+console.log(confp)
+console.log(conf)
 function id(e) { return document.getElementById(e) }
 
 let loggedin = false;
 
 
-let gids, gna = [], ccids = [], cna = [];
+// populate settings with appropriate values
+if (Rsettings.cachedlength) id('cachedlength').value = Rsettings.cachedlength
+
+if (!conf[0]) {
+    id("clearcache").disabled = true;
+    id("clearcache").setAttribute('title', 'its empty anyways')
+}
+
+
+let gids, gna = [], ccids = [], cna = []; // gids is guild ids, gna is guild names, ccids is channel ids and cna is channel names
 ipcRenderer.on("msg", (event, arg) => {
-    console.log(arg)
+    // console.log(arg)
     ccids.forEach(e => {
         if (e == arg.msg.channel) {
             let ul = document.createElement("ul")
@@ -44,7 +57,7 @@ ipcRenderer.on("msg", (event, arg) => {
     })
 })
 
-function dGids(arg) {
+function dGids(arg) { // generates and populates guild list..?
     if (!loggedin) return;
     let nn = document.createElement('option')
     nn.setAttribute("value", "none")
@@ -76,7 +89,7 @@ id('guilds').addEventListener('change', e => {
 id('channels').addEventListener("change", () => {
     id('msgdisplay').innerText = ''
     currentchannel = ccids[cna.indexOf(id('channels').value)]
-    ipcRenderer.send("cachedmessages", currentchannel)
+    ipcRenderer.send("cachedmessages", currentchannel, Rsettings.cachedlength)
     id('errout').innerHTML = ''
 })
 
@@ -149,7 +162,7 @@ id("msgin").addEventListener("keypress", e => {
     id('bs-helper').innerText = ''
     currentchannel = ccids[cna.indexOf(id('channels').value)]
     if (!id('channels').value) currentchannel = ccids[0]
-    console.log(currentchannel)
+    // console.log(currentchannel)
     ipcRenderer.send("msgin", {
         msg: id("msgin").value,
         channel: currentchannel
@@ -160,8 +173,12 @@ id("msgin").addEventListener("keypress", e => {
 id('topt').addEventListener('click', () => {
     id('options').style.display = "block"
 })
-id("leaveopts").addEventListener("click", () => {
+id("leaveopts").addEventListener("click", () => { // write settings to settings.json
     id('options').style.display = "none"
+    let settings = {
+        cachedlength: id("cachedlength").value
+    }
+    fs.writeFileSync("./settings.json", JSON.stringify(settings))
 })
 id('clearcache').addEventListener("click", () => {
     fs.writeFileSync("./config.json", "{ }")

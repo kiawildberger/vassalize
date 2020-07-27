@@ -2,6 +2,7 @@ const Discord = require("discord.js");
 const { ipcMain } = require("electron")
 const fs = require('fs')
 const conf = require('./config.json')
+let Rsettings = require("./settings.json")
 require("dotenv").config()
 
 let settings = {
@@ -16,7 +17,6 @@ let gids = []
 let cids = []
 let tagx = /.*#[0-9]{4}/
 let uidx = /<@!\d+>/
-let cmessagelength = 15;
 
 exports.init = function (win, tok) {
     window = win;
@@ -66,7 +66,7 @@ exports.init = function (win, tok) {
         if (b) {
             b.messages.fetch().then((resp) => {
                 let t = resp.array()
-                t.length = cmessagelength
+                t.length = Rsettings.cachedlength
                 t = t.reverse()
                 t.forEach(msg => {
                     let ct = msg.content
