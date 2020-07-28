@@ -1,5 +1,5 @@
 const Discord = require("discord.js");
-const { ipcMain } = require("electron")
+const { ipcMain, desktopCapturer } = require("electron")
 const fs = require('fs')
 const conf = require('./config.json')
 let Rsettings = require("./settings.json")
@@ -10,6 +10,7 @@ let settings = {
     defaultprefix: ".",
     prefix: "."
 }
+let uinfo = {}
 let window;
 let lastmessage;
 let isLoggedIn = false
@@ -28,14 +29,20 @@ exports.init = function (win, tok) {
         })
         let tokens = {}
         let botuser = client.user.username + "#" + client.user.discriminator
+        uinfo = {
+            name: client.user.username,
+            discrim: client.user.discriminator,
+            full: botuser
+        }
         if (conf) tokens = conf;
         tokens[botuser] = tok
         fs.writeFileSync("./config.json", JSON.stringify(tokens));
         console.log(botuser + " is ready!!")
-        window.webContents.send("valid-token", { user: botuser, gids: gids })
+        window.webContents.send("valid-token", { user: uinfo, gids: gids })
     });
     client.on("message", (message) => {
         process(message)
+        console.log(message)
     });
     client.login(tok)
         .catch(err => {
@@ -82,13 +89,13 @@ exports.init = function (win, tok) {
                         author: msg.author,
                         channel: msg.channel.id
                     }
-                    if (t.indexOf(msg) === t.length - 1) {
-                        if (msg.attachments) {
-                            m.images = []
-                            msg.attachments.array().forEach(e => {
-                                m.images.push(e.url)
-                            })
-                        }
+                    if(msg.attachments) {
+                        let d = msg.attachments.array()
+                        d.forEach(e => {
+                            e = e.url
+                        })
+                        m.images = d
+                        console.log(m.images)
                     }
                     setTimeout(() => {
                         window.webContents.send("msg", { msg: m })
@@ -100,29 +107,30 @@ exports.init = function (win, tok) {
                 }
             })
         } else { // could not fetch messages for some unknown reason
-            window.webContents.send("apierror", {custom: "could not fetch messages ¯\_(ツ)_/¯"})
+            window.webContents.send("apierror", { custom: "could not fetch messages ¯\\_(ツ)_/¯" })
         }
     })
 }
 
 function process(msg) {
-    if (settings.mode === "user") {
-        let ct = msg.content
-        if (msg.mentions) {
-            let mts = msg.mentions.users.array()
-            mts.forEach(e => {
-                let i = `@${e.username}#${e.discriminator}`
-                ct = ct.replace(uidx, i)
-            })
-        }
-        let m = {
-            content: ct,
-            author: msg.author,
-            channel: msg.channel.id
-        }
-        window.webContents.send("msg", { msg: m })
-        if(msg.content.includes("discord.gg")) {
-            console.log(msg)
-        }
+    let ct = msg.content
+    if (msg.mentions) {
+        let mts = msg.mentions.users.array()
+        mts.forEach(e => {
+            let i = `@${e.username}#${e.discriminator}`
+            ct = ct.replace(uidx, i)
+        })
+    }
+    let m = {
+        content: ct,
+        author: msg.author,
+        channel: msg.channel.id
+    }
+    if (msg.attachments.size) {
+        m.images = msg.attachments.array()
+    }
+    window.webContents.send("msg", { msg: m })
+    if (msg.content.includes("discord.gg")) {
+        console.log(msg)
     }
 }

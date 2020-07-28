@@ -1,13 +1,15 @@
-const { ipcRenderer } = require("electron")
+const { ipcRenderer, shell } = require("electron")
 const fs = require('fs')
+const ps = require("./ps")
 let conf = require('./config.json')
 let confp = require.resolve('./config.json')
 let Rsettings = require("./settings.json")
-console.log(confp)
-console.log(conf)
+let botActor;
 function id(e) { return document.getElementById(e) }
 
 let loggedin = false;
+let cdnUrl = /https?:\/\/cdn.discordapp.com\/attachments\/\d+\/\d+\/[a-zA-Z0-9_-]+\.[a-zA-Z]{2,5}/g
+let imagetypes = ["jpg", "JPG", 'png', 'PNG', 'gif', 'GIF', 'webp', 'WEBP', 'tiff', 'TIFF', 'jpeg', 'JPEG', 'svg', 'SVG']
 
 
 // populate settings with appropriate values
@@ -18,11 +20,13 @@ if (!conf[0]) {
     id("clearcache").setAttribute('title', 'its empty anyways')
 }
 
+// voice?
 
-let gids, gna = [], ccids = [], cna = []; // gids is guild ids, gna is guild names, ccids is channel ids and cna is channel names
-ipcRenderer.on("msg", (event, arg) => {
-    // console.log(arg)
-    ccids.forEach(e => {
+let gids, gna = [], ccids = [], cna = [], vcids = [], vcna = []; // gids is guild ids, gna is guild names, ccids is channel ids and cna is channel names
+ipcRenderer.on("msg", processmsg)
+function processmsg(event, arg) {
+    // console.log(arg.msg)
+        let e = ccids[cna.indexOf(id('channels').value)]
         if (e == arg.msg.channel) {
             let ul = document.createElement("ul")
             ul.classList.add("msg")
@@ -34,28 +38,48 @@ ipcRenderer.on("msg", (event, arg) => {
                 mt = mt.split("@")
                 let sp = []
                 mt.forEach(e => {
-                    if (e) sp.push(`<span class="png">@${e}</span>`)
+                    if (e && e !== botActor.full) sp.push(`<span class="ping">@${e}</span>`)
+                    if(e && e === botActor.full) sp.push(`<span class="selfping">@${e}</span>`)
                 })
                 ct = ct.replace(/@.*#\d{4}/, sp.join(" "))
             }
             let isimg = false;
             ul.innerHTML = arg.msg.author.username + "#" + arg.msg.author.discriminator + ": " + ct
-            if(arg.msg.images) {
+            if (arg.msg.images) {
                 isimg = true;
                 arg.msg.images.forEach(q => {
                     let img = document.createElement("img")
                     img.classList.add("user-img")
-                    img.src = q
+                    img.src = q.url
+                    img.title = q.url
                     ul.appendChild(img)
+                    img.addEventListener('click', () => { shell.openExternal(q.url) }) // shell.openExternal opens links in default browser, not electron
                     img.addEventListener("load", () => id('msgdisplay').scrollTop = id('msgdisplay').scrollHeight)
+                    // i guess the failed image doesn't send an error event???
+                    // img.addEventListener("error", () => { img.tagName = "p"; img.textContent = "failed to load image" })
+                })
+            }
+            if(arg.msg.content.match(cdnUrl)) {
+                arg.msg.content.match(cdnUrl).forEach(e => {
+                    let d = e.split('.')
+                    d = d[d.length-1]
+                    console.log(d)
+                    if(imagetypes.includes(d)) { // is an image we support and want to use
+                        let img = document.createElement('img')
+                        img.classList.add('user-img')
+                        img.src = e
+                        img.title = e
+                        img.addEventListener('click', () => { shell.openExternal(e) })
+                        ul.appendChild(img)
+                        img.addEventListener("load", () => id('msgdisplay').scrollTop = id('msgdisplay').scrollHeight)
+                    }
                 })
             }
             ul.setAttribute("data-channel", arg.msg.channel)
             id("msgdisplay").appendChild(ul)
-            if(!isimg) { id('msgdisplay').scrollTop = id('msgdisplay').scrollHeight }
+            if (!isimg) { id('msgdisplay').scrollTop = id('msgdisplay').scrollHeight }
         }
-    })
-})
+}
 
 function dGids(arg) { // generates and populates guild list..?
     if (!loggedin) return;
@@ -110,18 +134,19 @@ ipcRenderer.on("valid-token", (event, arg) => {
     id('bs-helper').innerText = "success!"
     id("bs-helper").style.color = "green"
     loggedin = true;
+    botActor = arg.user
     setTimeout(() => {
-        id('userd').innerHTML = `acting as <b>${arg.user}</b>`
-        document.title = arg.user
+        id('userd').innerHTML = `acting as <b>${arg.user.full}</b>`
+        document.title = arg.user.full
         dGids(arg.gids)
     }, 800)
 })
 
 ipcRenderer.on("apierror", (event, arg) => {
-    if(arg.custom) {
+    if (arg.custom) {
         id('errout').innerHTML = arg.custom
     }
-    if(arg === "missing access") {
+    if (arg === "missing access") {
         id('errout').innerHTML = "cannot read message history - missing permissions"
     }
 })
