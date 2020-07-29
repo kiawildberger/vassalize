@@ -37,12 +37,10 @@ exports.init = function (win, tok) {
         if (conf) tokens = conf;
         tokens[botuser] = tok
         fs.writeFileSync("./config.json", JSON.stringify(tokens));
-        console.log(botuser + " is ready!!")
         window.webContents.send("valid-token", { user: uinfo, gids: gids })
     });
     client.on("message", (message) => {
         process(message)
-        console.log(message)
     });
     client.login(tok)
         .catch(err => {
@@ -95,7 +93,6 @@ exports.init = function (win, tok) {
                             e = e.url
                         })
                         m.images = d
-                        console.log(m.images)
                     }
                     setTimeout(() => {
                         window.webContents.send("msg", { msg: m })

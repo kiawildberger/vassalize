@@ -32,7 +32,7 @@ app.whenReady().then(() => {
 TODO:
  - general polish
  x images display from cached messages
- - better styling/fonts
+ x better styling/fonts
  - send bot messages (from input on page) through discord instead of straight to the display (for fancy parsing like pings and images)
  x messages from other channels dont display when other channel is selected
  x make pings for other users less POP and pings for bot actor very noticeable
