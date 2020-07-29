@@ -103,9 +103,11 @@ id('guilds').addEventListener('change', e => {
     if (e.target.value === "none") {
         id('channels').innerHTML = '<option>none</option>'
         id('msgdisplay').innerText = ''
+        id('guild-channels').style.display = "none"
         return;
     }
     id('msgdisplay').innerText = ''
+    id('guild-channels').style.display = "block"
     let idx = gna.indexOf(e.target.value)
     ipcRenderer.send("rcids", idx)
 })
@@ -154,6 +156,9 @@ ipcRenderer.on("apierror", (event, arg) => {
 ipcRenderer.on("invalid-token", (event, arg) => { // arg should be "invalid"
     id('bs-helper').innerText = "client could not log in, try again"
     id('bs-helper').style.color = "red"
+    setTimeout(() => {
+        id('bs-helper').innerText = ''
+    }, 2000)
 })
 ipcRenderer.on("logpls", (event, arg) => {
     console.log(arg)
@@ -161,7 +166,8 @@ ipcRenderer.on("logpls", (event, arg) => {
 
 if (conf) {
     for (let i in conf) {
-        let r = document.createElement("ul")
+        let r = document.createElement("div")
+        if(id('no-recent-logins')) id('no-recent-logins').remove()
         r.classList.add("tcache")
         r.innerText = i;
         r.addEventListener("click", () => {
@@ -177,7 +183,8 @@ id('bot-secret').addEventListener("keypress", e => {
     ipcRenderer.send("startbot", e.target.value)
 })
 id('bs-btn').addEventListener("click", e => {
-    if (!e.target.value) return;
+    if(!id('bot-secret').value) return;
+    console.log(id('bot-secret').value)
     ipcRenderer.send("startbot", id("bot-secret").value)
 })
 
@@ -195,6 +202,13 @@ id("msgin").addEventListener("keypress", e => {
     id('msgin').value = ""
 })
 
+id('cached-btn').addEventListener('click', () => {
+    if(id('cached').style.display == 'block') {
+        id('cached').style.display = "none"
+    } else {
+        id('cached').style.display = "block"
+    }
+})
 id('topt').addEventListener('click', () => {
     id('options').style.display = "block"
 })

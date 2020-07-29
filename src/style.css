@@ -1,7 +1,12 @@
+@import url("https://fonts.googleapis.com/css?family=Ubuntu");
+
 body {
     width:100%;
     height:100%;
+    margin:0;
+    padding:0;
     overflow:hidden;
+    font-family:"ubuntu";
 }
 
 #msgdisplay {
@@ -15,15 +20,77 @@ body {
 .ping { color:#FA9A4B; }
 .selfping { color:#FA001A; background:#C5F9FA; }
 input[type="dropdown"] { width:50%; }
-#bs { width:25em !important; margin-left:5em; margin-top:2em; }
-label[for="bot-secret"], #bot-secret { display:inline; }
-#bs-helper { margin-left:5em;margin-top:1em; }
+#bs { 
+    width:100%;
+    height:100%;
+    padding-left:5em;
+    padding-top:2em;
+    background-color:#4A4D5D;
+}
+#bot-secret {
+    width:100%;
+    position:absolute;
+    height:2.5em;
+    outline:none;
+    border:1px solid #707070;
+    border-radius:30px;
+    padding-left:0.5em;
+}
+#bs-helper {
+    position:absolute;
+    top:60%;
+    left:27%;
+    font-family:"ubuntu";
+}
+.bs-input-container {
+    width:50%;
+    height:20%;
+    position:absolute;
+    top:65%;
+    left:25%;
+}
+#bs-btn {
+    position:absolute;
+    cursor:pointer;
+    top:0.26em;
+    right:0.5em;
+    margin-left:0.5em;
+    height:1.5em;
+    width:1.5em;
+}
+#cached-btn {
+    position:absolute;
+    cursor:pointer;
+    top:0.5em;
+    right:2.5em;
+    margin-left:0.5em;
+    height:1.2em;
+    width:1.2em;
+}
+#cached {
+    margin:3em 2em 0 2em;
+    background:rgba(255, 255, 255, 0.5);
+    border-radius:2px;
+    height:100%;
+    overflow-y: auto;
+}
+.tcache {
+    font-size:18px;
+    cursor:pointer;
+    width:fit-content;
+    margin:1em 3em 0 3em;
+}
+.tcache:hover {
+    font-weight:bold;
+}
+
 #msgdisplay { border:1px solid grey; margin:0.8em; }
 #userd { margin-top:1em; }
 #errout{ color:red; font-size:14px; }
-#bs-btn { outline: none; position:fixed; margin-left:0.5em; }
-#cached { overflow-y:auto; }
-select { width:10em; }
+select { 
+    width:10em;
+    /* background */
+}
 .user-img { width:150px; margin:0 0 1em 1em; border-left:2px solid green; padding-left:4px; display:block; }
 #topt { float:right; padding:0.5em; cursor:pointer; }
 #topt:hover {text-decoration:underline;}
@@ -39,15 +106,4 @@ label[for="clearcache"] { color:coral; font-size:14px; margin-left:1em; }
 #options > input[type="button"] {
     margin:0.5em;
     outline:none;
-}
-
-.tcache {
-    font-size:18px;
-    padding:8px;
-    padding-right:2em;
-    border:1px solid grey;
-    cursor:pointer;
-    width:fit-content;
-    margin:0 3em 0 3em;
-    margin-bottom:0.5em;
 }
