@@ -32,14 +32,14 @@ app.whenReady().then(() => {
 /*
 TODO:
  - general polish
- x images display from cached messages
- x better styling/fonts
- - send bot messages (from input on page) through discord instead of straight to the display (for fancy parsing like pings and images)
- x messages from other channels dont display when other channel is selected
- x make pings for other users less POP and pings for bot actor very noticeable
+ - show user avatars and generally neaten up the displaying of messages
+ - some weird shit happening with pings like with the terraria message in summer 2950 #events
+ - show user-uploaded videos (add on to images, i think message.attachments)
+ - maybe rethink the color scheme but idk
+ - reduce the spacing between servers
+ - server select div scroll on overflow
+ - little spinner when bot is trying to sign in, communicate to user that something is actually happening
  - display embeds (yt videos, webpage metadata, just straight embeds)
- - move away from chota (css)
-    - use Open Sans or smthn
  - load more messages as user scrolls up (button or auto)
 
 MAYBE:

@@ -5,15 +5,6 @@
 </head>
 
 <body>
-    <div id="options" style="display:none;">
-        <label for="cachedlength" style="display:inline;">messages initially loaded from a channel: </label>
-        <input type="number" id="cachedlength" value="15" style="display:inline;" min="5" max="50">
-
-
-        <br><br><input type="button" id="clearcache" value="clear cache"><br>
-        <label for="clearcache" style="display:none;">cache cleared!</label>
-        <br><input type="button" id="leaveopts" value="save & return">
-    </div>
     <div id="bs">
         <div id="bs-helper"></div>
         <div class="bs-input-container">
@@ -27,28 +18,34 @@
     </div>
     <div class="container" style="display:none;">
         <div id="topt">options</div>
-        <div id="guild-container">
+        <!-- <div id="guild-container">
             <label for="guilds">active guild:</label>
             <select id="guilds"></select>
         </div>
         <div id="guild-channels" style="display: none;">
             <label for="channels">active channel:</label>
             <select id="channels"></select>
-        </div>
-        <!-- <div  id="serverlist">
-            <div class="serverlist-label">servers</div>
-            <img class="serverlist-item" src="assets/check.svg">
-            <img class="serverlist-item" src="assets/check.svg">
-        </div>
-        <div id="channellist">
-            <div class="channel-label">channels</div>
-            <div class="channel-item">#general</div>
-            <div class="channel-item">#games</div>
         </div> -->
+        <div  id="serverlist">
+            <div class="serverlist-label">servers</div>
+        </div>
+        <div id="channellist" style="display:none;">
+            <div id="channel-triangle" style="top:17.5px;"></div>
+            <div class="channel-label">channels</div>
+        </div>
         <span id="errout"></span>
         <div id="msgdisplay" class="collection"></div>
         <input id="msgin" type="text">
         <div id="userd"></div>
+    </div>
+    <div id="options" style="display:none;">
+        <label for="cachedlength" style="display:inline;">messages initially loaded from a channel: </label>
+        <input type="number" id="cachedlength" value="15" style="display:inline;" min="5" max="50">
+
+
+        <br><br><input type="button" id="clearcache" value="clear cached tokens"><br>
+        <label for="clearcache" style="display:none;">tokens cleared!</label>
+        <br><input type="button" id="leaveopts" value="save & return">
     </div>
     <script src="index.js"></script>
 </body>

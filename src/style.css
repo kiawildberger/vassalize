@@ -1,4 +1,8 @@
-@import url("https://fonts.googleapis.com/css?family=Ubuntu");
+/* @import url("https://fonts.googleapis.com/css?family=Ubuntu"); */
+@font-face {
+    font-family:"Whitney";
+    src:url(fonts/whitney-medium.otf);
+}
 
 body {
     width:100%;
@@ -6,17 +10,31 @@ body {
     margin:0;
     padding:0;
     overflow:hidden;
-    font-family:"ubuntu";
+    /* font-family:"ubuntu"; */
+    font-family:Whitney,Helvetica Neue,Helvetica,Arial,sans-serif;
     background:#4A4D5D;
 }
 
 #msgdisplay {
-    width:100%;
-    height:20em;
-    margin:auto;
+    width:70%;
+    max-width:70%;
+    word-wrap: break-word;
+    height:80%;
     overflow-y: auto;
-    position:relative;
-    bottom:0;
+    position:absolute;
+    top:0;
+    right:0;
+    border:1px solid rgb(66, 66, 66);
+    /* i dont want a border in the end */
+    margin:1% 1% 0 0;
+}
+#msgin {
+    position:absolute;
+    right:6.3%;
+    width:65%;
+    height:35px;
+    top:85%;
+    outline:none;
 }
 .ping { color:#FA9A4B; }
 .selfping { color:#FA001A; background:#C5F9FA; }
@@ -88,14 +106,14 @@ body {
     width:100%;
     height:100%;
 }
-#msgdisplay { border:1px solid grey; margin:0.8em; }
-#userd { margin-top:1em; }
+#userd { position:absolute; bottom:0.2em; right:0.2em; }
 #errout{ color:red; font-size:14px; }
 
 
 #serverlist {
     position:absolute;
     left:0;
+    top:0;
     padding:0.5em;
     height:100%;
     border-right:1px solid #3a3b44;
@@ -110,33 +128,48 @@ body {
     height:50px;
     display:block;
     margin-bottom:25px;
+    cursor:pointer;
+    transition:border-radius 0.2s ease;
 }
+.serverlist-item:hover, .serverlist-active { border-radius:35%; }
 
 #channellist {
     background:#404040;
     width:15%;
-    height:65%;
+    padding:4px;
+    max-width: 15%;
+    word-wrap:break-word;
+    min-height:65%;
+    height:fit-content;
     position:absolute;
     top:3em;
-    left:6em;
+    left:4.75em;
+    overflow-y: auto;
 }
-.channel-triangle {
+#channel-triangle {
     /* is little mf triangle */
     position:absolute;
-    left:-1.5em;
+    left:-0.5em;
     /* top:attr(distance em 0); https://developer.mozilla.org/en-US/docs/Web/CSS/attr#Specifications */
     width:0;
     height:0;
-    border-top:1em solid transparent;
-    border-bottom:1em solid transparent;
-    border-right:1.5em solid #404040;
+    border-top:0.5em solid transparent;
+    border-bottom:0.5em solid transparent;
+    border-right:0.5em solid #404040;
 }
 .channel-label {
-
+    font-size:1.2em;
+    margin-bottom:4px;
+    padding:4px;
+    padding-bottom:6px;
+    border-bottom:1px solid black;
 }
 .channel-item {
-
+    font-size:1em;
+    margin-bottom:2px;
+    cursor:pointer;
 }
+.channel-item:hover { font-weight:bold; }
 
 
 
@@ -144,9 +177,9 @@ select {
     width:10em;
 }
 .user-img { width:150px; margin:0 0 1em 1em; border-left:2px solid green; padding-left:4px; display:block; }
-#topt { float:right; padding:0.5em; cursor:pointer; }
+#topt { position:absolute; bottom: 0; cursor:pointer; padding:6px 6px 6px 6px; z-index:2; background-color:#4A4D5D; }
 #topt:hover {text-decoration:underline;}
-#options { width:100%; height:100%; z-index:69; }
+#options { width:100%; height:100%; z-index:69; background:#4A4D5D; }
 #leaveopts { position:absolute; right:0; bottom:0; }
 label[for="clearcache"] { color:coral; font-size:14px; margin-left:1em; }
 

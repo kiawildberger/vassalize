@@ -17,7 +17,7 @@ let isLoggedIn = false
 let gids = []
 let cids = []
 let tagx = /.*#[0-9]{4}/;
-let uidx = /<@!\d+>/;
+let uidx = /<@!\d+>/g;
 
 exports.init = function (win, tok) {
     let client = new Discord.Client();
@@ -27,11 +27,11 @@ exports.init = function (win, tok) {
             let channels = [], msgcontent = [];
             t.channels.cache.array().forEach(e => {
                 if (e.type === "text") {
-                    channels.push({ name: e.name, id: e.id, content: msgcontent })
+                    channels.push({ name: e.name, id: e.id })
                 }
             })
             gids.push({
-                icon: `https://cdn.discordapp.com/${t.id}/${t.icon}.png`,
+                icon: `https://cdn.discordapp.com/icons/${t.id}/${t.icon}.png`,
                 name: t.name,
                 id: t.id,
                 channels: channels
@@ -113,29 +113,36 @@ exports.init = function (win, tok) {
         if (arg.msg.toString().includes("/shrug")) arg.msg = arg.msg.replace("/shrug", "¯\_(ツ)_/¯")
         client.channels.cache.get(arg.channel.id).send(arg.msg)
     })
+
+    function process(msg) {
+        let ct = msg.content
+        if (msg.mentions.users.array().length >= 1) {
+            let mts = msg.mentions.users.array()
+            mts.forEach(e => {
+                let i = `@${e.username}#${e.discriminator}`
+                console.log(i)
+                ct = ct.replace(`<@${e.id}>`, i)
+                ct = ct.replace(`<@!${e.id}>`, i)
+            })
+        }
+        let m = {
+            content: ct,
+            author: {
+                username: msg.author.username,
+                discriminator: msg.author.discriminator,
+                id: msg.author.id,
+                avatar: msg.author.avatarURL()
+            },
+            channel: msg.channel.id
+        }
+        if (msg.attachments.size) {
+            m.images = msg.attachments.array()
+        }
+        window.webContents.send("msg", { msg: m })
+        if (msg.content.includes("discord.gg")) {
+            console.log(msg)
+        }
+    }
 }
 
-
-
-function process(msg) {
-    let ct = msg.content
-    if (msg.mentions) {
-        let mts = msg.mentions.users.array()
-        mts.forEach(e => {
-            let i = `@${e.username}#${e.discriminator}`
-            ct = ct.replace(uidx, i)
-        })
-    }
-    let m = {
-        content: ct,
-        author: msg.author,
-        channel: msg.channel.id
-    }
-    if (msg.attachments.size) {
-        m.images = msg.attachments.array()
-    }
-    window.webContents.send("msg", { msg: m })
-    if (msg.content.includes("discord.gg")) {
-        console.log(msg)
-    }
-}
+// pings need to be shown as pings (user#0000) instead of a uid

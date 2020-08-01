@@ -17,16 +17,20 @@ if (Rsettings.cachedlength) id('cachedlength').value = Rsettings.cachedlength
 
 if (!conf[0]) {
     id("clearcache").disabled = true;
-    id("clearcache").setAttribute('title', 'its empty anyways')
+    id("clearcache").setAttribute('title', 'no tokens to clear')
 }
 
 // voice?
 
-let gids, gna = [], ccids = [], cna = [], vcids = [], vcna = []; // gids is guild ids, gna is guild names, ccids is channel ids and cna is channel names
+let gids = [], index = 0, currentchannel;
 ipcRenderer.on("msg", processmsg)
 function processmsg(event, arg) {
-    // console.log(arg.msg)
-    let e = gids[index].channels[currentchannel].id
+    let e;
+    gids[index].channels.forEach(o => {
+        if(o.id === currentchannel) {
+            e = currentchannel
+        }
+    })
     if (e == arg.msg.channel) {
         let ul = document.createElement("ul")
         ul.classList.add("msg")
@@ -38,8 +42,8 @@ function processmsg(event, arg) {
             mt = mt.split("@")
             let sp = []
             mt.forEach(e => {
-                if (e && e !== botActor.full) sp.push(`<span class="ping">@${e}</span>`)
-                if (e && e === botActor.full) sp.push(`<span class="selfping">@${e}</span>`)
+                if (e && e !== document.title) sp.push(`<span class="ping">@${e}</span>`)
+                if (e && e === document.title) sp.push(`<span class="selfping">@${e}</span>`)
             })
             ct = ct.replace(/@.*#\d{4}/, sp.join(" "))
         }
@@ -83,50 +87,72 @@ function processmsg(event, arg) {
 
 function fillGuildSelect(arg) { // generates and populates guild list..?
     if (!loggedin) return;
-    let nn = document.createElement('option')
-    nn.setAttribute("value", "none")
-    nn.innerText = "none"
-    id('guilds').appendChild(nn)
     arg.forEach(e => {
-        let opt = document.createElement("option")
-        opt.setAttribute("value", e.name)
+        let opt = document.createElement("img")
+        opt.setAttribute("class", "serverlist-item")
         opt.setAttribute("data-index", arg.indexOf(e))
-        opt.innerText = e.name
-        id('guilds').appendChild(opt)
-        gna.push(e.name)
+        opt.setAttribute("src", e.icon)
+        opt.title = e.name
+        id('serverlist').appendChild(opt)
     })
     gids = arg
+    let q = [...document.querySelectorAll('.serverlist-item')]
+    q.forEach(e => {
+        e.addEventListener("click", () => {
+            if (id('channellist').style.display === "none") id('channellist').style.display = 'block'
+            let r = [...document.querySelectorAll('.serverlist-active')]
+            r.forEach(e => e.classList.remove("serverlist-active"))
+            e.classList.add("serverlist-active")
+            let server = gids[e.getAttribute('data-index')]
+            index = e.getAttribute('data-index')
+            let tdistance = 17.5 + (75 * parseInt(e.getAttribute('data-index'))) + "px";
+            console.log(tdistance)
+            id('channellist').innerHTML = `<div id="channel-triangle"></div><div class="channel-label">channels</div>`
+            id('channel-triangle').style.top = tdistance;
+            server.channels.forEach(e => {
+                let elm = document.createElement("div")
+                elm.classList.add("channel-item")
+                elm.textContent = "#" + e.name
+                elm.setAttribute('data-id', e.id)
+                elm.addEventListener("click", () => {
+                    currentchannel = e.id
+                    id('msgdisplay').innerHTML = ''
+                    ipcRenderer.send("getChannelContent", e.id)
+                })
+                id("channellist").appendChild(elm)
+            })
+        })
+    })
     id('bs').style.display = "none"
     document.querySelector('.container').style.display = "block"
 }
-let currentchannel, index;
-id('guilds').addEventListener('change', e => {
-    id('channels').innerHTML = '<option>none</option>'
-    if (e.target.value === "none") {
-        id('msgdisplay').innerText = ''
-        id('guild-channels').style.display = "none"
-        return;
-    }
-    id('msgdisplay').innerText = ''
-    id('guild-channels').style.display = "block"
-    index = document.querySelector('#guilds>option[value="'+id('guilds').value+'"]').getAttribute('data-index')
-    console.log(gids[index])
-    gids[index].channels.forEach(e => {
-        let opt = document.createElement("option")
-        opt.setAttribute("value", e.name)
-        if(gids[index].channels.indexOf(e) === 0) opt.setAttribute("selected", "selected")
-        opt.setAttribute("data-index", gids[index].channels.indexOf(e))
-        opt.innerText = e.name
-        id('channels').appendChild(opt)
-        currentchannel = 0;
-    })
-    id("channels").dispatchEvent(new Event("change")) // h4x0r
-})
-id('channels').addEventListener("change", async () => {
-    id('msgdisplay').innerText = ''
-    currentchannel = document.querySelector('#channels>option[value="'+id('channels').value+'"]').getAttribute('data-index')
-    ipcRenderer.send("getChannelContent", gids[index].channels[currentchannel].id)
-})
+// id('guilds').addEventListener('change', e => {
+//     id('channels').innerHTML = '<option>none</option>'
+//     if (e.target.value === "none") {
+//         id('msgdisplay').innerText = ''
+//         id('guild-channels').style.display = "none"
+//         return;
+//     }
+//     id('msgdisplay').innerText = ''
+//     id('guild-channels').style.display = "block"
+//     index = document.querySelector('#guilds>option[value="'+id('guilds').value+'"]').getAttribute('data-index')
+//     console.log(gids[index])
+//     gids[index].channels.forEach(e => {
+//         let opt = document.createElement("option")
+//         opt.setAttribute("value", e.name)
+//         if(gids[index].channels.indexOf(e) === 0) opt.setAttribute("selected", "selected")
+//         opt.setAttribute("data-index", gids[index].channels.indexOf(e))
+//         opt.innerText = e.name
+//         id('channels').appendChild(opt)
+//         currentchannel = 0;
+//     })
+//     id("channels").dispatchEvent(new Event("change")) // h4x0r
+// })
+// id('channels').addEventListener("change", async () => {
+//     id('msgdisplay').innerText = ''
+//     currentchannel = document.querySelector('#channels>option[value="'+id('channels').value+'"]').getAttribute('data-index')
+//     ipcRenderer.send("getChannelContent", gids[index].channels[currentchannel].id)
+// })
 
 async function checkCached() {
     if (conf) {
@@ -145,7 +171,7 @@ async function checkCached() {
 checkCached()
 
 ipcRenderer.on("validtoken", (event, args) => { // the *one* ipc i will use
-    if(args.bot && args.guildInfo) {
+    if (args.bot && args.guildInfo) {
         botActor = args.botActor, gids = args.guildInfo
     }
     id('bs-helper').innerText = "success!"
