@@ -7,6 +7,7 @@ body {
     padding:0;
     overflow:hidden;
     font-family:"ubuntu";
+    background:#4A4D5D;
 }
 
 #msgdisplay {
@@ -19,13 +20,12 @@ body {
 }
 .ping { color:#FA9A4B; }
 .selfping { color:#FA001A; background:#C5F9FA; }
-input[type="dropdown"] { width:50%; }
 #bs { 
     width:100%;
     height:100%;
     padding-left:5em;
     padding-top:2em;
-    background-color:#4A4D5D;
+    /* background-color:#4A4D5D; */
 }
 #bot-secret {
     width:100%;
@@ -83,13 +83,65 @@ input[type="dropdown"] { width:50%; }
 .tcache:hover {
     font-weight:bold;
 }
-
+.container {
+    /* background: #4A4D5D; */
+    width:100%;
+    height:100%;
+}
 #msgdisplay { border:1px solid grey; margin:0.8em; }
 #userd { margin-top:1em; }
 #errout{ color:red; font-size:14px; }
+
+
+#serverlist {
+    position:absolute;
+    left:0;
+    padding:0.5em;
+    height:100%;
+    border-right:1px solid #3a3b44;
+}
+.serverlist-label {
+    color:#787878;
+    margin-bottom:1.5em;
+}
+.serverlist-item {
+    border-radius:50%;
+    width:50px;
+    height:50px;
+    display:block;
+    margin-bottom:25px;
+}
+
+#channellist {
+    background:#404040;
+    width:15%;
+    height:65%;
+    position:absolute;
+    top:3em;
+    left:6em;
+}
+.channel-triangle {
+    /* is little mf triangle */
+    position:absolute;
+    left:-1.5em;
+    /* top:attr(distance em 0); https://developer.mozilla.org/en-US/docs/Web/CSS/attr#Specifications */
+    width:0;
+    height:0;
+    border-top:1em solid transparent;
+    border-bottom:1em solid transparent;
+    border-right:1.5em solid #404040;
+}
+.channel-label {
+
+}
+.channel-item {
+
+}
+
+
+
 select { 
     width:10em;
-    /* background */
 }
 .user-img { width:150px; margin:0 0 1em 1em; border-left:2px solid green; padding-left:4px; display:block; }
 #topt { float:right; padding:0.5em; cursor:pointer; }

@@ -1,5 +1,3 @@
-<html>
-
 <head>
     <title>sign in</title>
     <!-- <link rel="stylesheet" href="https://unpkg.com/chota@latest"> -->
@@ -12,42 +10,38 @@
         <input type="number" id="cachedlength" value="15" style="display:inline;" min="5" max="50">
 
 
-        <br><br><input type="button" id="clearcache" value="clear cache" disabled="" title="its empty anyways"><br>
+        <br><br><input type="button" id="clearcache" value="clear cache"><br>
         <label for="clearcache" style="display:none;">cache cleared!</label>
-        <br><input type="button" id="leaveopts" value="save &amp; return">
+        <br><input type="button" id="leaveopts" value="save & return">
     </div>
-    <div id="bs">
-        <!-- <label for="bot-secret">bot secret: </label> -->
+    <div id="bs"  style="display:none;">
+        <div id="bs-helper"></div>
         <div class="bs-input-container">
             <input id="bot-secret" type="password" placeholder="bot secret">
             <img id="bs-btn" src="assets/check.svg">
             <img id="cached-btn" src="assets/cached-arrow.svg">
-            <div id="cached">
-                <div class="tcache">Squirrel#1313</div>
-                <div class="tcache">Squirrel#1313</div>
-                <div class="tcache">Squirrel#1313</div>
-                <div class="tcache">Squirrel#1313</div>
-                <div class="tcache">Squirrel#1313</div>
+            <div id="cached" style="display:none;">
+                <div id="no-recent-logins" align="center" style="margin-top:1.5em;">no recent logins</div>
             </div>
         </div>
-        <div id="bs-helper"></div><br><br>
     </div>
-    <div class="container" style="display:none;">
+    <div class="container">
         <div id="topt">options</div>
-        <div id="guild-container">
-            <label for="guilds">active guild:</label>
-            <select id="guilds"></select>
+        <div  id="serverlist">
+            <div class="serverlist-label">servers</div>
+            <img class="serverlist-item" src="assets/check.svg">
+            <img class="serverlist-item" src="assets/check.svg">
+            <img class="serverlist-item" src="assets/check.svg">
         </div>
-        <div id="guild-channels" style="display: none;">
-            <label for="channels">active channel:</label>
-            <select id="channels"></select>
+        <div id="channellist">
+            <div class="channel-triangle" style="top:10px;"></div> <!-- add 75px for each server, starting at 10 -->
+            <div class="channel-label">channels</div>
+            <div class="channel-item">#general</div>
+            <div class="channel-item">#games</div>
         </div>
         <span id="errout"></span>
         <div id="msgdisplay" class="collection"></div>
         <input id="msgin" type="text">
         <div id="userd"></div>
     </div>
-    <script src="index.js"></script>
 </body>
-
-</html>

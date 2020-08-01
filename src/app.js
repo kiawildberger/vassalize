@@ -1,5 +1,6 @@
 const { app, BrowserWindow, ipcMain, globalShortcut } = require('electron')
 let ps = require("./ps.js")
+// let ps = require("./ps.js")
 const conf = require('./config.json')
 let win;
 
@@ -25,7 +26,7 @@ app.whenReady().then(() => {
   ipcMain.on("startbot", (event, tok) => {
     ps.init(win, tok)
   })
-  if(conf) window.webContents.send("cached", conf)
+  // if(conf) window.webContents.send("cached", conf)
 })
 
 /*

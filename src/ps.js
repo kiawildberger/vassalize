@@ -16,15 +16,26 @@ let lastmessage;
 let isLoggedIn = false
 let gids = []
 let cids = []
-let tagx = /.*#[0-9]{4}/
-let uidx = /<@!\d+>/
+let tagx = /.*#[0-9]{4}/;
+let uidx = /<@!\d+>/;
 
 exports.init = function (win, tok) {
+    let client = new Discord.Client();
     window = win;
-    const client = new Discord.Client();
     client.on("ready", () => {
         client.guilds.cache.array().forEach(t => {
-            gids.push(t)
+            let channels = [], msgcontent = [];
+            t.channels.cache.array().forEach(e => {
+                if (e.type === "text") {
+                    channels.push({ name: e.name, id: e.id, content: msgcontent })
+                }
+            })
+            gids.push({
+                icon: `https://cdn.discordapp.com/${t.id}/${t.icon}.png`,
+                name: t.name,
+                id: t.id,
+                channels: channels
+            })
             isLoggedIn = true
         })
         let tokens = {}
@@ -37,37 +48,18 @@ exports.init = function (win, tok) {
         if (conf) tokens = conf;
         tokens[botuser] = tok
         fs.writeFileSync("./config.json", JSON.stringify(tokens));
-        window.webContents.send("valid-token", { user: uinfo, gids: gids })
+        window.webContents.send("validtoken", { bot: uinfo, guildInfo: gids })
     });
     client.on("message", (message) => {
         process(message)
     });
     client.login(tok)
         .catch(err => {
-            window.webContents.send("invalid-token", "invalid")
-            console.log('bad token')
-            return;
+            console.log('invalid token?')
+            return "invalid token"
         })
-    ipcMain.on("msgin", (event, arg) => {
-        if (arg.msg.toString().match(tagx)) { // is ping
-            let un = arg.msg.toString().match(tagx)[0].toString().split("#")[0].replace("@", '')
-            let g = client.channels.cache.get(arg.channel).guild.members.cache.filter(x => x.user.username === un).array()
-            arg.msg = arg.msg.replace(tagx, g[0].user)
-        }
-        if (arg.msg.toString().includes("/shrug")) arg.msg = arg.msg.replace("/shrug", "¯\_(ツ)_/¯")
-        console.log(arg.channel, arg.msg)
-        client.channels.cache.get(arg.channel).send(arg.msg)
-    })
-    ipcMain.on("rcids", (event, guild) => {
-        let cids = []
-        let e = gids[guild];
-        e.channels.cache.filter(c => c.type === "text").array().forEach(r => {
-            cids.push(r)
-        })
-        window.webContents.send("cids", cids)
-    })
-    ipcMain.on("cachedmessages", (event, arg) => {
-        let b = client.channels.cache.get(arg)
+    ipcMain.on("getChannelContent", (event, id) => {
+        let b = client.channels.cache.get(id)
         if (b) {
             b.messages.fetch().then((resp) => {
                 let t = resp.array()
@@ -84,10 +76,15 @@ exports.init = function (win, tok) {
                     }
                     let m = {
                         content: ct,
-                        author: msg.author,
+                        author: {
+                            username: msg.author.username,
+                            discriminator: msg.author.discriminator,
+                            id: msg.author.id,
+                            avatar: msg.author.avatarURL()
+                        },
                         channel: msg.channel.id
                     }
-                    if(msg.attachments) {
+                    if (msg.attachments) {
                         let d = msg.attachments.array()
                         d.forEach(e => {
                             e = e.url
@@ -95,19 +92,30 @@ exports.init = function (win, tok) {
                         m.images = d
                     }
                     setTimeout(() => {
-                        window.webContents.send("msg", { msg: m })
+                        process(msg)
                     }, 100)
                 })
-            }).catch(shit => {
-                if (shit.name === "DiscordAPIError" && shit.message === "Missing Access") {
-                    window.webContents.send("apierror", "missing access")
+            }).catch(err => {
+                if (err.name === "DiscordAPIError" && err.message === "Missing Access") {
+                    return { err: "missing access" }
                 }
             })
         } else { // could not fetch messages for some unknown reason
-            window.webContents.send("apierror", { custom: "could not fetch messages ¯\\_(ツ)_/¯" })
+            return { err: "could not fetch messages ¯\\_(ツ)_/¯" }
         }
     })
+    ipcMain.on("msgin", (event, arg) => {
+        if (arg.msg.toString().match(tagx)) { // is ping
+            let un = arg.msg.toString().match(tagx)[0].toString().split("#")[0].replace("@", '')
+            let g = client.channels.cache.get(arg.channel.id).guild.members.cache.filter(x => x.user.username === un).array()
+            arg.msg = arg.msg.replace(tagx, g[0].user)
+        }
+        if (arg.msg.toString().includes("/shrug")) arg.msg = arg.msg.replace("/shrug", "¯\_(ツ)_/¯")
+        client.channels.cache.get(arg.channel.id).send(arg.msg)
+    })
 }
+
+
 
 function process(msg) {
     let ct = msg.content
