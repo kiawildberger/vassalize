@@ -120,7 +120,6 @@ exports.init = function (win, tok) {
             let mts = msg.mentions.users.array()
             mts.forEach(e => {
                 let i = `@${e.username}#${e.discriminator}`
-                console.log(i)
                 ct = ct.replace(`<@${e.id}>`, i)
                 ct = ct.replace(`<@!${e.id}>`, i)
             })

@@ -32,6 +32,8 @@ app.whenReady().then(() => {
 /*
 TODO:
  - general polish
+ - FIX THE FUCKING ARROW FROM THE CHANNEL SELECT DIV
+ - emoji
  - show user avatars and generally neaten up the displaying of messages
  - some weird shit happening with pings like with the terraria message in summer 2950 #events
  - show user-uploaded videos (add on to images, i think message.attachments)

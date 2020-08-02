@@ -14,7 +14,6 @@ body {
     font-family:Whitney,Helvetica Neue,Helvetica,Arial,sans-serif;
     background:#4A4D5D;
 }
-
 #msgdisplay {
     width:70%;
     max-width:70%;
@@ -143,7 +142,7 @@ body {
     height:fit-content;
     position:absolute;
     top:3em;
-    left:4.75em;
+    left:5.25em;
     overflow-y: auto;
 }
 #channel-triangle {
@@ -151,11 +150,6 @@ body {
     position:absolute;
     left:-0.5em;
     /* top:attr(distance em 0); https://developer.mozilla.org/en-US/docs/Web/CSS/attr#Specifications */
-    width:0;
-    height:0;
-    border-top:0.5em solid transparent;
-    border-bottom:0.5em solid transparent;
-    border-right:0.5em solid #404040;
 }
 .channel-label {
     font-size:1.2em;
@@ -170,6 +164,10 @@ body {
     cursor:pointer;
 }
 .channel-item:hover { font-weight:bold; }
+.activechannel {
+    font-weight:bold;
+    color:rgb(185, 185, 185);
+}
 
 
 

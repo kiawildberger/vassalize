@@ -19,7 +19,7 @@ const options = {
     "src/index.html",
     "src/index.js",
     "src/style.css",
-    // "src/config.json"
+    "src/settings.json"
   ]
 }
 
