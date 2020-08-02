@@ -175,10 +175,12 @@ id("msgin").addEventListener("keypress", e => {
     if (e.keyCode !== 13) return;
     if (!e.target.value) return;
     id('bs-helper').innerText = ''
-    gids[index].channels[currentchannel]
+    console.log(gids)
+    console.log(index)
+    console.log(currentchannel)
     ipcRenderer.send("msgin", {
         msg: id("msgin").value,
-        channel: gids[index].channels[currentchannel]
+        channel: currentchannel
     })
     id('msgin').value = ""
 })

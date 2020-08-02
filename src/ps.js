@@ -111,7 +111,8 @@ exports.init = function (win, tok) {
             arg.msg = arg.msg.replace(tagx, g[0].user)
         }
         if (arg.msg.toString().includes("/shrug")) arg.msg = arg.msg.replace("/shrug", "¯\_(ツ)_/¯")
-        client.channels.cache.get(arg.channel.id).send(arg.msg)
+        console.log(arg)
+        client.channels.cache.get(arg.channel).send(arg.msg)
     })
 
     function process(msg) {
