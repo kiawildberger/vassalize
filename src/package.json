@@ -1,30 +1,32 @@
 {
-  "name": "rubber",
-  "version": "0.0.1",
-  "description": "epic bot",
+  "name": "vassalize",
+  "version": "1.1.0",
+  "description": "NOT A SELFBOT! send and read messages as a bot user",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "electron .",
-    "build": "node build.js"
+    "dist": "electron-builder --linux snap"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/kiawildberger/Rubber.git"
-  },
-  "author": "kia",
-  "license": "ISC",
+  "repository": "https://github.com/kiawildberger/rubber",
+  "author": "kiawildberger",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/kiawildberger/Rubber/issues"
   },
-  "homepage": "https://github.com/kiawildberger/Rubber#readme",
+  "keywords": [
+    "discord",
+    "discordjs",
+    "discord bot",
+    "chatbot",
+    "bot"
+  ],
   "dependencies": {
     "discord.js": "^12.1.1",
-    "dotenv": "^8.2.0",
-    "electron": "^8.2.4",
-    "electron-titlebar": "0.0.3"
+    "dotenv": "^8.2.0"
   },
   "devDependencies": {
+    "electron": "^9.2.0",
+    "electron-builder": "^22.8.0",
     "electron-packager": "^15.0.0"
   }
 }

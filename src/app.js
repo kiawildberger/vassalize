@@ -35,6 +35,7 @@ app.whenReady().then(() => {
 TODO:
  - emoji
  - pings are fucked
+ - tenor
  - show user avatars and generally neaten up the displaying of messages
  - show user-uploaded videos (add on to images, i think message.attachments)
  - maybe rethink the color scheme but idk
@@ -43,6 +44,7 @@ TODO:
  - little spinner when bot is trying to sign in, communicate to user that something is actually happening
  - display embeds (yt videos, webpage metadata, just straight embeds)
  - load more messages as user scrolls up (button or auto)
+ - keep bot online while app is closed (minimize to tray)
 
 MAYBE:
   - pfps
