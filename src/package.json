@@ -7,11 +7,11 @@
     "start": "electron .",
     "dist": "electron-builder --linux snap"
   },
-  "repository": "https://github.com/kiawildberger/rubber",
+  "repository": "https://github.com/kiawildberger/vassalize",
   "author": "kiawildberger",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/kiawildberger/Rubber/issues"
+    "url": "https://github.com/kiawildberger/vassalize/issues"
   },
   "keywords": [
     "vassalize",
