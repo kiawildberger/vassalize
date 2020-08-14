@@ -11,18 +11,6 @@ function id(e) { return document.getElementById(e) }
 let loggedin = false;
 let cdnUrl = /https?:\/\/cdn.discordapp.com\/attachments\/\d+\/\d+\/[a-zA-Z0-9_-]+\.[a-zA-Z]{2,5}/g
 let imagetypes = ["jpg", "JPG", 'png', 'PNG', 'gif', 'GIF', 'webp', 'WEBP', 'tiff', 'TIFF', 'jpeg', 'JPEG', 'svg', 'SVG']
-
-
-// populate settings with appropriate values
-if (Rsettings.cachedlength) id('cachedlength').value = Rsettings.cachedlength
-
-if (!conf[0]) {
-    id("clearcache").disabled = true;
-    id("clearcache").setAttribute('title', 'no tokens to clear')
-}
-
-// voice?
-
 let gids = [], index = 0, currentchannel;
 ipcRenderer.on("msg", processmsg)
 function processmsg(event, arg) {
@@ -221,10 +209,18 @@ id('cached-btn').addEventListener('click', () => {
     }
 })
 id('topt').addEventListener('click', () => {
+    document.querySelector('.container').style.display = 'none'
     id('options').style.display = "block"
+    // populate settings with stored values
+    if (Rsettings.cachedlength) id('cachedlength').value = Rsettings.cachedlength
+    if (!Object.keys(require("./config.json"))) {
+        id("clearcache").disabled = true;
+        id("clearcache").setAttribute('title', 'no tokens to clear')
+    }
 })
 id("leaveopts").addEventListener("click", () => { // write settings to settings.json
     id('options').style.display = "none"
+    document.querySelector('.container').style.display = 'block'
     let settings = {
         cachedlength: id("cachedlength").value
     }
@@ -232,6 +228,8 @@ id("leaveopts").addEventListener("click", () => { // write settings to settings.
 })
 id('clearcache').addEventListener("click", () => {
     fs.writeFileSync("./config.json", "{ }")
+    id('clearcache').disabled = true
+    id("clearcache").setAttribute('title', 'no tokens to clear')
     document.querySelector("label[for='clearcache']").style.display = 'block'
     setTimeout(() => document.querySelector("label[for='clearcache']").style.display = 'none', 1500)
 })
