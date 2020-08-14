@@ -1,6 +1,7 @@
 const { ipcRenderer, shell } = require("electron")
 const fs = require('fs')
 const ps = require("./ps.js")
+const elebar = require("electron-titlebar")
 let conf = require('./config.json')
 let confp = require.resolve('./config.json')
 let Rsettings = require("./settings.json")
@@ -27,7 +28,7 @@ ipcRenderer.on("msg", processmsg)
 function processmsg(event, arg) {
     let e;
     gids[index].channels.forEach(o => {
-        if(o.id === currentchannel) {
+        if (o.id === currentchannel) {
             e = currentchannel
         }
     })
@@ -85,32 +86,60 @@ function processmsg(event, arg) {
     }
 }
 
-function fillGuildSelect(arg) { // generates and populates guild list..?
+function fillGuildSelect(arg) { // generates and populates guild list
     if (!loggedin) return;
     arg.forEach(e => {
-        let opt = document.createElement("img")
-        opt.setAttribute("class", "serverlist-item")
-        opt.setAttribute("data-index", arg.indexOf(e))
-        opt.setAttribute("src", e.icon)
-        opt.title = e.name
-        id('serverlist').appendChild(opt)
+        if (!e.abbr) {
+            let div = document.createElement('div')
+            let opt = document.createElement("img")
+            opt.setAttribute("class", "serverlist-item")
+            opt.setAttribute("data-index", arg.indexOf(e))
+            div.appendChild(opt)
+            opt.setAttribute("src", e.icon)
+            opt.title = e.name
+            let tri = document.createElement("div")
+            tri.classList.add("channel-triangle")
+            div.appendChild(tri)
+            tri.style.display = 'none'
+            id('serverlist').appendChild(div)
+        } else if (e.abbr) {
+            let opt = document.createElement('div')
+            opt.setAttribute("data-index", arg.indexOf(e))
+            opt.classList.add("serverlist-item")
+            let text = document.createElement("p")
+            text.textContent = e.abbr
+            opt.title = e.abbr
+            opt.appendChild(text)
+            let tri = document.createElement("div")
+            tri.classList.add("channel-triangle")
+            tri.style.display = 'none'
+            opt.appendChild(tri)
+            id('serverlist').appendChild(opt)
+        }
     })
     gids = arg
     let q = [...document.querySelectorAll('.serverlist-item')]
     q.forEach(e => {
         e.addEventListener("click", () => {
+            if (q[q.indexOf(e)] != q) q.splice(q.indexOf(e), 1) // if this is duplicate of another one, should remove it
             id('msgdisplay').innerHTML = ''
             if (id('channellist').style.display === "none") id('channellist').style.display = 'block'
             let r = [...document.querySelectorAll('.serverlist-active')]
             r.forEach(e => e.classList.remove("serverlist-active"))
             e.classList.add("serverlist-active")
-            let server = gids[e.getAttribute('data-index')]
             index = e.getAttribute('data-index')
-            let tdistance = 17.5 + (75 * parseInt(e.getAttribute('data-index'))) + "px";
-            console.log(tdistance)
-            id('channellist').innerHTML = `<div id="channel-triangle"></div><div class="channel-label">channels</div>`
-            id('channel-triangle').style.top = tdistance;
-            server.channels.forEach(e => {
+            let tdistance = 68 + (75 * parseInt(e.getAttribute('data-index'))) + "px";
+            Array.from(document.querySelectorAll(".channel-triangle")).forEach(e => e.style.display = "none")
+            if(e.tagName === "IMG") {
+                e.nextElementSibling.style.display = 'block'
+                e.nextElementSibling.style.top = tdistance
+            } else {
+                e.querySelector('.channel-triangle').style.display = "block"
+                e.querySelector('.channel-triangle').style.top = tdistance
+            }
+            id('channellist').innerHTML = `<div class="channel-label">channels</div>`
+            let server = gids[e.getAttribute('data-index')]
+            server.channels.forEach(e => { // server.channels.forEach
                 let elm = document.createElement("div")
                 elm.classList.add("channel-item")
                 elm.textContent = "#" + e.name
@@ -118,13 +147,13 @@ function fillGuildSelect(arg) { // generates and populates guild list..?
                 elm.addEventListener("click", () => {
                     currentchannel = e.id
                     q = [...document.querySelectorAll(".activechannel")]
-                    q.forEach(e => { e.classList.remove("activechannel")})
+                    q.forEach(e => { e.classList.remove("activechannel") })
                     elm.classList.add("activechannel")
                     id('msgdisplay').innerHTML = ''
                     ipcRenderer.send("getChannelContent", e.id)
                 })
                 id("channellist").appendChild(elm)
-                if(server.channels.indexOf(e) === 0) elm.dispatchEvent(new Event('click'))
+                if (server.channels.indexOf(e) === 0) elm.dispatchEvent(new Event('click'))
             })
         })
     })
@@ -158,9 +187,9 @@ ipcRenderer.on("validtoken", (event, args) => { // the *one* ipc i will use
     setTimeout(() => {
         id('userd').innerHTML = `acting as <b>${args.bot.full}</b>`
         document.title = args.bot.full
+        // id('titlebar-title').textContent = args.bot.full
         fillGuildSelect(args.guildInfo)
     }, 800)
-    console.log(args)
 })
 id('bot-secret').addEventListener("keypress", e => {
     if (e.keyCode != 13) return;

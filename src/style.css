@@ -7,7 +7,7 @@
 body {
     width:100%;
     height:100%;
-    margin:0;
+    margin-top:2em;
     padding:0;
     overflow:hidden;
     /* font-family:"ubuntu"; */
@@ -21,6 +21,7 @@ body {
     height:80%;
     overflow-y: auto;
     position:absolute;
+    /* top:2em; */
     top:0;
     right:0;
     border:1px solid rgb(66, 66, 66);
@@ -38,11 +39,11 @@ body {
 .ping { color:#FA9A4B; }
 .selfping { color:#FA001A; background:#C5F9FA; }
 #bs { 
-    width:100%;
-    height:100%;
+    /* width:100%;
+    height:50%;
     padding-left:5em;
     padding-top:2em;
-    /* background-color:#4A4D5D; */
+    background-color:#4A4D5D; */
 }
 #bot-secret {
     width:100%;
@@ -130,6 +131,17 @@ body {
     cursor:pointer;
     transition:border-radius 0.2s ease;
 }
+div.serverlist-item {
+    width:50px;
+    height:50px;
+    background-color:#4b4b4b;
+}
+div.serverlist-item > p {
+    position:relative;
+    top:12.5px;
+    left:12.5px;
+}
+
 .serverlist-item:hover, .serverlist-active { border-radius:35%; }
 
 #channellist {
@@ -145,11 +157,13 @@ body {
     left:5.25em;
     overflow-y: auto;
 }
-#channel-triangle {
+.channel-triangle {
     /* is little mf triangle */
     position:absolute;
-    left:-0.5em;
-    /* top:attr(distance em 0); https://developer.mozilla.org/en-US/docs/Web/CSS/attr#Specifications */
+    left:4.75em;
+    border-top:0.5em solid transparent;
+    border-bottom:0.5em solid transparent;
+    border-right:0.5em solid #404040;
 }
 .channel-label {
     font-size:1.2em;

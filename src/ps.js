@@ -23,6 +23,7 @@ exports.init = function (win, tok) {
     let client = new Discord.Client();
     window = win;
     client.on("ready", () => {
+        if(isLoggedIn) return;
         client.guilds.cache.array().forEach(t => {
             let channels = [], msgcontent = [];
             t.channels.cache.array().forEach(e => {
@@ -30,12 +31,14 @@ exports.init = function (win, tok) {
                     channels.push({ name: e.name, id: e.id })
                 }
             })
-            gids.push({
-                icon: `https://cdn.discordapp.com/icons/${t.id}/${t.icon}.png`,
+            let ob = {
                 name: t.name,
                 id: t.id,
-                channels: channels
-            })
+                channels: channels,
+            }
+            if (t.icon) ob.icon = `https://cdn.discordapp.com/icons/${t.id}/${t.icon}.png`
+            if (!t.icon) ob.abbr = t.nameAcronym
+            gids.push(ob)
             isLoggedIn = true
         })
         let tokens = {}
@@ -43,7 +46,8 @@ exports.init = function (win, tok) {
         uinfo = {
             name: client.user.username,
             discrim: client.user.discriminator,
-            full: botuser
+            full: botuser,
+            guildNumber: client.guilds.cache.array().length
         }
         if (conf) tokens = conf;
         tokens[botuser] = tok
@@ -55,7 +59,7 @@ exports.init = function (win, tok) {
     });
     client.login(tok)
         .catch(err => {
-            console.log('invalid token?')
+            console.log('invalid token?') // need to send this to the user (something failed, try again?)
             return "invalid token"
         })
     ipcMain.on("getChannelContent", (event, id) => {
@@ -111,7 +115,6 @@ exports.init = function (win, tok) {
             arg.msg = arg.msg.replace(tagx, g[0].user)
         }
         if (arg.msg.toString().includes("/shrug")) arg.msg = arg.msg.replace("/shrug", "¯\_(ツ)_/¯")
-        console.log(arg)
         client.channels.cache.get(arg.channel).send(arg.msg)
     })
 
@@ -140,7 +143,7 @@ exports.init = function (win, tok) {
         }
         window.webContents.send("msg", { msg: m })
         if (msg.content.includes("discord.gg")) {
-            console.log(msg)
+            console.log('someone sent a discord invite link: ' + msg.content)
         }
     }
 }

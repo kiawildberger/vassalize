@@ -8,6 +8,7 @@ function createWindow() {
   win = new BrowserWindow({
     width: 800,
     height: 600,
+    // frame: false,
     icon: "./icon.png",
     webPreferences: {
       nodeIntegration: true
@@ -30,12 +31,11 @@ app.whenReady().then(() => {
 })
 
 /*
+
 TODO:
- - general polish
- - FIX THE FUCKING ARROW FROM THE CHANNEL SELECT DIV
  - emoji
+ - pings are fucked
  - show user avatars and generally neaten up the displaying of messages
- - some weird shit happening with pings like with the terraria message in summer 2950 #events
  - show user-uploaded videos (add on to images, i think message.attachments)
  - maybe rethink the color scheme but idk
  - reduce the spacing between servers
