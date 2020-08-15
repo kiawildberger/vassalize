@@ -9,7 +9,7 @@ function createWindow() {
     width: 800,
     height: 600,
     // frame: false,
-    icon: "./icon.png",
+    icon: "./icon.ico",
     webPreferences: {
       nodeIntegration: true
     }
@@ -37,6 +37,7 @@ TODO:
  - pings are fucked
  - tenor
  - show user avatars and generally neaten up the displaying of messages
+  - images on snapcraft
  - show user-uploaded videos (add on to images, i think message.attachments)
  - maybe rethink the color scheme but idk
  - reduce the spacing between servers
@@ -47,7 +48,6 @@ TODO:
  - keep bot online while app is closed (minimize to tray)
 
 MAYBE:
-  - pfps
   - full discord styling
   - typing indicator (can enable/disable)
   - status updater
