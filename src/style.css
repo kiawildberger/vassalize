@@ -117,6 +117,8 @@ body {
     padding:0.5em;
     height:100%;
     border-right:1px solid #3a3b44;
+    overflow-y:auto; /* need to create hella servers and add squorl bot to test this, will be annoying
+    hopefully the fucken scrollbar doesnt show tho needa deal with that probably */
 }
 .serverlist-label {
     color:#787878;

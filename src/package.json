@@ -13,6 +13,15 @@
   "bugs": {
     "url": "https://github.com/kiawildberger/vassalize/issues"
   },
+  "build": {
+    "appId": "vassalize",
+    "target": "snap",
+    "icon": "./icon.png",
+    "linux": {
+      "category":"Social",
+      "category":"Entertainment"
+    }
+  },
   "keywords": [
     "vassalize",
     "vassal",
