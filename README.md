@@ -4,7 +4,7 @@ Control <sup>(hijack)</sup> a discord bot!
 
 It can read/send messages and view attachments (videos soon!), which is all discord really does anyways.
 
-###Upcoming features:
+### Upcoming features:
 - beautifying the way messages are displayed
 - videos
 - minimizing to tray to keep the bot online
