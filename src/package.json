@@ -13,15 +13,6 @@
   "bugs": {
     "url": "https://github.com/kiawildberger/vassalize/issues"
   },
-  "build": {
-    "appId": "vassalize",
-    "target": "snap",
-    "icon": "./icon.png",
-    "linux": {
-      "category":"Social",
-      "category":"Entertainment"
-    }
-  },
   "keywords": [
     "vassalize",
     "vassal",
@@ -32,7 +23,8 @@
   ],
   "dependencies": {
     "discord.js": "^12.1.1",
-    "dotenv": "^8.2.0"
+    "dotenv": "^8.2.0",
+    "electron-titlebar": "0.0.3"
   },
   "devDependencies": {
     "electron": "^9.2.0",

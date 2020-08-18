@@ -2,6 +2,7 @@ const { app, BrowserWindow, ipcMain, globalShortcut } = require('electron')
 let ps = require("./ps.js")
 // let ps = require("./ps.js")
 const conf = require('./config.json')
+let settings = require("./settings.json")
 let win;
 
 function createWindow() {
@@ -16,10 +17,14 @@ function createWindow() {
   })
   win.loadFile('index.html')
   win.setMenu(null)
-  // win.webContents.openDevTools()
-  globalShortcut.register("CommandOrControl+Shift+I", () => {
-    win.webContents.openDevTools()
-  })
+  if (settings.devmode) {
+    globalShortcut.register("CommandOrControl+Shift+I", () => {
+      win.webContents.openDevTools()
+    })
+    globalShortcut.register("CommandOrControl+Shift+W", () => { // should this be in devmode or no
+      app.quit()
+    })
+  }
 }
 
 app.whenReady().then(() => {

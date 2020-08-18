@@ -2,8 +2,13 @@ const { ipcRenderer, shell } = require("electron")
 const fs = require('fs')
 const ps = require("./ps.js")
 const elebar = require("electron-titlebar")
-let conf = require('./config.json')
-let confp = require.resolve('./config.json')
+let conf, confp;
+if (!fs.existsSync("./config.json")) {
+    fs.writeFileSync("./config.json", "{ }")
+} else {
+    conf = require('./config.json')
+    confp = require.resolve("./config.json")
+}
 let Rsettings = require("./settings.json")
 let botActor;
 function id(e) { return document.getElementById(e) }
@@ -118,7 +123,7 @@ function fillGuildSelect(arg) { // generates and populates guild list
             index = e.getAttribute('data-index')
             let tdistance = 68 + (75 * parseInt(e.getAttribute('data-index'))) + "px";
             Array.from(document.querySelectorAll(".channel-triangle")).forEach(e => e.style.display = "none")
-            if(e.tagName === "IMG") {
+            if (e.tagName === "IMG") {
                 e.nextElementSibling.style.display = 'block'
                 e.nextElementSibling.style.top = tdistance
             } else {
@@ -149,6 +154,14 @@ function fillGuildSelect(arg) { // generates and populates guild list
     document.querySelector('.container').style.display = "block"
 }
 
+ipcRenderer.on("invalidtoken", () => {
+    id('bs-helper').style.color = 'red'
+    id('bs-helper').textContent = "something went wrong and could not login"
+    setTimeout(() => {
+        id('bs-helper').textContent = ''
+    }, 3000)
+})
+
 async function checkCached() {
     if (conf) {
         for (let i in conf) {
@@ -176,6 +189,7 @@ ipcRenderer.on("validtoken", (event, args) => { // the *one* ipc i will use
         id('userd').innerHTML = `acting as <b>${args.bot.full}</b>`
         document.title = args.bot.full
         // id('titlebar-title').textContent = args.bot.full
+        id('bs-helper').innerText = ''
         fillGuildSelect(args.guildInfo)
     }, 800)
 })
@@ -217,12 +231,20 @@ id('topt').addEventListener('click', () => {
         id("clearcache").disabled = true;
         id("clearcache").setAttribute('title', 'no tokens to clear')
     }
+    if (Rsettings.devmode) {
+        id('devmode').checked = true // on/off tho
+    } else { id("devmode").checked = false }
 })
 id("leaveopts").addEventListener("click", () => { // write settings to settings.json
     id('options').style.display = "none"
     document.querySelector('.container').style.display = 'block'
+    let dvm;
+    if (id('devmode').value == "on") {
+        dvm = true
+    } else { dvm = false }
     let settings = {
-        cachedlength: id("cachedlength").value
+        cachedlength: id("cachedlength").value,
+        devmode: dvm // bool
     }
     fs.writeFileSync("./settings.json", JSON.stringify(settings))
 })

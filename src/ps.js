@@ -1,7 +1,11 @@
 const Discord = require("discord.js");
 const { ipcMain, desktopCapturer } = require("electron")
 const fs = require('fs')
-const conf = require('./config.json')
+let conf;
+if (!fs.existsSync("./config.json")) {
+    fs.writeFileSync("./config.json", "{ }")
+    conf = require("./config.json")
+}
 let Rsettings = require("./settings.json")
 require("dotenv").config()
 
@@ -23,7 +27,7 @@ exports.init = function (win, tok) {
     let client = new Discord.Client();
     window = win;
     client.on("ready", () => {
-        if(isLoggedIn) return;
+        if (isLoggedIn) return;
         client.guilds.cache.array().forEach(t => {
             let channels = [], msgcontent = [];
             t.channels.cache.array().forEach(e => {
@@ -59,8 +63,7 @@ exports.init = function (win, tok) {
     });
     client.login(tok)
         .catch(err => {
-            console.log('invalid token?') // need to send this to the user (something failed, try again?)
-            return "invalid token"
+            window.webContents.send('invalidtoken')
         })
     ipcMain.on("getChannelContent", (event, id) => {
         let b = client.channels.cache.get(id)
