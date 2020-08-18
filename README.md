@@ -1,14 +1,17 @@
 # Rubber
 
-Control a discord bot!
+Control <sup>(hijack)</sup> a discord bot!
 
-## Features
+It can read/send messages and view attachments (videos soon!), which is all discord really does anyways.
 
-- caches tokens (in config.json)
-    - can clear cached tokens
-- send and read messages in channels
-- view images
+###Upcoming features:
+- beautifying the way messages are displayed
+- videos
+- minimizing to tray to keep the bot online
+    - user can provide scripts for the bot
+
+You can check src/app.js for a more frequently-updated todo list. 
 
 ---
 
-If you spot one of the many issues, feel free to report it on the [issue page](https://github.com/kiawildberger/Rubber/issues)!
+If you spot one of the many issues, feel free to report it on the [issue page](https://github.com/kiawildberger/vassalize/issues)!
