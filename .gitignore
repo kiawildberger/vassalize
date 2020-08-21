@@ -2,5 +2,5 @@
 /src/.env
 /src/config.json
 /build/
-/rubber-win32-x64
+/vassalize-win32-x64
 /src/dist

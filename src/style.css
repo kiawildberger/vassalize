@@ -17,7 +17,7 @@ body {
 #msgdisplay {
     width:70%;
     max-width:70%;
-    word-wrap: break-word;
+    overflow-x:;
     height:80%;
     overflow-y: auto;
     position:absolute;
@@ -28,6 +28,15 @@ body {
     /* i dont want a border in the end */
     margin:1% 1% 0 0;
 }
+#msgdisplay > ul > pre {
+    white-space:pre-wrap;
+    display:inline;
+    /*word-break:break-word;*/
+}
+#msgdisplay > ul > p {
+    display:inline;
+}
+
 #msgin {
     position:absolute;
     right:6.3%;
@@ -100,6 +109,13 @@ body {
 }
 .tcache:hover {
     font-weight:bold;
+}
+a {
+    outline: none; /* pls dont hurt */
+    color:cornflower;
+}
+a:visited {
+    color:lavender;
 }
 .container {
     /* background: #4A4D5D; */
@@ -191,6 +207,7 @@ select {
     width:10em;
 }
 .user-img { width:150px; margin:0 0 1em 1em; border-left:2px solid green; padding-left:4px; display:block; }
+.user-video { outline:none; margin-top:0; }
 #topt { position:absolute; bottom: 0; cursor:pointer; padding-bottom:6px; z-index:2; background-color:#4A4D5D; }
 #topt:hover {text-decoration:underline;}
 #options { width:100%; height:100%; background:#4A4D5D; }

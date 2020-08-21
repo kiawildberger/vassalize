@@ -1,7 +1,12 @@
 const { ipcRenderer, shell } = require("electron")
 const fs = require('fs')
 const ps = require("./ps.js")
-const elebar = require("electron-titlebar")
+let md = require("markdown-it")({
+    linkify: false // dont want to auto-link until can figure out how to open them externally, or link them myself idrk
+})
+require("dotenv").config()
+let tenorkey = process.env.TENORKEY
+// const elebar = require("electron-titlebar")
 let conf, confp;
 if (!fs.existsSync("./config.json")) {
     fs.writeFileSync("./config.json", "{ }")
@@ -15,7 +20,10 @@ function id(e) { return document.getElementById(e) }
 
 let loggedin = false;
 let cdnUrl = /https?:\/\/cdn.discordapp.com\/attachments\/\d+\/\d+\/[a-zA-Z0-9_-]+\.[a-zA-Z]{2,5}/g
+// why is cdnurl have the {2,5} after it, what if src has more numbers??? needa test regex101.com lamo gotem
+let tenorurl = /https:\/\/tenor.com\/view\/[a-z-]+\d+/g
 let imagetypes = ["jpg", "JPG", 'png', 'PNG', 'gif', 'GIF', 'webp', 'WEBP', 'tiff', 'TIFF', 'jpeg', 'JPEG', 'svg', 'SVG']
+let vidtypes = ["mp4", "MP4", "webm", "WEBM", "mkv", "MKV", "ogg", "OGG", "ogv", "OGV", "avi", "AVI", "gifv", "GIFV", "mpeg", "MPEG"]
 let gids = [], index = 0, currentchannel;
 ipcRenderer.on("msg", processmsg)
 function processmsg(event, arg) {
@@ -30,39 +38,72 @@ function processmsg(event, arg) {
         ul.classList.add("msg")
         ul.classList.add("collection-item")
         let ct = arg.msg.content
-        let mt = ct.match(/.*#[0-9]{4}/)
-        if (mt) {
-            mt = mt[0]
-            mt = mt.split("@")
-            let sp = []
+        let mt = arg.msg.mentions
+        ct = md.render(ct)
+        if(ct.includes("@everyone")) {
+            ct = ct.replace("@everyone", `<span class="selfping">@everyone</span>`)
+        }
+        if(ct.includes("@here")) {
+            ct = ct.replace("@here", `<span class="selfping">@here</span>`)
+        }
+        if(mt) {
             mt.forEach(e => {
-                if (e && e !== document.title) sp.push(`<span class="ping">@${e}</span>`)
-                if (e && e === document.title) sp.push(`<span class="selfping">@${e}</span>`)
+                ct = ct.replace(`@${e.username}#${e.discriminator}`, `<span class="ping">@${e.username}#${e.discriminator}</span>`)
+                if(e.username === botActor.username && e.discriminator === botActor.discrim) {
+                    ct = ct.replace(`@${e.username}#${e.discriminator}`, `<span class="selfping">@${e.username}#${e.discriminator}</span>`)
+                }
             })
-            ct = ct.replace(/@.*#\d{4}/, sp.join(" "))
         }
         let isimg = false;
-        ul.innerHTML = arg.msg.author.username + "#" + arg.msg.author.discriminator + ": " + ct
+        ul.innerHTML = `<p class="username-card">${arg.msg.author.username}#${arg.msg.author.discriminator}:&nbsp;&nbsp;</p>${ct}`
         if (arg.msg.images) {
-            isimg = true;
+            isimg = true; // should be "ismedia" bc videos but im not gon change that shit rn
             arg.msg.images.forEach(q => {
-                let img = document.createElement("img")
-                img.classList.add("user-img")
-                img.src = q.url
-                img.title = q.url
-                ul.appendChild(img)
-                img.addEventListener('click', () => { shell.openExternal(q.url) }) // shell.openExternal opens links in default browser, not electron
-                img.addEventListener("load", () => id('msgdisplay').scrollTop = id('msgdisplay').scrollHeight)
-                // i guess the failed image doesn't send an error event???
-                // img.addEventListener("error", () => { img.tagName = "p"; img.textContent = "failed to load image" })
+                let d = q.attachment.split(".")[q.attachment.split(".").length-1]
+                if(imagetypes.includes(d)) {
+                    let img = document.createElement("img")
+                    img.classList.add("user-img")
+                    img.src = q.url
+                    img.title = q.url
+                    ul.appendChild(img)
+                    img.addEventListener('click', () => { shell.openExternal(q.url) }) // shell.openExternal opens links in default browser, not electron
+                    img.addEventListener("load", () => id('msgdisplay').scrollTop = id('msgdisplay').scrollHeight)
+                    // i guess the failed image doesn't send an error event???
+                    // img.addEventListener("error", () => { img.tagName = "p"; img.textContent = "failed to load image" })
+                } else if(vidtypes.includes(d)) {
+                    let video = document.createElement("video")
+                    let source = document.createElement("source")
+                    source.setAttribute("src", q.attachment)
+                    source.setAttribute("type", "video/"+d.toLowerCase())
+                    video.controls = "true"
+                    video.width = "200" // slightly bigger than images, maybe should incrase the size of images??
+                    video.appendChild(source)
+                    video.classList.add("user-video")
+                    ul.appendChild(video)
+                    // should add to open external? maybe an pseudo-element that appears when hovered would be best
+                    video.addEventListener("load", () => id('msgdisplay').scrollTop = id('msgdisplay').scrollHeight)
+                }
+            })
+        }
+        if (arg.msg.content.match(tenorurl)) {
+            arg.msg.content.match(tenorurl).forEach(async (e) => {
+                let id = e.match(/gif-\d+/)[0].replace("gif-", '')
+                // let tenorgifs = await fetch("https://api.tenor.com/v1/gifs?key="+tenorkey+"&ids="+id)
+                //     .then(response => {
+                //         const reader = response.body.getReader()
+                //         // this is pain
+                //     })
+                // console.log(tenorgifs)
+                // die
+                // ul.appendChild(img)
+                // img.addEventListener("load", () => id('msgdisplay').scrollTop = id('msgdisplay').scrollHeight)
             })
         }
         if (arg.msg.content.match(cdnUrl)) {
             arg.msg.content.match(cdnUrl).forEach(e => {
                 let d = e.split('.')
                 d = d[d.length - 1]
-                console.log(d)
-                if (imagetypes.includes(d)) { // is an image we support and want to use
+                if (imagetypes.includes(d)) { // ig i have to have the caps in the array cos im not iterating on it
                     let img = document.createElement('img')
                     img.classList.add('user-img')
                     img.src = e
@@ -180,7 +221,7 @@ checkCached()
 
 ipcRenderer.on("validtoken", (event, args) => { // the *one* ipc i will use
     if (args.bot && args.guildInfo) {
-        botActor = args.botActor, gids = args.guildInfo
+        botActor = args.bot, gids = args.guildInfo
     }
     id('bs-helper').innerText = "success!"
     id("bs-helper").style.color = "green"

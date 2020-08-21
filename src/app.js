@@ -10,7 +10,7 @@ function createWindow() {
     width: 800,
     height: 600,
     // frame: false,
-    icon: "./icon.ico",
+    icon: "./icon.png",
     webPreferences: {
       nodeIntegration: true
     }
@@ -25,6 +25,10 @@ function createWindow() {
       app.quit()
     })
   }
+  win.webContents.on('new-window', function(event, url){
+    event.preventDefault();
+    shell.openExternal(url)
+  });
 }
 
 app.whenReady().then(() => {
@@ -39,11 +43,15 @@ app.whenReady().then(() => {
 
 TODO:
  - emoji
- - pings are literally broken
+ + fixed pings
+ + using markdown-it to cover basic formatting (bold, italics, etc)
+ + inline videos
+ - make message readability better (separation between)
+ - open links externally
+    - not on linux? (in non-sandboxed)
  - tenor
+    - holy fuck is pain
  - show user avatars and generally neaten up the displaying of messages
-  - images on snapcraft
- - show user-uploaded videos (add on to images, i think message.attachments)
  - server select div scroll on overflow
  - display embeds (yt videos, webpage metadata, just straight embeds)
  - load more messages as user scrolls up (button or auto)

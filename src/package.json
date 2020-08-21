@@ -24,7 +24,8 @@
   "dependencies": {
     "discord.js": "^12.1.1",
     "dotenv": "^8.2.0",
-    "electron-titlebar": "0.0.3"
+    "electron-titlebar": "0.0.3",
+    "markdown-it": "^11.0.0"
   },
   "devDependencies": {
     "electron": "^9.2.0",

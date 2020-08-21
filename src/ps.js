@@ -141,6 +141,10 @@ exports.init = function (win, tok) {
             },
             channel: msg.channel.id
         }
+        // console.log(msg.mentions)
+        if(msg.mentions.users.array().length != 0) {
+            m.mentions = msg.mentions.users.array()
+        }
         if (msg.attachments.size) {
             m.images = msg.attachments.array()
         }
