@@ -42,11 +42,12 @@ app.whenReady().then(() => {
 /*
 
 TODO:
- - emoji
- + fixed pings
+ + emoji
  + using markdown-it to cover basic formatting (bold, italics, etc)
+  - will do it myself later
  + inline videos
  - make message readability better (separation between)
+    + consolidate continued messages from same user
  - open links externally
     - not on linux? (in non-sandboxed)
  - tenor

@@ -29,16 +29,26 @@ exports.init = function (win, tok) {
     client.on("ready", () => {
         if (isLoggedIn) return;
         client.guilds.cache.array().forEach(t => {
-            let channels = [], msgcontent = [];
+            let channels = [], msgcontent = [], emojis = [], emojids = [];
             t.channels.cache.array().forEach(e => {
                 if (e.type === "text") {
                     channels.push({ name: e.name, id: e.id })
                 }
             })
+            t.emojis.cache.array().forEach(e => {
+              emojis.push({
+                name: e.name,
+                id: e.id,
+                url: e.url
+              })
+              emojids.push(e.id)
+            })
             let ob = {
                 name: t.name,
                 id: t.id,
                 channels: channels,
+                emoji: emojis,
+                emojiIds: emojids
             }
             if (t.icon) ob.icon = `https://cdn.discordapp.com/icons/${t.id}/${t.icon}.png`
             if (!t.icon) ob.abbr = t.nameAcronym
@@ -139,7 +149,8 @@ exports.init = function (win, tok) {
                 id: msg.author.id,
                 avatar: msg.author.avatarURL()
             },
-            channel: msg.channel.id
+            channel: msg.channel.id,
+            guild: msg.guild.id // what
         }
         // console.log(msg.mentions)
         if(msg.mentions.users.array().length != 0) {
