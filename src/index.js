@@ -27,6 +27,7 @@ function id(e) {
 let loggedin = false;
 let cdnUrl = /https?:\/\/cdn.discordapp.com\/attachments\/\d+\/\d+\/[a-zA-Z0-9_-]+\.[a-zA-Z]{2,5}/g
 // why is cdnurl have the {2,5} after it, what if src has more numbers??? needa test regex101.com lamo gotem
+// that is file extension 4head     bonk
 let tenorurl = /https:\/\/tenor.com\/view\/[a-z-]+\d+/g
 let imagetypes = ["jpg", "JPG", 'png', 'PNG', 'gif', 'GIF', 'webp', 'WEBP', 'tiff', 'TIFF', 'jpeg', 'JPEG', 'svg', 'SVG']
 let vidtypes = ["mp4", "MP4", "webm", "WEBM", "mkv", "MKV", "ogg", "OGG", "ogv", "OGV", "avi", "AVI", "gifv", "GIFV", "mpeg", "MPEG"]
@@ -54,7 +55,8 @@ function processmsg(event, arg) {
     let pemojis = ct.match(/<:[a-zA-Z0-9]+:\d+>/g)
     if (pemojis) {
       pemojis.forEach(e => {
-        let d = e.split(":")[2].replace(">", ''), name = e.split(":")[1],
+        let d = e.split(":")[2].replace(">", ''),
+          name = e.split(":")[1],
           url;
         if (gids[index].emojiIds.includes(d)) {
           url = gids[index].emoji[gids[index].emojiIds.indexOf(d)].url
@@ -195,6 +197,7 @@ function fillGuildSelect(arg) { // generates and populates guild list
   let q = [...document.querySelectorAll('.serverlist-item')]
   q.forEach(e => {
     e.addEventListener("click", () => {
+      id('msgin').disabled = false
       if (q[q.indexOf(e)] != q) q.splice(q.indexOf(e), 1) // if this is duplicate of another one, should remove it
       id('msgdisplay').innerHTML = ''
       if (id('channellist').style.display === "none") id('channellist').style.display = 'block'
@@ -285,14 +288,21 @@ id('bs-btn').addEventListener("click", e => {
   if (!id('bot-secret').value) return;
   ipcRenderer.send("startbot", id("bot-secret").value)
 })
+
+let istyping = false;
 id("msgin").addEventListener("keypress", e => {
+  if(!istyping && Rsettings.typing) ipcRenderer.send("typing", { start: true, chid: currentchannel })
+  istyping = true
+  if (id("msgin").value === "") {
+    if(Rsettings.typing) ipcRenderer.send("typing", { stop: true, chid: currentchannel })
+    istyping = false
+  }
   if (e.keyCode !== 13) return;
   if (!e.target.value) return;
   id('bs-helper').innerText = ''
-  ipcRenderer.send("msgin", {
-    msg: id("msgin").value,
-    channel: currentchannel
-  })
+  if(Rsettings.typing) ipcRenderer.send("typing", { stop: true, chid: currentchannel })
+  istyping = false;
+  ipcRenderer.send("msgin", { msg: id("msgin").value, channel: currentchannel })
   id('msgin').value = ""
 })
 id('cached-btn').addEventListener('click', () => {
@@ -311,26 +321,20 @@ id('topt').addEventListener('click', () => {
     id("clearcache").disabled = true;
     id("clearcache").setAttribute('title', 'no tokens to clear')
   }
-  if (Rsettings.devmode) {
-    id('devmode').checked = true // on/off tho
-  } else {
-    id("devmode").checked = false
-  }
+  id('devmode').checked = Rsettings.devmode
+  id("typingIndicator").checked = Rsettings.typing
 })
 id("leaveopts").addEventListener("click", () => { // write settings to settings.json
   id('options').style.display = "none"
   document.querySelector('.container').style.display = 'block'
-  let dvm;
-  if (id('devmode').value == "on") {
-    dvm = true
-  } else {
-    dvm = false
-  }
   let settings = {
     cachedlength: id("cachedlength").value,
-    devmode: dvm // bool
+    devmode: id("devmode").checked,
+    typing: id("typingIndicator").checked
   }
+  Rsettings = settings
   fs.writeFileSync("./settings.json", JSON.stringify(settings))
+  ipcRenderer.send("refreshSettings")
 })
 id('clearcache').addEventListener("click", () => {
   fs.writeFileSync("./config.json", "{ }")

@@ -1,4 +1,9 @@
-const { app, BrowserWindow, ipcMain, globalShortcut } = require('electron')
+const {
+  app,
+  BrowserWindow,
+  ipcMain,
+  globalShortcut
+} = require('electron')
 let ps = require("./ps.js")
 // let ps = require("./ps.js")
 const conf = require('./config.json')
@@ -17,15 +22,10 @@ function createWindow() {
   })
   win.loadFile('index.html')
   win.setMenu(null)
-  if (settings.devmode) {
-    globalShortcut.register("CommandOrControl+Shift+I", () => {
-      win.webContents.openDevTools()
-    })
-    globalShortcut.register("CommandOrControl+Shift+W", () => { // should this be in devmode or no
-      app.quit()
-    })
-  }
-  win.webContents.on('new-window', function(event, url){
+  // opening devtoosl will not be in the very final release
+  globalShortcut.register("CommandOrControl+Shift+I", () => win.webContents.openDevTools())
+  globalShortcut.register("CommandOrControl+Shift+W", () => app.quit())
+  win.webContents.on('new-window', function(event, url) {
     event.preventDefault();
     shell.openExternal(url)
   });
@@ -36,29 +36,30 @@ app.whenReady().then(() => {
   ipcMain.on("startbot", (event, tok) => {
     ps.init(win, tok)
   })
-  // if(conf) window.webContents.send("cached", conf)
 })
 
 /*
 
 TODO:
- + emoji
+ - be able to send custom emojis
+ - get non-custom emoji to look normal
+ - server select div scroll on overflow
+  - fucc that lmao
+ - load more messages as user scrolls up (button or auto)
+ + typing indicator
+ + show user avatars and generally neaten up the displaying of messages
+  + made it look a whole lot nicer
  + using markdown-it to cover basic formatting (bold, italics, etc)
-  - will do it myself later
- + inline videos
+  - will do it myself
  - make message readability better (separation between)
     + consolidate continued messages from same user
  - open links externally
-    - not on linux? (in non-sandboxed)
+    - not on linux?
  - tenor
     - holy fuck is pain
- - show user avatars and generally neaten up the displaying of messages
- - server select div scroll on overflow
  - display embeds (yt videos, webpage metadata, just straight embeds)
- - load more messages as user scrolls up (button or auto)
  - keep bot online while app is closed (minimize to tray)
  - custom scripts and actions (user provides a js file with commands/event handlers)
- - typing indicator
 
 MAYBE:
   - status updater
