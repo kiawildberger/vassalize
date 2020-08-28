@@ -2,7 +2,8 @@ const {
   app,
   BrowserWindow,
   ipcMain,
-  globalShortcut
+  globalShortcut,
+  shell
 } = require('electron')
 let ps = require("./ps.js")
 // let ps = require("./ps.js")
@@ -22,8 +23,10 @@ function createWindow() {
   })
   win.loadFile('index.html')
   win.setMenu(null)
-  // opening devtoosl will not be in the very final release
-  globalShortcut.register("CommandOrControl+Shift+I", () => win.webContents.openDevTools())
+  if(settings.devmode) {
+    globalShortcut.register("CommandOrControl+Shift+I", () => win.webContents.openDevTools())
+    globalShortcut.register("CommandOrControl+Shift+R", () => { app.relaunch(); app.exit(); } )
+  }
   globalShortcut.register("CommandOrControl+Shift+W", () => app.quit())
   win.webContents.on('new-window', function(event, url) {
     event.preventDefault();
@@ -36,12 +39,17 @@ app.whenReady().then(() => {
   ipcMain.on("startbot", (event, tok) => {
     ps.init(win, tok)
   })
+  ipcMain.on("restart", () => {
+    app.relaunch()
+    app.exit()
+  })
 })
 
 /*
 
 TODO:
- - update readme to include "docs" for scripts
+ - display profile pictures for defaults
+ - decide whether or not to keep the logfile
  - be able to send custom emojis
  + custom scripts and actions (user provides a js file with commands/event handlers)
  - get non-custom emoji to look normal

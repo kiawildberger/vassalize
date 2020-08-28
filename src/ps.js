@@ -32,6 +32,7 @@ let enabledscripts = scripts.filter(e => e.enabled)
 function logFile(e) {
   if (Rsettings.fileLogging) fs.appendFile("./logfile", e + "\n", () => {})
 }
+function clog(e) { window.webContents.send('clog', e) }
 
 exports.init = function(win, tok) {
   client = new Discord.Client()
@@ -40,6 +41,7 @@ exports.init = function(win, tok) {
   client.on("ready", () => {
     if (isLoggedIn) return;
     if (enabledscripts.length > 0 && Rsettings.csenabled) {
+      window.webContents.send("refreshScript")
       enabledscripts.forEach(e => {
         try {
           let script = require(e.path)
@@ -144,7 +146,7 @@ exports.init = function(win, tok) {
             m.images = d
           }
           setTimeout(() => {
-            process(msg)
+            process(msg, true)
           }, 100)
         })
       }).catch(err => {
@@ -169,13 +171,19 @@ exports.init = function(win, tok) {
     if (arg.msg.toString().includes("/shrug")) arg.msg = arg.msg.replace("/shrug", "¯\_(ツ)_/¯")
     client.channels.cache.get(arg.channel).send(arg.msg)
   })
-
-  function process(msg) {
-    if (Rsettings.csenabled) {
+  let currentchannel;
+  ipcMain.on("currentchannel", (event, arg) => {
+    currentchannel = arg;
+  })
+  function process(msg, iscached=false) {
+    if (Rsettings.csenabled && !iscached) {
+      window.webContents.send("refreshScript")
       enabledscripts.forEach(e => {
         try {
           let script = require(e.path)
-          if (script.message) var g = script.message(msg)
+          let c = client.channels.cache.get(currentchannel)
+          var g = script.message(msg, c)
+          console.log(g)
           if (g) logFile(e.name + " > " + g)
         } catch {
           logFile("[Scripts] " + e.name + " was unable to receive a message")
@@ -217,6 +225,7 @@ exports.init = function(win, tok) {
     }
   }
   ipcMain.on("typing", (event, arg) => {
+    if(!Rsettings.typing) return;
     if (arg.start) {
       client.channels.cache.get(arg.chid).startTyping()
     } else if (arg.stop) {

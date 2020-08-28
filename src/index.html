@@ -41,7 +41,7 @@
       <input type="checkbox" id="typingIndicator" style="display:inline;">
     </p>
     <label for="logfile">Log certain events to a file for scripting and debugging</label>
-    <input type="checkbox" id="logfile" style="display:inline;"><br>
+    <input type="checkbox" id="logfile" style="display:inline;"><input type="button" style="display:inline;" onclick="fs.writeFileSync('./logfile', '');" value="Clear logfile"><br>
     <label for="scriptsenabled">Allow custom scripts to run</label>
     <input type="checkbox" id="scriptsenabled" style="display:inline;">
     <br><br><input type="button" id="clearcache" value="clear cached tokens"><br>
@@ -49,9 +49,9 @@
     <br><input type="button" id="leaveopts" value="save & return">
     <h2 style="width:fit-content; padding-bottom:0.3em; padding-right:2em; border-bottom:1.5px solid black;">Advanced</h2>
     <div>
-      <label for="enter-script-button">Supply your own script to automate processing/sending of messages and more.</label>
-      <input type="button" onclick="document.getElementById('custom-script-input').click()" value="select files">
-      <input type="file" accept="text/javascript" id="custom-script-input" style="display:none;">
+      <label for="enter-script-button">Add a custom script <a href="https://github.com/kiawildberger/vassalize/blob/master/README.md" target="_blank">Learn more</a>&nbsp;&nbsp;</label>
+      <input type="button" onclick="document.getElementById('custom-script-input').click()" value="select files"><input type="button" onclick="ipcRenderer.send('restart')" title="requires sign-in" value="Reload window">
+      <input type="file" multiple accept="text/javascript" id="custom-script-input" style="display:none;">
     </div>
     <ul id="cscript-list"></ul>
   </div>

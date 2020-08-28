@@ -13,6 +13,7 @@ body {
     font-family:Whitney,Helvetica Neue,Helvetica,Arial,sans-serif;
     background:#4A4D5D;
 }
+a { color:cornflower; }
 #msgdisplay {
     width:70%;
     max-width:70%;
@@ -32,6 +33,11 @@ body {
     white-space:pre-wrap;
     display:inline;
     /*word-break:break-word;*/
+}
+blockquote {
+    border-left:1.5px solid green;
+    padding-left:0.5em;
+    margin-left:2em;
 }
 #msgdisplay > ul > p {
     display:block;
@@ -132,11 +138,6 @@ a:visited {
 }
 #userd { position:absolute; bottom:0.2em; right:0.2em; }
 #errout{ color:red; font-size:14px; }
-blockquote {
-    border-left:1.5px solid green;
-    padding-left:0.5em;
-    margin-left:0;
-}
 .customscript-ul {
   margin-bottom:0.8em;
   width:65%;
@@ -233,9 +234,7 @@ select { width:10em; }
 #leaveopts { position:absolute; right:0; bottom:0; }
 label[for="clearcache"] { color:coral; font-size:14px; margin-left:1em; }
 #options { margin-left:2.5em; margin-top:1em; }
-#options > input[type="button"] { margin:0.5em; outline:none; }
-.cs-close { cursor:pointer; position:relative; top:0.5em; right:0.5em; }
-.cs-close { text-decoration:underline; }
+#options input[type="button"] { margin:0.5em; outline:none; border:none; width:fit-content; background:#767DA8; cursor:pointer; border-radius:2px; }
 ::-webkit-scrollbar {
   width:10px;
 }

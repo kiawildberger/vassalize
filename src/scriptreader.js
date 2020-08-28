@@ -7,14 +7,41 @@ const {
 // if(!fs.existsSync("./scripts.json")) fs.writeFileSync("./scripts.json", "[]")
 let scripts = require("./scripts.json")
 exports.scripts = scripts
-const firstLine = `console.log = function(str){ require("fs").appendFile("./logfile", str+"\\n", () => {}) };\n`
-
 function updateRefresh(e) {
+  e.forEach(q => {
+    if(!fs.existsSync(q.opath)) return;
+    let fullfile = fs.readFileSync(q.path, "utf-8"), ofile = fs.readFileSync(q.opath, "utf-8")
+    // console.log((fullfile === ofile))
+    console.log(fullfile)
+    console.log(ofile)
+    if(fullfile !== ofile) {
+      fs.writeFileSync(q.path, ofile) // rewrites file in /scripts/ to match original
+    }
+  })
   fs.writeFileSync("./scripts.json", JSON.stringify(e))
   ipcRenderer.send("refreshScripts")
 }
+exports.update = updateRefresh
+function logFile(e) {if (Rsettings.fileLogging) fs.appendFile("./logfile", e + "\n", () => {})}
+
+function refreshJSONFromFile(script) {
+  let fullfile = fs.readFileSync(script.path, "utf-8"),
+    name, desc, iLines = fullfile.split("\n");
+  iLines = iLines.filter(el => el != "")
+  iLines.forEach(line => {
+    if (line.includes("&name")) {
+      script.name = line.replace("//", '').replace("&name", '').trim()
+    }
+    if (line.includes("&desc")) {
+      script.desc = line.replace("//", '').replace("&desc", '').trim()
+    }
+  })
+  if(scripts.indexOf(script) > -1) scripts.splice(scripts.indexOf(script), 1)
+  scripts.push(script)
+}
 
 function createScriptHTML(script) {
+  refreshJSONFromFile(script)
   let ul = document.createElement("ul");
   ul.classList.add("customscript-ul");
   ul.title = script.opath
@@ -32,21 +59,32 @@ function createScriptHTML(script) {
     } else {
       script.enabled = false
     }
-    console.log(scripts)
     updateRefresh(scripts)
     input.value = (script.enabled) ? "Disable" : "Enable";
   })
-  ul.appendChild(input)
-  let p = document.createElement("p")
+  let p = document.createElement("input")
   p.className = "cs-close"
-  p.textContent = "X"
-  p.title = "remove " + script.name + " from script library"
+  p.value = "Remove"
+  p.type = "button"
+  p.style.float = "right"
+  p.title = "remove " + script.name + " from script library and delete file"
   p.addEventListener("click", () => {
     scripts.splice(scripts.indexOf(script), 1)
     updateRefresh(scripts)
+    if(!fs.existsSync(script.path)) {
+      logFile("[Scripts] could not delete file "+script.path+" because it did not exist")
+      ul.remove()
+      return;
+    }
+    fs.unlinkSync(script.path)
+    logFile("[Scripts] deleted "+script.path)
     ul.remove()
   })
   ul.appendChild(p)
+  ul.appendChild(input)
+  p.style.margin = 0
+  input.style.margin = 0
+  input.style.marginRight = "0.5em"
   document.getElementById("cscript-list").appendChild(ul)
 }
 scripts.forEach(e => {
@@ -64,7 +102,6 @@ exports.processFiles = function(q) {
     let fullfile = fs.readFileSync(e.path, "utf-8"),
       name, desc, iLines = fullfile.split("\n");
     iLines = iLines.filter(el => el != "")
-    cfirstline = firstLine
     iLines.forEach(line => {
       if (line.includes("&name")) {
         name = line.replace("//", '').replace("&name", '').trim()
@@ -78,15 +115,11 @@ exports.processFiles = function(q) {
       name: name,
       desc: desc,
       enabled: false,
-      path: "./custom/" + filename + ".js",
+      path: "./custom/scripts/" + filename + ".js",
       opath: e.path
     }
     scripts.push(csobj)
-    if (fullfile.includes(firstLine)) {
-      fs.writeFileSync("./custom/" + filename + ".js", fullfile)
-    } else {
-      fs.writeFileSync("./custom/" + filename + ".js", cfirstline + fullfile)
-    }
+    fs.writeFileSync("./custom/scripts/" + filename + ".js", fullfile)
     createScriptHTML(csobj)
   })
   fs.writeFileSync("./scripts.json", JSON.stringify(scripts))

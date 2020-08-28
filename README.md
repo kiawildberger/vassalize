@@ -23,16 +23,16 @@ Vassalize provides a way for users to automate the processing of messages with u
 exports.init = function(client) {
   // code here
 }
-exports.message = function(message) {
+exports.message = function(message, currentchannel) {
   // code here
 }
 ```
-The script can have as much or as little code as you need, but as long as the `&name` and `&desc`, and the`init` and `message` properties are present, vassalize will accept it as a script.
-The `client` and `message` arguments to `init` and `message` respectively are straight from discord.js. Refer to the (documentation)[https://discord.js.org/#/docs/main/stable/general/welcome] for details.
+The script can have as much or as little code as you need, but as long as the `&name`, `&desc`, `init` and `message` properties are present, vassalize will accept it as a script.
+The `client` and `message` arguments to `init` and `message` respectively are straight from discord.js, and the `currentchannel` argument is the channel ID of the currently selected channel in the vassalize client. Refer to the (documentation)[https://discord.js.org/#/docs/main/stable/general/welcome] for details on discord.js. 
 
-To run the script, make sure the "Allow custom scripts to run" option is checked, import your file, and enable it. After reloading, it should run.
+To run the script, make sure the "Allow custom scripts to run" option is checked, import your file, and enable it. After reloading the app, it should run.
 
-Custom scripts log messages to src/logfile instead of the system console allow for testing/debugging of scripts when not running with npm.
+Custom scripts log messages to src/logfile instead of the system console, which allows for testing/debugging of scripts when not running with npm.
 
 ---
 
