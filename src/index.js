@@ -2,8 +2,10 @@ const {
   ipcRenderer,
   shell
 } = require("electron")
+const readline = require("readline")
 const fs = require('fs')
-const ps = require("./ps.js")
+const ps = require("./ps.js"),
+  scriptreader = require("./scriptreader.js")
 let md = require("markdown-it")({
   linkify: false // dont want to auto-link until can figure out how to open them externally, or link them myself idrk
 })
@@ -291,18 +293,30 @@ id('bs-btn').addEventListener("click", e => {
 
 let istyping = false;
 id("msgin").addEventListener("keypress", e => {
-  if(!istyping && Rsettings.typing) ipcRenderer.send("typing", { start: true, chid: currentchannel })
+  if (!istyping && Rsettings.typing) ipcRenderer.send("typing", {
+    start: true,
+    chid: currentchannel
+  })
   istyping = true
   if (id("msgin").value === "") {
-    if(Rsettings.typing) ipcRenderer.send("typing", { stop: true, chid: currentchannel })
+    if (Rsettings.typing) ipcRenderer.send("typing", {
+      stop: true,
+      chid: currentchannel
+    })
     istyping = false
   }
   if (e.keyCode !== 13) return;
   if (!e.target.value) return;
   id('bs-helper').innerText = ''
-  if(Rsettings.typing) ipcRenderer.send("typing", { stop: true, chid: currentchannel })
+  if (Rsettings.typing) ipcRenderer.send("typing", {
+    stop: true,
+    chid: currentchannel
+  })
   istyping = false;
-  ipcRenderer.send("msgin", { msg: id("msgin").value, channel: currentchannel })
+  ipcRenderer.send("msgin", {
+    msg: id("msgin").value,
+    channel: currentchannel
+  })
   id('msgin').value = ""
 })
 id('cached-btn').addEventListener('click', () => {
@@ -312,6 +326,39 @@ id('cached-btn').addEventListener('click', () => {
     id('cached').style.display = "block"
   }
 })
+// populate list of custom scripts
+// let scriptsObj = require("./scripts.json"),
+//   slist = id("cscript-list");
+// if (scriptsObj.length) {
+//   scriptsObj.forEach(e => {
+//     let script = e
+//     if (!fs.existsSync(script.path)) {
+//       id("deleted-files").style.display = "block"
+//       // scriptsObj = scriptsObj.splice(scriptsObj.indexOf(script), 1)
+//     } else {
+//       let ul = document.createElement("ul");
+//       ul.classList.add("customscript-ul");
+//       ul.title = script.opath
+//       ul.setAttribute("cs-enabled", script.enabled)
+//       let buttonenabled = (script.enabled) ? "Disable" : "Enable";
+//       ul.innerHTML = `
+//     <h4 class="name">${script.name}</h4>
+//     <p class="desc">${script.desc}</p>
+//     `
+//       let input = document.createElement("input")
+//       input.type = "button"
+//       input.classList.add("cs-toggle")
+//       input.value = buttonenabled
+//       input.addEventListener("click", () => {
+//         script.enabled = (script.enabled) ? false : true;
+//       })
+//       ul.appendChild(input)
+//       slist.appendChild(ul)
+//     }
+//   })
+// } else {
+//   slist.innerHTML = "<div align='center'>no custom scripts loaded</div>"
+// }
 id('topt').addEventListener('click', () => {
   document.querySelector('.container').style.display = 'none'
   id('options').style.display = "block"
@@ -323,6 +370,8 @@ id('topt').addEventListener('click', () => {
   }
   id('devmode').checked = Rsettings.devmode
   id("typingIndicator").checked = Rsettings.typing
+  id("logfile").checked = Rsettings.fileLogging
+  id("scriptsenabled").checked = Rsettings.csenabled
 })
 id("leaveopts").addEventListener("click", () => { // write settings to settings.json
   id('options').style.display = "none"
@@ -330,11 +379,12 @@ id("leaveopts").addEventListener("click", () => { // write settings to settings.
   let settings = {
     cachedlength: id("cachedlength").value,
     devmode: id("devmode").checked,
-    typing: id("typingIndicator").checked
+    typing: id("typingIndicator").checked,
+    fileLogging: id("logfile").checked,
+    csenabled: id("scriptsenabled").checked
   }
   Rsettings = settings
   fs.writeFileSync("./settings.json", JSON.stringify(settings))
-  ipcRenderer.send("refreshSettings")
 })
 id('clearcache').addEventListener("click", () => {
   fs.writeFileSync("./config.json", "{ }")
@@ -342,4 +392,8 @@ id('clearcache').addEventListener("click", () => {
   id("clearcache").setAttribute('title', 'no tokens to clear')
   document.querySelector("label[for='clearcache']").style.display = 'block'
   setTimeout(() => document.querySelector("label[for='clearcache']").style.display = 'none', 1500)
+})
+
+id("custom-script-input").addEventListener("change", e => {
+  scriptreader.processFiles(e)
 })

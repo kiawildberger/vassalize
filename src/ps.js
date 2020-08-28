@@ -26,12 +26,34 @@ let cids = []
 let tagx = /.*#[0-9]{4}/;
 let uidx = /<@!\d+>/g;
 let client;
+let scripts = require("./scripts.json")
+let enabledscripts = scripts.filter(e => e.enabled)
+
+function logFile(e) {
+  if (Rsettings.fileLogging) fs.appendFile("./logfile", e + "\n", () => {})
+}
 
 exports.init = function(win, tok) {
   client = new Discord.Client()
+  ipcMain.on("refreshScripts", () => scripts = require("./scripts.json"))
   window = win;
   client.on("ready", () => {
     if (isLoggedIn) return;
+    if (enabledscripts.length > 0 && Rsettings.csenabled) {
+      enabledscripts.forEach(e => {
+        try {
+          let script = require(e.path)
+          if (script.init) var g = script.init(client)
+          logFile("[Scripts] " + e.name + " started successfully")
+          if (g) {
+            logFile(e.name + " > " + g)
+          }
+        } catch (err) {
+          logFile("[Scripts] " + e.name + " failed to start")
+          throw err;
+        }
+      })
+    }
     client.guilds.cache.array().forEach(t => {
       let channels = [],
         msgcontent = [],
@@ -88,106 +110,117 @@ exports.init = function(win, tok) {
     .catch(err => {
       window.webContents.send('invalidtoken')
     })
-      ipcMain.on("getChannelContent", (event, id) => {
-        let b = client.channels.cache.get(id)
-        if (b) {
-          b.messages.fetch().then((resp) => {
-            let t = resp.array()
-            t.length = Rsettings.cachedlength
-            t = t.reverse()
-            t.forEach(msg => {
-              let ct = msg.content
-              if (msg.mentions) {
-                let mts = msg.mentions.users.array()
-                mts.forEach(e => {
-                  let i = `@${e.username}#${e.discriminator}`
-                  ct = ct.replace(uidx, i)
-                })
-              }
-              let m = {
-                content: ct,
-                author: {
-                  username: msg.author.username,
-                  discriminator: msg.author.discriminator,
-                  id: msg.author.id,
-                  avatar: msg.author.avatarURL()
-                },
-                channel: msg.channel.id
-              }
-              if (msg.attachments) {
-                let d = msg.attachments.array()
-                d.forEach(e => {
-                  e = e.url
-                })
-                m.images = d
-              }
-              setTimeout(() => {
-                process(msg)
-              }, 100)
+  ipcMain.on("getChannelContent", (event, id) => {
+    let b = client.channels.cache.get(id)
+    if (b) {
+      b.messages.fetch().then((resp) => {
+        let t = resp.array()
+        t.length = Rsettings.cachedlength
+        t = t.reverse()
+        t.forEach(msg => {
+          let ct = msg.content
+          if (msg.mentions) {
+            let mts = msg.mentions.users.array()
+            mts.forEach(e => {
+              let i = `@${e.username}#${e.discriminator}`
+              ct = ct.replace(uidx, i)
             })
-          }).catch(err => {
-            if (err.name === "DiscordAPIError" && err.message === "Missing Access") {
-              return {
-                err: "missing access"
-              }
-            }
-          })
-        } else { // could not fetch messages for some unknown reason
+          }
+          let m = {
+            content: ct,
+            author: {
+              username: msg.author.username,
+              discriminator: msg.author.discriminator,
+              id: msg.author.id,
+              avatar: msg.author.avatarURL()
+            },
+            channel: msg.channel.id
+          }
+          if (msg.attachments) {
+            let d = msg.attachments.array()
+            d.forEach(e => {
+              e = e.url
+            })
+            m.images = d
+          }
+          setTimeout(() => {
+            process(msg)
+          }, 100)
+        })
+      }).catch(err => {
+        if (err.name === "DiscordAPIError" && err.message === "Missing Access") {
           return {
-            err: "could not fetch messages ¯\\_(ツ)_/¯"
+            err: "missing access"
           }
         }
       })
-      ipcMain.on("msgin", (event, arg) => {
-        if (arg.msg.toString().match(tagx)) { // is ping
-          let un = arg.msg.toString().match(tagx)[0].toString().split("#")[0].replace("@", '')
-          let g = client.channels.cache.get(arg.channel.id).guild.members.cache.filter(x => x.user.username === un).array()
-          arg.msg = arg.msg.replace(tagx, g[0].user)
-        }
-        if (arg.msg.toString().includes("/shrug")) arg.msg = arg.msg.replace("/shrug", "¯\_(ツ)_/¯")
-        client.channels.cache.get(arg.channel).send(arg.msg)
-      })
-
-      function process(msg) {
-        let ct = msg.content
-        if (msg.mentions.users.array().length >= 1) {
-          let mts = msg.mentions.users.array()
-          mts.forEach(e => {
-            let i = `@${e.username}#${e.discriminator}`
-            ct = ct.replace(`<@${e.id}>`, i)
-            ct = ct.replace(`<@!${e.id}>`, i)
-          })
-        }
-        let m = {
-          content: ct,
-          author: {
-            username: msg.author.username,
-            discriminator: msg.author.discriminator,
-            id: msg.author.id,
-            avatar: msg.author.avatarURL()
-          },
-          channel: msg.channel.id,
-          guild: msg.guild.id // what
-        }
-        // console.log(msg.mentions)
-        if (msg.mentions.users.array().length != 0) {
-          m.mentions = msg.mentions.users.array()
-        }
-        if (msg.attachments.size) {
-          m.images = msg.attachments.array()
-        }
-        window.webContents.send("msg", {
-          msg: m
-        })
-        if (msg.content.includes("discord.gg")) {
-          console.log('someone sent a discord invite link: ' + msg.content)
-        }
+    } else { // could not fetch messages for some unknown reason
+      return {
+        err: "could not fetch messages ¯\\_(ツ)_/¯"
       }
-      ipcMain.on("typing", (event, arg) => {
-        if (arg.start) {
-          client.channels.cache.get(arg.chid).startTyping()
-        } else if (arg.stop) {
-          client.channels.cache.get(arg.chid).stopTyping()
+    }
+  })
+  ipcMain.on("msgin", (event, arg) => {
+    if (arg.msg.toString().match(tagx)) { // is ping
+      let un = arg.msg.toString().match(tagx)[0].toString().split("#")[0].replace("@", '')
+      let g = client.channels.cache.get(arg.channel.id).guild.members.cache.filter(x => x.user.username === un).array()
+      arg.msg = arg.msg.replace(tagx, g[0].user)
+    }
+    if (arg.msg.toString().includes("/shrug")) arg.msg = arg.msg.replace("/shrug", "¯\_(ツ)_/¯")
+    client.channels.cache.get(arg.channel).send(arg.msg)
+  })
+
+  function process(msg) {
+    if (Rsettings.csenabled) {
+      enabledscripts.forEach(e => {
+        try {
+          let script = require(e.path)
+          if (script.message) var g = script.message(msg)
+          if (g) logFile(e.name + " > " + g)
+        } catch {
+          logFile("[Scripts] " + e.name + " was unable to receive a message")
         }
       })
+    }
+    let ct = msg.content
+    if (msg.mentions.users.array().length >= 1) {
+      let mts = msg.mentions.users.array()
+      mts.forEach(e => {
+        let i = `@${e.username}#${e.discriminator}`
+        ct = ct.replace(`<@${e.id}>`, i)
+        ct = ct.replace(`<@!${e.id}>`, i)
+      })
+    }
+    let m = {
+      content: ct,
+      author: {
+        username: msg.author.username,
+        discriminator: msg.author.discriminator,
+        id: msg.author.id,
+        avatar: msg.author.avatarURL()
+      },
+      channel: msg.channel.id,
+      guild: msg.guild.id // what
+    }
+    // console.log(msg.mentions)
+    if (msg.mentions.users.array().length != 0) {
+      m.mentions = msg.mentions.users.array()
+    }
+    if (msg.attachments.size) {
+      m.images = msg.attachments.array()
+    }
+    window.webContents.send("msg", {
+      msg: m
+    })
+    if (msg.content.includes("discord.gg")) {
+      console.log('someone sent a discord invite link: ' + msg.content)
+    }
+  }
+  ipcMain.on("typing", (event, arg) => {
+    if (arg.start) {
+      client.channels.cache.get(arg.chid).startTyping()
+    } else if (arg.stop) {
+      client.channels.cache.get(arg.chid).stopTyping()
+    }
+  })
 }

@@ -41,11 +41,12 @@ app.whenReady().then(() => {
 /*
 
 TODO:
+ - update readme to include "docs" for scripts
  - be able to send custom emojis
+ + custom scripts and actions (user provides a js file with commands/event handlers)
  - get non-custom emoji to look normal
- - server select div scroll on overflow
-  - fucc that lmao
  - load more messages as user scrolls up (button or auto)
+ - timestamps, deleted messages, edits
  + typing indicator
  + show user avatars and generally neaten up the displaying of messages
   + made it look a whole lot nicer
@@ -59,7 +60,8 @@ TODO:
     - holy fuck is pain
  - display embeds (yt videos, webpage metadata, just straight embeds)
  - keep bot online while app is closed (minimize to tray)
- - custom scripts and actions (user provides a js file with commands/event handlers)
+ - server select div scroll on overflow
+  - fucc that lmao
 
 MAYBE:
   - status updater

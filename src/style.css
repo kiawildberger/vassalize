@@ -137,7 +137,18 @@ blockquote {
     padding-left:0.5em;
     margin-left:0;
 }
-
+.customscript-ul {
+  margin-bottom:0.8em;
+  width:65%;
+  padding:0.5em;
+  border:0.5px solid black;
+  border-radius:10px;
+  background-color:transparent;
+  box-shadow:1px 2px 3px black;
+}
+.customscript-ul > .name { padding:0.4em; display:inline; }
+.customscript-ul > .desc { display:inline; }
+.customscript-ul > .cs-toggle { cursor:pointer; display:inline; float:right; }
 #serverlist {
     position:absolute;
     left:0;
@@ -218,11 +229,13 @@ select { width:10em; }
 .user-video { outline:none; margin-top:0; }
 #topt { position:absolute; bottom: 0; cursor:pointer; padding-bottom:6px; z-index:2; background-color:#4A4D5D; }
 #topt:hover {text-decoration:underline;}
-#options { width:100%; height:100%; background:#4A4D5D; }
+#options { width:100%; height:100%; background:#4A4D5D; overflow-y:auto; }
 #leaveopts { position:absolute; right:0; bottom:0; }
 label[for="clearcache"] { color:coral; font-size:14px; margin-left:1em; }
 #options { margin-left:2.5em; margin-top:1em; }
 #options > input[type="button"] { margin:0.5em; outline:none; }
+.cs-close { cursor:pointer; position:relative; top:0.5em; right:0.5em; }
+.cs-close { text-decoration:underline; }
 ::-webkit-scrollbar {
   width:10px;
 }
