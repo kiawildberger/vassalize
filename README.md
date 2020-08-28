@@ -28,7 +28,7 @@ exports.message = function(message, currentchannel) {
 }
 ```
 The script can have as much or as little code as you need, but as long as the `&name`, `&desc`, `init` and `message` properties are present, vassalize will accept it as a script.
-The `client` and `message` arguments to `init` and `message` respectively are straight from discord.js, and the `currentchannel` argument is the channel ID of the currently selected channel in the vassalize client. Refer to the (documentation)[https://discord.js.org/#/docs/main/stable/general/welcome] for details on discord.js. 
+The `client` and `message` arguments to `init` and `message` respectively are straight from discord.js, and the `currentchannel` argument is the channel ID of the currently selected channel in the vassalize client. Refer to the [documentation](https://discord.js.org/#/docs/main/stable/general/welcome) for details on discord.js. 
 
 To run the script, make sure the "Allow custom scripts to run" option is checked, import your file, and enable it. After reloading the app, it should run.
 
