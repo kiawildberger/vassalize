@@ -7,5 +7,5 @@ exports.init = function(client) {
 
 exports.message = function(message) {
   if(message.author.bot) return;
-  message.channel.send("what a nerd, who says \""+message.content+"\"")
+  // message.channel.send("what a nerd, who says \""+message.content+"\"")
 }

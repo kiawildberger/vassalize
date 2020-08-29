@@ -6,9 +6,7 @@ const readline = require("readline")
 const fs = require('fs')
 const ps = require("./ps.js"),
   scriptreader = require("./scriptreader.js")
-let md = require("markdown-it")({
-  linkify: false // dont want to auto-link until can figure out how to open them externally, or link them myself idrk
-})
+const snarkdown = require("snarkdown")
 // require("dotenv").config()
 // let tenorkey = process.env.TENORKEY
 // const elebar = require("electron-titlebar")
@@ -68,8 +66,8 @@ function processmsg(event, arg) {
         ct = ct.replace(e, elem)
       })
     }
-
-    ct = md.render(ct)
+    ct = snarkdown(ct)
+    ct = `<p mid="${arg.msg.id}">${ct}</p>`
     // going to have to remove this and parse it myself so everything is easier
     if (ct.includes("@everyone")) {
       ct = ct.replace("@everyone", `<span class="selfping">@everyone</span>`)
@@ -90,9 +88,11 @@ function processmsg(event, arg) {
     let usertag = `<div class="username-card">${arg.msg.author.username}<span class="user-discrim">#${arg.msg.author.discriminator}</span>&nbsp;&nbsp;</div>`
     let lastmsg = document.querySelectorAll("ul.collection-item")[document.querySelectorAll("ul.collection-item").length - 1]
     if (lastmsg && lastmsg.getAttribute("uid") === arg.msg.author.id) {
+      // lastmsg.innerHTML += `<p mid="${arg.msg.id}">${ct}</p>`
       lastmsg.innerHTML += ct
     } else {
-      ul.innerHTML = useravatar + usertag + ct
+      // ul.innerHTML = useravatar + usertag + `<p mid="${arg.msg.id}">${ct}</p>`
+      ul.innerHTML = useravatar+usertag+ct
     }
     if (arg.msg.images) {
       isimg = true; // should be "ismedia" bc videos but im not gon change that shit rn
@@ -370,7 +370,10 @@ id('clearcache').addEventListener("click", () => {
   document.querySelector("label[for='clearcache']").style.display = 'block'
   setTimeout(() => document.querySelector("label[for='clearcache']").style.display = 'none', 1500)
 })
-
+ipcRenderer.on("messagedeleted", (event, id) => {
+  let messageElement = document.querySelector(`p[mid="${id}"]`)
+  if(messageElement) messageElement.innerHTML += `<span class="deleted-reminder">(deleted)</span>`
+})
 id("custom-script-input").addEventListener("change", e => {
   scriptreader.processFiles(e)
 })

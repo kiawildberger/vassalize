@@ -11,7 +11,6 @@ if (!fs.existsSync("./config.json")) {
 }
 let Rsettings = require("./settings.json")
 require("dotenv").config()
-
 let settings = {
   mode: "user", // define actions available (user is user-controlled)
   defaultprefix: ".",
@@ -32,7 +31,6 @@ let enabledscripts = scripts.filter(e => e.enabled)
 function logFile(e) {
   if (Rsettings.fileLogging) fs.appendFile("./logfile", e + "\n", () => {})
 }
-function clog(e) { window.webContents.send('clog', e) }
 
 exports.init = function(win, tok) {
   client = new Discord.Client()
@@ -107,6 +105,9 @@ exports.init = function(win, tok) {
   });
   client.on("message", (message) => {
     process(message)
+  });
+  client.on("messageDelete", message => {
+    window.webContents.send("messagedeleted", message.id)
   });
   client.login(tok)
     .catch(err => {
@@ -194,13 +195,18 @@ exports.init = function(win, tok) {
         ct = ct.replace(`<@!${e.id}>`, i)
       })
     }
+    let avatarURL = msg.author.displayAvatarURL()
+    // if(avatarURL === null) {
+    //   avatarURL = msg.author.defaultAvatarURL()
+    // }
     let m = {
       content: ct,
+      id: msg.id,
       author: {
         username: msg.author.username,
         discriminator: msg.author.discriminator,
         id: msg.author.id,
-        avatar: msg.author.avatarURL()
+        avatar: avatarURL
       },
       channel: msg.channel.id,
       guild: msg.guild.id // what

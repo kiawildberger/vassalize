@@ -49,7 +49,6 @@ app.whenReady().then(() => {
 
 TODO:
  - display profile pictures for defaults
- - decide whether or not to keep the logfile
  - be able to send custom emojis
  + custom scripts and actions (user provides a js file with commands/event handlers)
  - get non-custom emoji to look normal

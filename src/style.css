@@ -235,6 +235,7 @@ select { width:10em; }
 label[for="clearcache"] { color:coral; font-size:14px; margin-left:1em; }
 #options { margin-left:2.5em; margin-top:1em; }
 #options input[type="button"] { margin:0.5em; outline:none; border:none; width:fit-content; background:#767DA8; cursor:pointer; border-radius:2px; }
+.deleted-reminder { color:black; font-size:0.7em; opacity:0.8; margin-left:0.5em; }
 ::-webkit-scrollbar {
   width:10px;
 }
