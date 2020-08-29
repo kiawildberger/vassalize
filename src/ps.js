@@ -171,19 +171,14 @@ exports.init = function(win, tok) {
     if (arg.msg.toString().includes("/shrug")) arg.msg = arg.msg.replace("/shrug", "¯\_(ツ)_/¯")
     client.channels.cache.get(arg.channel).send(arg.msg)
   })
-  let currentchannel;
-  ipcMain.on("currentchannel", (event, arg) => {
-    currentchannel = arg;
-  })
   function process(msg, iscached=false) {
     if (Rsettings.csenabled && !iscached) {
       window.webContents.send("refreshScript")
       enabledscripts.forEach(e => {
         try {
           let script = require(e.path)
-          let c = client.channels.cache.get(currentchannel)
-          var g = script.message(msg, c)
-          console.log(g)
+          var g = script.message(msg)
+          if(g) console.log(g)
           if (g) logFile(e.name + " > " + g)
         } catch {
           logFile("[Scripts] " + e.name + " was unable to receive a message")

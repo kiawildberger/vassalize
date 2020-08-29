@@ -225,7 +225,6 @@ function fillGuildSelect(arg) { // generates and populates guild list
         elm.setAttribute('data-id', e.id)
         elm.addEventListener("click", () => {
           currentchannel = e.id
-          ipcRenderer.send("currentchannel", e.id)
           q = [...document.querySelectorAll(".activechannel")]
           q.forEach(e => {
             e.classList.remove("activechannel")
