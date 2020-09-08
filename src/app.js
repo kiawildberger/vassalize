@@ -11,6 +11,22 @@ const conf = require('./config.json')
 let settings = require("./settings.json")
 let win;
 
+ipcMain.on("addwindow", (event, arg) => childWindow(arg.url))
+
+function childWindow(url) {
+  let childwindow = new BrowserWindow({
+    width: 350,
+    height: 200,
+    parent: win,
+    frame:false,
+    webPreferences: {
+      nodeIntegration: true
+    }
+  })
+  // childwindow.webContents.openDevTools();
+  childwindow.loadFile(url)
+}
+
 function createWindow() {
   win = new BrowserWindow({
     width: 800,
@@ -18,13 +34,20 @@ function createWindow() {
     // frame: false,
     icon: "./icon.png",
     webPreferences: {
-      nodeIntegration: true
+      nodeIntegration: true,
+      nativeWindowOpen: true
     }
   })
   win.loadFile('index.html')
   win.setMenu(null)
   if(settings.devmode) {
-    globalShortcut.register("CommandOrControl+Shift+I", () => win.webContents.openDevTools())
+    globalShortcut.register("CommandOrControl+Shift+I", () => {
+      if(win.webContents.isDevToolsOpened()) {
+        win.webContents.closeDevTools()
+      } else {
+        win.webContents.openDevTools()
+      }
+    })
     globalShortcut.register("CommandOrControl+Shift+R", () => { app.relaunch(); app.exit(); } )
   }
   globalShortcut.register("CommandOrControl+Shift+W", () => app.quit())
@@ -48,27 +71,19 @@ app.whenReady().then(() => {
 /*
 
 TODO:
- - display profile pictures for defaults
+ + display profile pictures for defaults
  - be able to send custom emojis
  + custom scripts and actions (user provides a js file with commands/event handlers)
  - get non-custom emoji to look normal
  - load more messages as user scrolls up (button or auto)
  - timestamps, deleted messages, edits
- + typing indicator
- + show user avatars and generally neaten up the displaying of messages
   + made it look a whole lot nicer
- + using markdown-it to cover basic formatting (bold, italics, etc)
-  - will do it myself
  - make message readability better (separation between)
-    + consolidate continued messages from same user
- - open links externally
-    - not on linux?
- - tenor
-    - holy fuck is pain
+ - open links externally (also autolink)
  - display embeds (yt videos, webpage metadata, just straight embeds)
  - keep bot online while app is closed (minimize to tray)
  - server select div scroll on overflow
-  - fucc that lmao
+  - fuck that lmao
 
 MAYBE:
   - status updater

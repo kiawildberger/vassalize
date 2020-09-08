@@ -2,10 +2,11 @@
 //&desc literally stupid
 
 exports.init = function(client) {
-  console.log(client.user.username+"#"+client.user.discriminator + " has signed in!")
+  console.log("bro its "+client.user.username+"!")
 }
 
 exports.message = function(message) {
-  if(message.author.bot) return;
-  // message.channel.send("what a nerd, who says \""+message.content+"\"")
+  if(message.author.bot || message.channel.guild.id === 658043882000482305) return;
+  console.log("but can i")
+  // message.channel.send("im not trying to be annoying please forgive me")
 }

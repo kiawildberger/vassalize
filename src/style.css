@@ -226,6 +226,8 @@ div.serverlist-item > p {
 .user-discrim { color:black; opacity:0.7; font-size:0.75em; margin-left:4px; }
 .username-card { display: inline-block; margin-bottom:20px; font-size:1.2em; }
 select { width:10em; }
+.hoverunderline { cursor:pointer; text-decoration:none; }
+.hoverunderline:hover { text-decoration:underline; }
 .user-img { width:150px; margin:0 0 1em 1em; border-left:2px solid green; padding-left:4px; display:block; }
 .user-video { outline:none; margin-top:0; }
 #topt { position:absolute; bottom: 0; cursor:pointer; padding-bottom:6px; z-index:2; background-color:#4A4D5D; }

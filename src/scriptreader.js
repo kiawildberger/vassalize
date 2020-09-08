@@ -1,5 +1,4 @@
-const fs = require("fs"),
-  byline = require("byline");
+const fs = require("fs");
 const {
   ipcRenderer
 } = require("electron")

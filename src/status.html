@@ -1,0 +1,47 @@
+<head>
+    <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+    <select id="status-presence">
+        <option value="playing">playing</option>
+        <option value="listening">listening</option>
+        <option value="watching">watching</option>
+        <!-- bots cant set custom statuses -->
+    </select>
+    <!-- this is shit ui design but maybe ill do some image shit idrk-->
+    <select id="status-status">
+        <option value="online">online</option>
+        <option value="idle">idle</option>
+        <option value="dnd">do not disturb</option>
+        <option value="invisible">invisible</option>
+    </select>
+
+    <input type="text" id="status-name" placeholder="status text" />
+
+    <p class="hoverunderline" onclick="clearStatus()">clear status</p>
+    <p id="closeWin" style="position:absolute; bottom:0.75em; right:1em;" class="hoverunderline">close</p>
+    <script>
+        let { ipcRenderer } = require("electron");
+        let { status } = require("./settings.json")
+        let type = document.getElementById("status-status"), presence = document.getElementById("status-presence"), name = document.getElementById("status-name");
+        if(status) {
+            type.value = status.status
+            presence.value = status.activity.type.toLowerCase();
+            name.value = status.activity.name
+        }
+        document.getElementById("closeWin").addEventListener("click", setStatus);
+        function setStatus() {
+            let presencedata = {
+                status: type.value,
+                activity: {
+                    name: name.value,
+                    type: presence.value.toUpperCase()
+                }
+            }
+            ipcRenderer.send("setstatus", { data: presencedata });
+            window.close();
+        }
+        function clearStatus() { ipcRenderer.send("clearstatus", {}) }
+    </script>
+</body>

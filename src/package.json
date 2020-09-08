@@ -22,11 +22,12 @@
     "bot"
   ],
   "dependencies": {
-    "byline": "^5.0.0",
     "discord.js": "^12.1.1",
     "dotenv": "^8.2.0",
     "electron-titlebar": "0.0.3",
-    "snarkdown": "^1.2.2"
+    "emojilib": "^2.4.0",
+    "snarkdown": "^1.2.2",
+    "unidecode": "^0.1.8"
   },
   "devDependencies": {
     "electron": "^9.2.0",

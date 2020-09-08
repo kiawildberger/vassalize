@@ -1,8 +1,5 @@
 const Discord = require("discord.js");
-const {
-  ipcMain,
-  desktopCapturer
-} = require("electron")
+const { ipcMain, desktopCapturer } = require("electron")
 const fs = require('fs')
 let conf;
 if (!fs.existsSync("./config.json")) {
@@ -29,15 +26,17 @@ let scripts = require("./scripts.json")
 let enabledscripts = scripts.filter(e => e.enabled)
 
 function logFile(e) {
-  if (Rsettings.fileLogging) fs.appendFile("./logfile", e + "\n", () => {})
+  if (Rsettings.fileLogging) fs.appendFile("./logfile", e + "\n", () => { })
 }
 
-exports.init = function(win, tok) {
+exports.init = function (win, tok) {
   client = new Discord.Client()
   ipcMain.on("refreshScripts", () => scripts = require("./scripts.json"))
   window = win;
   client.on("ready", () => {
     if (isLoggedIn) return;
+    let chip = client.emojis.cache.find(e => e.name === "chipmunk")
+    console.log(chip)
     if (enabledscripts.length > 0 && Rsettings.csenabled) {
       window.webContents.send("refreshScript")
       enabledscripts.forEach(e => {
@@ -172,14 +171,14 @@ exports.init = function(win, tok) {
     if (arg.msg.toString().includes("/shrug")) arg.msg = arg.msg.replace("/shrug", "¯\_(ツ)_/¯")
     client.channels.cache.get(arg.channel).send(arg.msg)
   })
-  function process(msg, iscached=false) {
+  function process(msg, iscached = false) {
     if (Rsettings.csenabled && !iscached) {
       window.webContents.send("refreshScript")
       enabledscripts.forEach(e => {
         try {
           let script = require(e.path)
           var g = script.message(msg)
-          if(g) console.log(g)
+          if (g) console.log(g)
           if (g) logFile(e.name + " > " + g)
         } catch {
           logFile("[Scripts] " + e.name + " was unable to receive a message")
@@ -226,11 +225,23 @@ exports.init = function(win, tok) {
     }
   }
   ipcMain.on("typing", (event, arg) => {
-    if(!Rsettings.typing) return;
+    if (!Rsettings.typing) return;
     if (arg.start) {
       client.channels.cache.get(arg.chid).startTyping()
     } else if (arg.stop) {
       client.channels.cache.get(arg.chid).stopTyping()
     }
   })
+  ipcMain.on("setstatus", (event, arg) => {
+    client.user.setPresence(arg.data);
+    let newsettings = require("./settings.json");
+    newsettings.status = arg.data
+    fs.writeFileSync("./settings.json", JSON.stringify(newsettings));
+  });
+  ipcMain.on("clearstatus", () => {
+    client.user.setActivity(null)
+    let newsettings = require("./settings.json")
+    if(newsettings.status) delete newsettings.status
+    fs.writeFileSync("./settings.json", JSON.stringify(newsettings));
+  });
 }

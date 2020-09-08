@@ -2,6 +2,7 @@ const {
   ipcRenderer,
   shell
 } = require("electron")
+const emoji = require("emojilib")
 const readline = require("readline")
 const fs = require('fs')
 const ps = require("./ps.js"),
@@ -51,8 +52,9 @@ function processmsg(event, arg) {
     let ct = arg.msg.content
     let mt = arg.msg.mentions
 
-    // this is only custom emoji tho
-    let pemojis = ct.match(/<:[a-zA-Z0-9]+:\d+>/g)
+    // custom emoji
+    // let pemojis = ct.match(/<:[a-zA-Z0-9]+:\d+>/g)
+    let pemojis;
     if (pemojis) {
       pemojis.forEach(e => {
         let d = e.split(":")[2].replace(">", ''),
@@ -63,10 +65,28 @@ function processmsg(event, arg) {
         }
         let elem = `![emoji](${url})`
         // make them bigger if message is *only* emojis
-        ct = ct.replace(e, elem)
+        // ct = ct.replace(e, elem)
       })
     }
-    ct = snarkdown(ct)
+    // twemoji
+    let temoji = arg.msg.content.match(/:.*:/g)
+    let tunicode = arg.msg.content.match(/\u.*/g)
+    // console.log(tunicode)
+    // console.log(temoji)
+    if(temoji) {
+      temoji.forEach(e => {
+        for(key in emoji.lib) {
+          if(e === key || e === emoji.lib[key].char) {
+            console.log(emoji.lib[key].keywords)
+            ct = ct.replace(emoji.lib[key].char)
+            ct = twemoji.parse(ct)
+            console.log(ct)
+          }
+        }
+      })
+      // console.log(ct);
+    }
+    // ct = snarkdown(ct)
     ct = `<p mid="${arg.msg.id}">${ct}</p>`
     // going to have to remove this and parse it myself so everything is easier
     if (ct.includes("@everyone")) {
@@ -123,20 +143,6 @@ function processmsg(event, arg) {
           // should add to open external? maybe an pseudo-element that appears when hovered would be best
           video.addEventListener("load", () => id('msgdisplay').scrollTop = id('msgdisplay').scrollHeight)
         }
-      })
-    }
-    if (arg.msg.content.match(tenorurl)) {
-      arg.msg.content.match(tenorurl).forEach(async (e) => {
-        let id = e.match(/gif-\d+/)[0].replace("gif-", '')
-        // let tenorgifs = await fetch("https://api.tenor.com/v1/gifs?key="+tenorkey+"&ids="+id)
-        //     .then(response => {
-        //         const reader = response.body.getReader()
-        //         // this is pain
-        //     })
-        // console.log(tenorgifs)
-        // die
-        // ul.appendChild(img)
-        // img.addEventListener("load", () => id('msgdisplay').scrollTop = id('msgdisplay').scrollHeight)
       })
     }
     if (arg.msg.content.match(cdnUrl)) {
@@ -274,7 +280,7 @@ ipcRenderer.on("validtoken", (event, args) => { // the *one* ipc i will use
   id("bs-helper").style.color = "green"
   loggedin = true;
   setTimeout(() => {
-    id('userd').innerHTML = `acting as <b>${args.bot.full}</b>`
+    id('userd').innerHTML = `acting as <span style="cursor:pointer;" onclick="ipcRenderer.send('addwindow', {url:'./status.html'})"><b>${args.bot.full}</b></span>`
     document.title = args.bot.full
     // id('titlebar-title').textContent = args.bot.full
     id('bs-helper').innerText = ''
