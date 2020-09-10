@@ -1,5 +1,5 @@
 const Discord = require("discord.js");
-const { ipcMain, desktopCapturer } = require("electron")
+const { ipcMain } = require("electron")
 const fs = require('fs')
 let conf;
 if (!fs.existsSync("./config.json")) {
@@ -35,8 +35,7 @@ exports.init = function (win, tok) {
   window = win;
   client.on("ready", () => {
     if (isLoggedIn) return;
-    let chip = client.emojis.cache.find(e => e.name === "chipmunk")
-    console.log(chip)
+    client.user.setPresence(Rsettings.status)
     if (enabledscripts.length > 0 && Rsettings.csenabled) {
       window.webContents.send("refreshScript")
       enabledscripts.forEach(e => {
@@ -92,6 +91,7 @@ exports.init = function (win, tok) {
       name: client.user.username,
       discrim: client.user.discriminator,
       full: botuser,
+      pfp: client.user.avatarURL(),
       guildNumber: client.guilds.cache.array().length
     }
     if (conf) tokens = conf;
@@ -244,4 +244,8 @@ exports.init = function (win, tok) {
     if(newsettings.status) delete newsettings.status
     fs.writeFileSync("./settings.json", JSON.stringify(newsettings));
   });
+  ipcMain.on("statusEntered", (event, arg) => {
+    // pain
+    win.webContents.send("statusUpdate", {presenceData: arg.presenceData})
+  })
 }

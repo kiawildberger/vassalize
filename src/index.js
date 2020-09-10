@@ -86,7 +86,7 @@ function processmsg(event, arg) {
       })
       // console.log(ct);
     }
-    // ct = snarkdown(ct)
+    ct = snarkdown(ct)
     ct = `<p mid="${arg.msg.id}">${ct}</p>`
     // going to have to remove this and parse it myself so everything is easier
     if (ct.includes("@everyone")) {
@@ -272,6 +272,33 @@ async function checkCached() {
 }
 checkCached()
 
+function fillStatus(bot, presenceData=undefined) {
+  if(!bot) return;
+  let sett;
+  fs.readFile("./settings.json", {encoding:"utf-8"}, (err, data) => {
+    sett = JSON.parse(data)
+    // why do i have to do this instead of readfilesync idfk
+    let stattype = sett.status.activity.type.toLowerCase()
+    stattype = stattype.replace(stattype[0], stattype[0].toUpperCase());
+    let statname = sett.status.activity.name.toLowerCase();
+    if(presenceData) {
+      stattype = presenceData.activity.type
+      statname = presenceData.activity.name.toLowerCase();
+      stattype = stattype.replace(stattype[0], stattype[0].toUpperCase());
+    }
+    if(stattype === "Listening" || stattype === "LISTENING") stattype = "Listening to"
+    let template = `<img class="statusd" src="${bot.pfp}">
+    <div class="status-data">
+    <p class="statusn">${bot.name}<span class="status-discrim"> #${bot.discrim}</span></p>
+    <p class="hoverunderline status-pres" onclick="ipcRenderer.send('addwindow', {url:'./status.html'})"><span class="status-type">${stattype} </span>${statname}</p>
+    </div>` // nice readability huh
+    id('userd').innerHTML = template;
+  })
+}
+ipcRenderer.on("statusUpdate", (event, arg) => {
+  fillStatus(botActor, arg.presenceData)
+});
+
 ipcRenderer.on("validtoken", (event, args) => { // the *one* ipc i will use
   if (args.bot && args.guildInfo) {
     botActor = args.bot, gids = args.guildInfo
@@ -282,6 +309,7 @@ ipcRenderer.on("validtoken", (event, args) => { // the *one* ipc i will use
   setTimeout(() => {
     id('userd').innerHTML = `acting as <span style="cursor:pointer;" onclick="ipcRenderer.send('addwindow', {url:'./status.html'})"><b>${args.bot.full}</b></span>`
     document.title = args.bot.full
+    fillStatus(args.bot);
     // id('titlebar-title').textContent = args.bot.full
     id('bs-helper').innerText = ''
     fillGuildSelect(args.guildInfo)

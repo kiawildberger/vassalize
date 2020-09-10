@@ -32,7 +32,7 @@ function createWindow() {
     width: 800,
     height: 600,
     // frame: false,
-    icon: "./icon.png",
+    icon: "./icon.ico",
     webPreferences: {
       nodeIntegration: true,
       nativeWindowOpen: true
@@ -71,22 +71,21 @@ app.whenReady().then(() => {
 /*
 
 TODO:
- + display profile pictures for defaults
+ - keep bot online while app is closed (minimize to tray)
+ - timestamps, deleted messages, edits
+  + deleted messages are marked as deleted
  - be able to send custom emojis
- + custom scripts and actions (user provides a js file with commands/event handlers)
  - get non-custom emoji to look normal
  - load more messages as user scrolls up (button or auto)
- - timestamps, deleted messages, edits
   + made it look a whole lot nicer
  - make message readability better (separation between)
  - open links externally (also autolink)
  - display embeds (yt videos, webpage metadata, just straight embeds)
- - keep bot online while app is closed (minimize to tray)
  - server select div scroll on overflow
   - fuck that lmao
+ + status updater
 
 MAYBE:
-  - status updater
   - brute force fucker for bot tokens lmao
   - VOICE? bruh
 */

@@ -20,10 +20,10 @@
     <input type="text" id="status-name" placeholder="status text" />
 
     <p class="hoverunderline" onclick="clearStatus()">clear status</p>
-    <p id="closeWin" style="position:absolute; bottom:0.75em; right:1em;" class="hoverunderline">close</p>
+    <p id="closeWin" style="position:absolute; bottom:0.75em; right:1em;" class="hoverunderline" title="may take a few moments to update">close</p>
     <script>
         let { ipcRenderer } = require("electron");
-        let { status } = require("./settings.json")
+        let { status } = require("./settings.json");
         let type = document.getElementById("status-status"), presence = document.getElementById("status-presence"), name = document.getElementById("status-name");
         if(status) {
             type.value = status.status
@@ -39,6 +39,7 @@
                     type: presence.value.toUpperCase()
                 }
             }
+            ipcRenderer.send("statusEntered", {presenceData: presencedata})
             ipcRenderer.send("setstatus", { data: presencedata });
             window.close();
         }
