@@ -34,7 +34,7 @@
   </div>
   <div id="options" style="display:none;">
     <label for="cachedlength" style="display:inline;">messages initially loaded from a channel: </label>
-    <input type="number" id="cachedlength" value="15" style="display:inline;" min="5" max="50"><br>
+    <input type="number" id="cachedlength" value="15" style="display:inline;" min="5" max="50"><br><br>
     <label for="devmode">Toggle developer mode: </label>
     <input type="checkbox" id="devmode" style="display:inline;"><br>
     <p title="one or more characters already typed">
@@ -42,9 +42,11 @@
       <input type="checkbox" id="typingIndicator" style="display:inline;">
     </p>
     <label for="logfile">Log certain events to a file for scripting and debugging</label>
-    <input type="checkbox" id="logfile" style="display:inline;"><input type="button" style="display:inline;" onclick="fs.writeFileSync('./logfile', '');" value="Clear logfile"><br>
+    <input type="checkbox" id="logfile" style="display:inline;"><input type="button" style="display:inline;" onclick="fs.writeFileSync('./logfile', '');" value="Clear logfile"><br><br>
     <label for="scriptsenabled">Allow custom scripts to run</label>
     <input type="checkbox" id="scriptsenabled" style="display:inline;">
+    <br><br><label for="minimizeWhenClosed" title="right-click on the tray icon to fully quit">Minimize window to tray when closed</label>
+    <input type="checkbox" id="minimizeWhenClosed" title="right-click on the tray icon to fully quit">
     <br><br><input type="button" id="clearcache" value="clear cached tokens"><br>
     <label for="clearcache" style="display:none;">tokens cleared!</label>
     <br><input type="button" id="leaveopts" value="save & return">

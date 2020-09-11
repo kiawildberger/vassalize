@@ -5,7 +5,8 @@
   "main": "app.js",
   "scripts": {
     "start": "electron .",
-    "dist": "electron-builder --linux snap"
+    "dist": "electron-builder --linux snap",
+    "test": "node ./tester/app.js"
   },
   "repository": "https://github.com/kiawildberger/vassalize",
   "author": "kiawildberger",

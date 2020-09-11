@@ -43,6 +43,6 @@
             ipcRenderer.send("setstatus", { data: presencedata });
             window.close();
         }
-        function clearStatus() { ipcRenderer.send("clearstatus", {}) }
+        function clearStatus() { ipcRenderer.send("clearstatus"); window.close(); }
     </script>
 </body>

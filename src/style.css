@@ -12,6 +12,7 @@ body {
     /* font-family:"ubuntu"; */
     font-family:Whitney,Helvetica Neue,Helvetica,Arial,sans-serif;
     background:#4A4D5D;
+    user-select:none;
 }
 a { color:cornflower; }
 #msgdisplay {
@@ -28,7 +29,7 @@ a { color:cornflower; }
     /* i dont want a border in the end */
     margin:1% 1% 0 0;
 }
-#msgdisplay > ul { padding-left:1em; }
+#msgdisplay > ul { padding-left:1em; user-select:text; }
 #msgdisplay > ul > pre {
     white-space:pre-wrap;
     display:inline;
@@ -46,7 +47,7 @@ blockquote {
 #msgdisplay > ul:first-child {
     margin-left:0;
 }
-#msgdisplay img[alt="emoji"] { display: inline; height:20px; }
+#msgdisplay img[alt="emoji"] { display: inline; }
 #msgin {
     position:absolute;
     right:6.3%;
@@ -270,7 +271,8 @@ label[for="clearcache"] { color:coral; font-size:14px; margin-left:1em; }
     bottom: 5em;
     top:100%;
     width:fit-content;
-    z-index:-2;
+    /* z-index:-2; causes big issues */
+    transform: scale(0.8);
     transform: translateY(-200%);
     /* what a hack bruh */
 }

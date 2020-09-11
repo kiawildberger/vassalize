@@ -1,7 +1,5 @@
-const {
-  ipcRenderer,
-  shell
-} = require("electron")
+const { ipcRenderer, shell, remote } = require("electron")
+const {Tray, Menu} = remote;
 const emoji = require("emojilib")
 const readline = require("readline")
 const fs = require('fs')
@@ -24,6 +22,16 @@ let botActor;
 function id(e) {
   return document.getElementById(e)
 }
+
+
+let tray = new Tray("./icon.ico");
+let contextMenu = Menu.buildFromTemplate([
+  { label: "quit", click: () => ipcRenderer.send("quit")}
+])
+tray.on("click", () => ipcRenderer.send('show'))
+tray.setToolTip("vassalize")
+tray.setContextMenu(contextMenu);
+
 
 let loggedin = false;
 let cdnUrl = /https?:\/\/cdn.discordapp.com\/attachments\/\d+\/\d+\/[a-zA-Z0-9_-]+\.[a-zA-Z]{2,5}/g
@@ -115,7 +123,7 @@ function processmsg(event, arg) {
       ul.innerHTML = useravatar+usertag+ct
     }
     if (arg.msg.images) {
-      isimg = true; // should be "ismedia" bc videos but im not gon change that shit rn
+      isimg = true; // should be "ismedia" bc videos but im not gon change that rn
       arg.msg.images.forEach(q => {
         let d = q.attachment.split(".")[q.attachment.split(".").length - 1]
         if (imagetypes.includes(d)) {
@@ -277,6 +285,14 @@ function fillStatus(bot, presenceData=undefined) {
   let sett;
   fs.readFile("./settings.json", {encoding:"utf-8"}, (err, data) => {
     sett = JSON.parse(data)
+    if(!sett.status) {
+      id("userd").innerHTML = `<img class="statusd" src="${bot.pfp}">
+      <div class="status-data">
+      <p class="statusn">${bot.name}<span class="status-discrim"> #${bot.discrim}</span></p>
+      <p class="status-pres hoverunderline" onclick="ipcRenderer.send('addwindow', {url:'./status.html'})">Set a status</p>
+      </div>`
+      return;
+    }
     // why do i have to do this instead of readfilesync idfk
     let stattype = sett.status.activity.type.toLowerCase()
     stattype = stattype.replace(stattype[0], stattype[0].toUpperCase());
@@ -295,14 +311,16 @@ function fillStatus(bot, presenceData=undefined) {
     id('userd').innerHTML = template;
   })
 }
-ipcRenderer.on("statusUpdate", (event, arg) => {
-  fillStatus(botActor, arg.presenceData)
-});
+ipcRenderer.on("statusUpdate", (event, arg) => fillStatus(botActor, arg.presenceData));
+ipcRenderer.on("clearstatus", () => document.querySelector(".status-pres").innerHTML = 'Set a status');
 
 ipcRenderer.on("validtoken", (event, args) => { // the *one* ipc i will use
   if (args.bot && args.guildInfo) {
     botActor = args.bot, gids = args.guildInfo
   }
+  contextMenu.items.unshift({label: args.bot.full})
+  contextMenu = Menu.buildFromTemplate(contextMenu.items)
+  tray.setContextMenu(contextMenu)
   id('bs-helper').innerText = "success!"
   id("bs-helper").style.color = "green"
   loggedin = true;
@@ -373,8 +391,9 @@ id('cached-btn').addEventListener('click', () => {
 id('topt').addEventListener('click', () => {
   document.querySelector('.container').style.display = 'none'
   id('options').style.display = "block"
-  // populate settings with stored values
+  // populating settings with stored values
   if (Rsettings.cachedlength) id('cachedlength').value = Rsettings.cachedlength
+  // remember, this does nothing because require() caches modules/json files, definitley need to change
   if (!Object.keys(require("./config.json"))) {
     id("clearcache").disabled = true;
     id("clearcache").setAttribute('title', 'no tokens to clear')
@@ -383,6 +402,7 @@ id('topt').addEventListener('click', () => {
   id("typingIndicator").checked = Rsettings.typing
   id("logfile").checked = Rsettings.fileLogging
   id("scriptsenabled").checked = Rsettings.csenabled
+  id("minimizeWhenClosed").checked = Rsettings.minimize
 })
 id("leaveopts").addEventListener("click", () => { // write settings to settings.json
   id('options').style.display = "none"
@@ -392,7 +412,8 @@ id("leaveopts").addEventListener("click", () => { // write settings to settings.
     devmode: id("devmode").checked,
     typing: id("typingIndicator").checked,
     fileLogging: id("logfile").checked,
-    csenabled: id("scriptsenabled").checked
+    csenabled: id("scriptsenabled").checked,
+    minimize: id("minimizeWhenClosed").checked
   }
   Rsettings = settings
   fs.writeFileSync("./settings.json", JSON.stringify(settings))

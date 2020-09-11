@@ -35,7 +35,7 @@ exports.init = function (win, tok) {
   window = win;
   client.on("ready", () => {
     if (isLoggedIn) return;
-    client.user.setPresence(Rsettings.status)
+    if(Rsettings.status) client.user.setPresence(Rsettings.status)
     if (enabledscripts.length > 0 && Rsettings.csenabled) {
       window.webContents.send("refreshScript")
       enabledscripts.forEach(e => {
@@ -178,7 +178,6 @@ exports.init = function (win, tok) {
         try {
           let script = require(e.path)
           var g = script.message(msg)
-          if (g) console.log(g)
           if (g) logFile(e.name + " > " + g)
         } catch {
           logFile("[Scripts] " + e.name + " was unable to receive a message")
@@ -233,13 +232,24 @@ exports.init = function (win, tok) {
     }
   })
   ipcMain.on("setstatus", (event, arg) => {
-    client.user.setPresence(arg.data);
+    let data = arg.data;
     let newsettings = require("./settings.json");
+    if(!data.name && data.status) {
+      client.user.setStatus(data.status)
+      return;
+    }
     newsettings.status = arg.data
+    if(arg.data.name.includes("https://") || arg.data.name.includes("http://")) {
+      data.url = data.name
+      delete data.name
+    }
+    client.user.setPresence(data);
     fs.writeFileSync("./settings.json", JSON.stringify(newsettings));
   });
   ipcMain.on("clearstatus", () => {
-    client.user.setActivity(null)
+    console.log("clearstatus")
+    client.user.setActivity(null);
+    win.webContents.send("clearstatus")
     let newsettings = require("./settings.json")
     if(newsettings.status) delete newsettings.status
     fs.writeFileSync("./settings.json", JSON.stringify(newsettings));

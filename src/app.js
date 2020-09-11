@@ -3,7 +3,7 @@ const {
   BrowserWindow,
   ipcMain,
   globalShortcut,
-  shell
+  shell, Tray, Menu
 } = require('electron')
 let ps = require("./ps.js")
 // let ps = require("./ps.js")
@@ -26,6 +26,7 @@ function childWindow(url) {
   // childwindow.webContents.openDevTools();
   childwindow.loadFile(url)
 }
+let fullyClose = false;
 
 function createWindow() {
   win = new BrowserWindow({
@@ -55,13 +56,25 @@ function createWindow() {
     event.preventDefault();
     shell.openExternal(url)
   });
+  win.on("close", event => {
+    if(!fullyClose) {
+      event.preventDefault();
+      win.hide();
+    } else {
+      app.quit();
+    }
+  })
 }
 
 app.whenReady().then(() => {
-  createWindow()
+  createWindow();
+  
   ipcMain.on("startbot", (event, tok) => {
     ps.init(win, tok)
   })
+  ipcMain.on("show", () => win.show())
+  ipcMain.on("hide", () => win.hide())
+  ipcMain.on("quit", () => { fullyClose=true; app.quit() })
   ipcMain.on("restart", () => {
     app.relaunch()
     app.exit()
