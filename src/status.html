@@ -40,7 +40,7 @@
                 }
             }
             ipcRenderer.send("statusEntered", {presenceData: presencedata})
-            ipcRenderer.send("setstatus", { data: presencedata });
+            // ipcRenderer.send("setstatus", { data: presencedata });
             window.close();
         }
         function clearStatus() { ipcRenderer.send("clearstatus"); window.close(); }

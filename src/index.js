@@ -1,14 +1,12 @@
 const { ipcRenderer, shell, remote } = require("electron")
 const {Tray, Menu} = remote;
-const emoji = require("emojilib")
 const readline = require("readline")
 const fs = require('fs')
 const ps = require("./ps.js"),
   scriptreader = require("./scriptreader.js")
-const snarkdown = require("snarkdown")
 // require("dotenv").config()
 // let tenorkey = process.env.TENORKEY
-// const elebar = require("electron-titlebar")
+const titlebar = require("electron-titlebar")
 let conf, confp;
 if (!fs.existsSync("./config.json")) {
   fs.writeFileSync("./config.json", "{ }")
@@ -22,7 +20,6 @@ let botActor;
 function id(e) {
   return document.getElementById(e)
 }
-
 
 let tray = new Tray("./icon.ico");
 let contextMenu = Menu.buildFromTemplate([
@@ -38,15 +35,28 @@ let cdnUrl = /https?:\/\/cdn.discordapp.com\/attachments\/\d+\/\d+\/[a-zA-Z0-9_-
 // why is cdnurl have the {2,5} after it, what if src has more numbers??? needa test regex101.com lamo gotem
 // that is file extension 4head     bonk
 let tenorurl = /https:\/\/tenor.com\/view\/[a-z-]+\d+/g
+let urlregex = /https?:\/\/.*\..*/g
+let mdurlregex = /(\[.*\])(https?:\/\/.*)/
 let imagetypes = ["jpg", "JPG", 'png', 'PNG', 'gif', 'GIF', 'webp', 'WEBP', 'tiff', 'TIFF', 'jpeg', 'JPEG', 'svg', 'SVG']
 let vidtypes = ["mp4", "MP4", "webm", "WEBM", "mkv", "MKV", "ogg", "OGG", "ogv", "OGV", "avi", "AVI", "gifv", "GIFV", "mpeg", "MPEG"]
 let gids = [],
   index = 0,
   currentchannel;
-ipcRenderer.on("msg", processmsg)
+ipcRenderer.on("msg", (event, arg) => {
+  processmsg(arg);
+  Array.from(document.querySelectorAll("p")).forEach(e => {
+    if(!isNaN(e.getAttribute("mid"))) {
+      e.outerHTML = `<p>${e.textContent}</p>`
+    }
+  })
+})
 
-function processmsg(event, arg) {
+function processmsg(arg) {
   let e;
+  let hasmdlink = arg.msg.content.match(mdurlregex)
+  if(hasmdlink) {
+    console.log(hasmdlink)
+  }
   gids[index].channels.forEach(o => {
     if (o.id === currentchannel) {
       e = currentchannel
@@ -76,25 +86,8 @@ function processmsg(event, arg) {
         // ct = ct.replace(e, elem)
       })
     }
-    // twemoji
-    let temoji = arg.msg.content.match(/:.*:/g)
-    let tunicode = arg.msg.content.match(/\u.*/g)
-    // console.log(tunicode)
-    // console.log(temoji)
-    if(temoji) {
-      temoji.forEach(e => {
-        for(key in emoji.lib) {
-          if(e === key || e === emoji.lib[key].char) {
-            console.log(emoji.lib[key].keywords)
-            ct = ct.replace(emoji.lib[key].char)
-            ct = twemoji.parse(ct)
-            console.log(ct)
-          }
-        }
-      })
-      // console.log(ct);
-    }
-    ct = snarkdown(ct)
+    // twemoji is pain
+    ct = require("snarkdown")(ct)
     ct = `<p mid="${arg.msg.id}">${ct}</p>`
     // going to have to remove this and parse it myself so everything is easier
     if (ct.includes("@everyone")) {
@@ -116,10 +109,8 @@ function processmsg(event, arg) {
     let usertag = `<div class="username-card">${arg.msg.author.username}<span class="user-discrim">#${arg.msg.author.discriminator}</span>&nbsp;&nbsp;</div>`
     let lastmsg = document.querySelectorAll("ul.collection-item")[document.querySelectorAll("ul.collection-item").length - 1]
     if (lastmsg && lastmsg.getAttribute("uid") === arg.msg.author.id) {
-      // lastmsg.innerHTML += `<p mid="${arg.msg.id}">${ct}</p>`
       lastmsg.innerHTML += ct
     } else {
-      // ul.innerHTML = useravatar + usertag + `<p mid="${arg.msg.id}">${ct}</p>`
       ul.innerHTML = useravatar+usertag+ct
     }
     if (arg.msg.images) {
@@ -280,36 +271,40 @@ async function checkCached() {
 }
 checkCached()
 
+const clearmodule = require("clear-module")
+
 function fillStatus(bot, presenceData=undefined) {
   if(!bot) return;
-  let sett;
-  fs.readFile("./settings.json", {encoding:"utf-8"}, (err, data) => {
-    sett = JSON.parse(data)
-    if(!sett.status) {
-      id("userd").innerHTML = `<img class="statusd" src="${bot.pfp}">
-      <div class="status-data">
-      <p class="statusn">${bot.name}<span class="status-discrim"> #${bot.discrim}</span></p>
-      <p class="status-pres hoverunderline" onclick="ipcRenderer.send('addwindow', {url:'./status.html'})">Set a status</p>
-      </div>`
-      return;
-    }
-    // why do i have to do this instead of readfilesync idfk
-    let stattype = sett.status.activity.type.toLowerCase()
-    stattype = stattype.replace(stattype[0], stattype[0].toUpperCase());
-    let statname = sett.status.activity.name.toLowerCase();
-    if(presenceData) {
-      stattype = presenceData.activity.type
-      statname = presenceData.activity.name.toLowerCase();
-      stattype = stattype.replace(stattype[0], stattype[0].toUpperCase());
-    }
-    if(stattype === "Listening" || stattype === "LISTENING") stattype = "Listening to"
-    let template = `<img class="statusd" src="${bot.pfp}">
+  clearmodule("./settings.json")
+  let sett = require("./settings.json")
+  if(!sett.status) {
+    id("userd").innerHTML = `<img class="statusd" src="${bot.pfp}">
     <div class="status-data">
     <p class="statusn">${bot.name}<span class="status-discrim"> #${bot.discrim}</span></p>
-    <p class="hoverunderline status-pres" onclick="ipcRenderer.send('addwindow', {url:'./status.html'})"><span class="status-type">${stattype} </span>${statname}</p>
-    </div>` // nice readability huh
-    id('userd').innerHTML = template;
-  })
+    <p class="status-pres hoverunderline" onclick="ipcRenderer.send('addwindow', {url:'./status.html'})">Set a status</p>
+    </div>`
+    return;
+  }
+  let stattype = sett.status.activity.type.toLowerCase()
+  stattype = stattype.replace(stattype[0], stattype[0].toUpperCase());
+  console.log(stattype)
+  let statname = sett.status.activity.name.toLowerCase();
+  if(presenceData) {
+    stattype = presenceData.activity.type
+    statname = presenceData.activity.name.toLowerCase();
+    stattype = stattype.replace(stattype[0], stattype[0].toUpperCase());
+    console.log(stattype)
+  }
+  if(stattype === "Listening" || stattype === "LISTENING") stattype = "Listening to"
+  if(stattype === "PLAYING") stattype = "Playing"
+  if(stattype === "WATCHING") stattype = "Watching"
+  // this is pain why do i have to write this out manually??? did the .replace() not work or smthn
+  let template = `<img class="statusd" src="${bot.pfp}">
+  <div class="status-data">
+  <p class="statusn">${bot.name}<span class="status-discrim"> #${bot.discrim}</span></p>
+  <p class="hoverunderline status-pres" onclick="ipcRenderer.send('addwindow', {url:'./status.html'})"><span class="status-type">${stattype} </span>${statname}</p>
+  </div>` // nice readability huh
+  id('userd').innerHTML = template;
 }
 ipcRenderer.on("statusUpdate", (event, arg) => fillStatus(botActor, arg.presenceData));
 ipcRenderer.on("clearstatus", () => document.querySelector(".status-pres").innerHTML = 'Set a status');
@@ -324,10 +319,11 @@ ipcRenderer.on("validtoken", (event, args) => { // the *one* ipc i will use
   id('bs-helper').innerText = "success!"
   id("bs-helper").style.color = "green"
   loggedin = true;
+  fillStatus(args.bot);
   setTimeout(() => {
-    id('userd').innerHTML = `acting as <span style="cursor:pointer;" onclick="ipcRenderer.send('addwindow', {url:'./status.html'})"><b>${args.bot.full}</b></span>`
+    // id('userd').innerHTML = `acting as <span style="cursor:pointer;" onclick="ipcRenderer.send('addwindow', {url:'./status.html'})"><b>${args.bot.full}</b></span>`
     document.title = args.bot.full
-    fillStatus(args.bot);
+    id('titlebar-title').textContent = args.bot.full
     // id('titlebar-title').textContent = args.bot.full
     id('bs-helper').innerText = ''
     fillGuildSelect(args.guildInfo)

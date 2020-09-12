@@ -32,7 +32,7 @@ function createWindow() {
   win = new BrowserWindow({
     width: 800,
     height: 600,
-    // frame: false,
+    frame: false,
     icon: "./icon.ico",
     webPreferences: {
       nodeIntegration: true,
@@ -84,7 +84,9 @@ app.whenReady().then(() => {
 /*
 
 TODO:
- - keep bot online while app is closed (minimize to tray)
+ + keep bot online while app is closed (minimize to tray)
+ + custom script editing while app is open (no restart required)
+ - status polishing
  - timestamps, deleted messages, edits
   + deleted messages are marked as deleted
  - be able to send custom emojis
@@ -96,7 +98,6 @@ TODO:
  - display embeds (yt videos, webpage metadata, just straight embeds)
  - server select div scroll on overflow
   - fuck that lmao
- + status updater
 
 MAYBE:
   - brute force fucker for bot tokens lmao

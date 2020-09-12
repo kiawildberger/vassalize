@@ -6,57 +6,65 @@
 </head>
 
 <body>
-  <!-- <div id="electron-titlebar" class="drag"><div id="titlebar-title" style="width: 100%; height: 100%; text-align: center; line-height: 40px; ">sign in</div></div> -->
-  <!-- i submitted an issue about the position:relative div, will uncomment and use electron-titlebar when i get resolution on it -->
-  <div id="bs">
-    <div id="bs-helper"></div>
-    <div class="bs-input-container">
-      <input id="bot-secret" type="password" placeholder="bot secret">
-      <img id="bs-btn" src="assets/check.svg">
-      <img id="cached-btn" src="assets/cached-arrow.svg">
-      <div id="cached" style="display:none;">
-        <div id="no-recent-logins" align="center" style="margin-top:1.5em;">no recent logins</div>
+  <div id="electron-titlebar" class="drag">
+    <div id="titlebar-title" style="width: 100%; height: 100%; text-align: center; line-height: 40px; ">sign in</div>
+  </div>
+  <div>
+    <div id="bs">
+      <div id="bs-helper"></div>
+      <div class="bs-input-container">
+        <input id="bot-secret" type="password" placeholder="bot secret">
+        <img id="bs-btn" src="assets/check.svg">
+        <img id="cached-btn" src="assets/cached-arrow.svg">
+        <div id="cached" style="display:none;">
+          <div id="no-recent-logins" align="center" style="margin-top:1.5em;">no recent logins</div>
+        </div>
       </div>
     </div>
-  </div>
-  <div class="container" style="display:none;">
-    <div id="topt">options</div>
-    <div id="serverlist">
-      <div class="serverlist-label">servers</div>
+    <div class="container" style="display:none;">
+      <div id="topt">options</div>
+      <div id="serverlist">
+        <div class="serverlist-label">servers</div>
+      </div>
+      <div id="channellist" style="display:none;">
+        <div class="channel-label">channels</div>
+      </div>
+      <span id="errout"></span>
+      <div id="msgdisplay" class="collection"></div>
+      <input id="msgin" type="text" disabled="true">
+      <div id="userd"></div>
     </div>
-    <div id="channellist" style="display:none;">
-      <div class="channel-label">channels</div>
+    <div id="options" style="display:none;">
+      <label for="cachedlength" style="display:inline;">messages initially loaded from a channel: </label>
+      <input type="number" id="cachedlength" value="15" style="display:inline;" min="5" max="50"><br><br>
+      <label for="devmode">Toggle developer mode: </label>
+      <input type="checkbox" id="devmode" style="display:inline;"><br>
+      <p title="one or more characters already typed">
+        <label for="typingIndicator">Users can see when you're typing</label>
+        <input type="checkbox" id="typingIndicator" style="display:inline;">
+      </p>
+      <label for="logfile">Log certain events to a file for scripting and debugging</label>
+      <input type="checkbox" id="logfile" style="display:inline;"><input type="button" style="display:inline;"
+        onclick="fs.writeFileSync('./logfile', '');" value="Clear logfile"><br><br>
+      <label for="scriptsenabled">Allow custom scripts to run</label>
+      <input type="checkbox" id="scriptsenabled" style="display:inline;">
+      <br><br><label for="minimizeWhenClosed" title="right-click on the tray icon to fully quit">Minimize window to tray
+        when closed</label>
+      <input type="checkbox" id="minimizeWhenClosed" title="right-click on the tray icon to fully quit">
+      <br><br><input type="button" id="clearcache" value="clear cached tokens"><br>
+      <label for="clearcache" style="display:none;">tokens cleared!</label>
+      <br><input type="button" id="leaveopts" value="save & return">
+      <h2 style="width:fit-content; padding-bottom:0.3em; padding-right:2em; border-bottom:1.5px solid black;">Advanced
+      </h2>
+      <div>
+        <label for="enter-script-button">Add a custom script <a href="https://github.com/kiawildberger/vassalize/blob/master/README.md" target="_blank">Learn more</a>&nbsp;&nbsp;</label>
+        <input type="button" onclick="document.getElementById('custom-script-input').click()"
+          value="select files"><input type="button" onclick="ipcRenderer.send('restart')" title="requires sign-in"
+          value="Reload window">
+        <input type="file" multiple accept="text/javascript" id="custom-script-input" style="display:none;">
+      </div>
+      <ul id="cscript-list"></ul>
     </div>
-    <span id="errout"></span>
-    <div id="msgdisplay" class="collection"></div>
-    <input id="msgin" type="text" disabled="true">
-    <div id="userd"></div>
-  </div>
-  <div id="options" style="display:none;">
-    <label for="cachedlength" style="display:inline;">messages initially loaded from a channel: </label>
-    <input type="number" id="cachedlength" value="15" style="display:inline;" min="5" max="50"><br><br>
-    <label for="devmode">Toggle developer mode: </label>
-    <input type="checkbox" id="devmode" style="display:inline;"><br>
-    <p title="one or more characters already typed">
-      <label for="typingIndicator">Users can see when you're typing</label>
-      <input type="checkbox" id="typingIndicator" style="display:inline;">
-    </p>
-    <label for="logfile">Log certain events to a file for scripting and debugging</label>
-    <input type="checkbox" id="logfile" style="display:inline;"><input type="button" style="display:inline;" onclick="fs.writeFileSync('./logfile', '');" value="Clear logfile"><br><br>
-    <label for="scriptsenabled">Allow custom scripts to run</label>
-    <input type="checkbox" id="scriptsenabled" style="display:inline;">
-    <br><br><label for="minimizeWhenClosed" title="right-click on the tray icon to fully quit">Minimize window to tray when closed</label>
-    <input type="checkbox" id="minimizeWhenClosed" title="right-click on the tray icon to fully quit">
-    <br><br><input type="button" id="clearcache" value="clear cached tokens"><br>
-    <label for="clearcache" style="display:none;">tokens cleared!</label>
-    <br><input type="button" id="leaveopts" value="save & return">
-    <h2 style="width:fit-content; padding-bottom:0.3em; padding-right:2em; border-bottom:1.5px solid black;">Advanced</h2>
-    <div>
-      <label for="enter-script-button">Add a custom script <a href="https://github.com/kiawildberger/vassalize/blob/master/README.md" target="_blank">Learn more</a>&nbsp;&nbsp;</label>
-      <input type="button" onclick="document.getElementById('custom-script-input').click()" value="select files"><input type="button" onclick="ipcRenderer.send('restart')" title="requires sign-in" value="Reload window">
-      <input type="file" multiple accept="text/javascript" id="custom-script-input" style="display:none;">
-    </div>
-    <ul id="cscript-list"></ul>
   </div>
   <script src="index.js"></script>
 </body>

@@ -13,6 +13,7 @@ let settings = {
   defaultprefix: ".",
   prefix: "."
 }
+const clearmodule = require("clear-module")
 let uinfo = {}
 let window;
 let lastmessage;
@@ -165,7 +166,7 @@ exports.init = function (win, tok) {
   ipcMain.on("msgin", (event, arg) => {
     if (arg.msg.toString().match(tagx)) { // is ping
       let un = arg.msg.toString().match(tagx)[0].toString().split("#")[0].replace("@", '')
-      let g = client.channels.cache.get(arg.channel.id).guild.members.cache.filter(x => x.user.username === un).array()
+      let g = client.channels.cache.get(arg.channel).guild.members.cache.filter(x => x.user.username === un).array()
       arg.msg = arg.msg.replace(tagx, g[0].user)
     }
     if (arg.msg.toString().includes("/shrug")) arg.msg = arg.msg.replace("/shrug", "¯\_(ツ)_/¯")
@@ -176,11 +177,13 @@ exports.init = function (win, tok) {
       window.webContents.send("refreshScript")
       enabledscripts.forEach(e => {
         try {
+          clearmodule(e.path)
           let script = require(e.path)
           var g = script.message(msg)
           if (g) logFile(e.name + " > " + g)
-        } catch {
+        } catch(err) {
           logFile("[Scripts] " + e.name + " was unable to receive a message")
+          throw err;
         }
       })
     }
@@ -231,31 +234,21 @@ exports.init = function (win, tok) {
       client.channels.cache.get(arg.chid).stopTyping()
     }
   })
-  ipcMain.on("setstatus", (event, arg) => {
-    let data = arg.data;
-    let newsettings = require("./settings.json");
-    if(!data.name && data.status) {
-      client.user.setStatus(data.status)
-      return;
-    }
-    newsettings.status = arg.data
-    if(arg.data.name.includes("https://") || arg.data.name.includes("http://")) {
-      data.url = data.name
-      delete data.name
-    }
-    client.user.setPresence(data);
-    fs.writeFileSync("./settings.json", JSON.stringify(newsettings));
-  });
   ipcMain.on("clearstatus", () => {
-    console.log("clearstatus")
     client.user.setActivity(null);
     win.webContents.send("clearstatus")
+    clearmodule("./settings.json")
     let newsettings = require("./settings.json")
     if(newsettings.status) delete newsettings.status
     fs.writeFileSync("./settings.json", JSON.stringify(newsettings));
   });
   ipcMain.on("statusEntered", (event, arg) => {
     // pain
+    clearmodule("./settings.json")
+    let newsettings = require("./settings.json")
+    newsettings.status = arg.presenceData
+    fs.writeFileSync("./settings.json", JSON.stringify(newsettings))
+    client.user.setPresence(arg.presenceData)
     win.webContents.send("statusUpdate", {presenceData: arg.presenceData})
   })
 }

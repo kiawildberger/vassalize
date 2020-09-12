@@ -6,7 +6,7 @@
 body {
     width:100%;
     height:100%;
-    margin-top:2em;
+    margin:0;
     padding:0;
     overflow:hidden;
     /* font-family:"ubuntu"; */
@@ -14,18 +14,19 @@ body {
     background:#4A4D5D;
     user-select:none;
 }
-a { color:cornflower; }
+#electron-titlebar {
+    position:fixed;
+}
 #msgdisplay {
     width:70%;
     max-width:70%;
     word-wrap:break-word;
-    height:80%;
+    height:70%;
     overflow-y: auto;
     position:absolute;
-    /* top:2em; */
-    top:0;
+    top:2em;
     right:0;
-    border:1px solid rgb(66, 66, 66);
+    /* border:1px solid rgb(66, 66, 66); */
     /* i dont want a border in the end */
     margin:1% 1% 0 0;
 }
@@ -53,7 +54,7 @@ blockquote {
     right:6.3%;
     width:65%;
     height:35px;
-    top:85%;
+    top:80%;
     outline:none;
     background-color:#767DA8;
     border:none;
@@ -127,7 +128,9 @@ blockquote {
 }
 a {
     outline: none; /* pls dont hurt */
+    width:fit-content;
     color:cornflower;
+    padding-right:0.5em;
 }
 a:visited {
     color:lavender;
@@ -232,9 +235,9 @@ select { width:10em; }
 .hoverunderline:hover { text-decoration:underline; }
 .user-img { width:150px; margin:0 0 1em 1em; border-left:2px solid green; padding-left:4px; display:block; }
 .user-video { outline:none; margin-top:0; }
-#topt { position:absolute; bottom: 0; cursor:pointer; padding-bottom:6px; z-index:2; background-color:#4A4D5D; }
+#topt { position:absolute; bottom: 0; left:8px; cursor:pointer; padding-bottom:6px; z-index:2; background-color:#4A4D5D; }
 #topt:hover {text-decoration:underline;}
-#options { width:100%; height:100%; background:#4A4D5D; overflow-y:auto; }
+#options { width:100%; height:100%; margin-top:2em; background:#4A4D5D; overflow-y:auto; }
 #leaveopts { position:absolute; right:0; bottom:0; }
 label[for="clearcache"] { color:coral; font-size:14px; margin-left:1em; }
 #options { margin-left:2.5em; margin-top:1em; }
@@ -255,11 +258,11 @@ label[for="clearcache"] { color:coral; font-size:14px; margin-left:1em; }
   opacity:1;
 }
 
-.statusd { height: 50px; position: relative; border-radius: 50%; bottom: -1.5em; }
+.statusd { height: 30px; position: relative; border-radius: 50%; bottom: -1em; }
 .status-data { position: relative; display:inline-block; width:10em; }
 .status-type { font-weight: normal; }
 .status-pres {
-    font-size: 12px;
+    font-size: 10px;
     font-weight: 800;
     position: absolute;
     margin: 0;
@@ -276,5 +279,5 @@ label[for="clearcache"] { color:coral; font-size:14px; margin-left:1em; }
     transform: translateY(-200%);
     /* what a hack bruh */
 }
-.statusn { display: inline; margin-left: 0.5em; font-size: 18px; }
-.status-discrim { font-size: 14px; opacity: 0.8; }
+.statusn { display: inline; margin-left: 0.5em; font-size: 16px; }
+.status-discrim { font-size: 12px; opacity: 0.8; }
