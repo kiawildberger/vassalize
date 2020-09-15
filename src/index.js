@@ -312,10 +312,8 @@ ipcRenderer.on("clearstatus", () => document.querySelector(".status-pres").inner
 ipcRenderer.on("validtoken", (event, args) => { // the *one* ipc i will use
   if (args.bot && args.guildInfo) {
     botActor = args.bot, gids = args.guildInfo
+    document.querySelector(".serverlist-label").innerHTML += `<span> (${gids.length})</span>`;
   }
-  contextMenu.items.unshift({label: args.bot.full})
-  contextMenu = Menu.buildFromTemplate(contextMenu.items)
-  tray.setContextMenu(contextMenu)
   id('bs-helper').innerText = "success!"
   id("bs-helper").style.color = "green"
   loggedin = true;
@@ -330,7 +328,7 @@ ipcRenderer.on("validtoken", (event, args) => { // the *one* ipc i will use
   }, 800)
 })
 id('bot-secret').addEventListener("keypress", e => {
-  if (e.keyCode != 13) return;
+  if (e.code != "Enter") return; // keyCode is apparently deprecated?
   if (!e.target.value) return;
   ipcRenderer.send("startbot", e.target.value)
 })
@@ -387,6 +385,8 @@ id('cached-btn').addEventListener('click', () => {
 id('topt').addEventListener('click', () => {
   document.querySelector('.container').style.display = 'none'
   id('options').style.display = "block"
+  clearmodule("./settings.json")
+  Rsettings = require("./settings.json")
   // populating settings with stored values
   if (Rsettings.cachedlength) id('cachedlength').value = Rsettings.cachedlength
   // remember, this does nothing because require() caches modules/json files, definitley need to change
@@ -398,6 +398,7 @@ id('topt').addEventListener('click', () => {
   id("typingIndicator").checked = Rsettings.typing
   id("logfile").checked = Rsettings.fileLogging
   id("scriptsenabled").checked = Rsettings.csenabled
+  console.log(Rsettings.minimize)
   id("minimizeWhenClosed").checked = Rsettings.minimize
 })
 id("leaveopts").addEventListener("click", () => { // write settings to settings.json

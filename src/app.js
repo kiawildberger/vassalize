@@ -9,6 +9,7 @@ let ps = require("./ps.js")
 // let ps = require("./ps.js")
 const conf = require('./config.json')
 let settings = require("./settings.json")
+const clearmodule = require("clear-module")
 let win;
 
 ipcMain.on("addwindow", (event, arg) => childWindow(arg.url))
@@ -57,10 +58,12 @@ function createWindow() {
     shell.openExternal(url)
   });
   win.on("close", event => {
-    if(!fullyClose) {
-      event.preventDefault();
-      win.hide();
-    } else {
+    event.preventDefault();
+    clearmodule("./settings.json")
+    settings = require("./settings.json")
+    win.hide();
+    if(!settings.minimize) {
+      win.destroy(); // according to docs its not bad to use but what about beforeclose and beforeunload..?
       app.quit();
     }
   })
@@ -74,7 +77,7 @@ app.whenReady().then(() => {
   })
   ipcMain.on("show", () => win.show())
   ipcMain.on("hide", () => win.hide())
-  ipcMain.on("quit", () => { fullyClose=true; app.quit() })
+  ipcMain.on("quit", () => { app.quit() })
   ipcMain.on("restart", () => {
     app.relaunch()
     app.exit()
