@@ -282,3 +282,5 @@ label[for="clearcache"] { color:coral; font-size:14px; margin-left:1em; }
 }
 .statusn { display: inline; margin-left: 0.5em; font-size: 16px; }
 .status-discrim { font-size: 12px; opacity: 0.8; }
+em { font-style:oblique; }
+strong { font-weight:bold; }

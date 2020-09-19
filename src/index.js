@@ -38,16 +38,9 @@ let urlregex = /https?:\/\/.*\..*/g
 let mdurlregex = /(\[.*\])(https?:\/\/.*)/
 let imagetypes = ["jpg", "JPG", 'png', 'PNG', 'gif', 'GIF', 'webp', 'WEBP', 'tiff', 'TIFF', 'jpeg', 'JPEG', 'svg', 'SVG']
 let vidtypes = ["mp4", "MP4", "webm", "WEBM", "mkv", "MKV", "ogg", "OGG", "ogv", "OGV", "avi", "AVI", "gifv", "GIFV", "mpeg", "MPEG"]
-let gids = [],
-  index = 0,
-  currentchannel;
+let gids = [], index = 0, currentchannel;
 ipcRenderer.on("msg", (event, arg) => {
   processmsg(arg);
-  Array.from(document.querySelectorAll("p")).forEach(e => {
-    if (!isNaN(e.getAttribute("mid"))) {
-      e.outerHTML = `<p>${e.textContent}</p>`
-    }
-  })
 })
 
 function processmsg(arg) {
@@ -108,7 +101,7 @@ function processmsg(arg) {
     let usertag = `<div class="username-card">${arg.msg.author.username}<span class="user-discrim">#${arg.msg.author.discriminator}</span>&nbsp;&nbsp;</div>`
     let lastmsg = document.querySelectorAll("ul.collection-item")[document.querySelectorAll("ul.collection-item").length - 1]
     if (lastmsg && lastmsg.getAttribute("uid") === arg.msg.author.id) {
-      lastmsg.innerHTML += ct
+      lastmsg.innerHTML += ct;
     } else {
       ul.innerHTML = useravatar + usertag + ct
     }
@@ -413,6 +406,19 @@ id("leaveopts").addEventListener("click", () => { // write settings to settings.
   }
   Rsettings = settings
   fs.writeFileSync("./settings.json", JSON.stringify(settings))
+})
+function refreshSettings() {
+  clearmodule("./settings.json")
+  Rsettings = require("./settings.json")
+  id('devmode').checked = Rsettings.devmode
+  id("typingIndicator").checked = Rsettings.typing
+  id("logfile").checked = Rsettings.fileLogging
+  id("scriptsenabled").checked = Rsettings.csenabled
+  id("minimizeWhenClosed").checked = Rsettings.minimize
+}
+id("opt-restore-defaults").addEventListener("click", () => {
+  ipcRenderer.send("confirm-restore-settings")
+  refreshSettings();
 })
 id('clearcache').addEventListener("click", () => {
   fs.writeFileSync("./config.json", "{ }")

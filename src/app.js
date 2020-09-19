@@ -3,10 +3,10 @@ const {
   BrowserWindow,
   ipcMain,
   globalShortcut,
-  shell, Tray, Menu
+  shell, dialog
 } = require('electron')
 let ps = require("./ps.js")
-// let ps = require("./ps.js")
+const fs = require("fs")
 const conf = require('./config.json')
 let settings = require("./settings.json")
 const clearmodule = require("clear-module")
@@ -42,16 +42,17 @@ function createWindow() {
   })
   win.loadFile('index.html')
   win.setMenu(null)
-  if(settings.devmode) {
-    globalShortcut.register("CommandOrControl+Shift+I", () => {
+  globalShortcut.register("CommandOrControl+Shift+I", () => {
+    clearmodule("./settings.json")
+    settings = require("./settings.json")
+    if(settings.devmode) {
       if(win.webContents.isDevToolsOpened()) {
         win.webContents.closeDevTools()
       } else {
         win.webContents.openDevTools()
       }
-    })
-    globalShortcut.register("CommandOrControl+Shift+R", () => { app.relaunch(); app.exit(); } )
-  }
+    }
+  })
   globalShortcut.register("CommandOrControl+Shift+W", () => app.quit())
   win.webContents.on('new-window', function(event, url) {
     event.preventDefault();
@@ -83,6 +84,9 @@ app.whenReady().then(() => {
     app.relaunch()
     app.exit()
   })
+  ipcMain.on("confirm-restore-settings", (event, arg) => {
+    fs.writeFileSync("./settings.json", JSON.stringify(require("./defaultsettings.json")))
+  })
 })
 
 /*
@@ -91,6 +95,7 @@ TODO:
  + keep bot online while app is closed (minimize to tray)
  + custom script editing while app is open (no restart required)
  - status polishing
+ + default settings, can restore to defaults
  - timestamps, deleted messages, edits
   + deleted messages are marked as deleted
  - be able to send custom emojis
