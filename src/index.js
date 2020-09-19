@@ -1,5 +1,5 @@
 const { ipcRenderer, shell, remote } = require("electron")
-const {Tray, Menu} = remote;
+const { Tray, Menu } = remote;
 const readline = require("readline")
 const fs = require('fs')
 const ps = require("./ps.js"),
@@ -23,12 +23,11 @@ function id(e) {
 
 let tray = new Tray("./icon.ico");
 let contextMenu = Menu.buildFromTemplate([
-  { label: "quit", click: () => ipcRenderer.send("quit")}
+  { label: "quit", click: () => ipcRenderer.send("quit") }
 ])
 tray.on("click", () => ipcRenderer.send('show'))
 tray.setToolTip("vassalize")
 tray.setContextMenu(contextMenu);
-
 
 let loggedin = false;
 let cdnUrl = /https?:\/\/cdn.discordapp.com\/attachments\/\d+\/\d+\/[a-zA-Z0-9_-]+\.[a-zA-Z]{2,5}/g
@@ -45,7 +44,7 @@ let gids = [],
 ipcRenderer.on("msg", (event, arg) => {
   processmsg(arg);
   Array.from(document.querySelectorAll("p")).forEach(e => {
-    if(!isNaN(e.getAttribute("mid"))) {
+    if (!isNaN(e.getAttribute("mid"))) {
       e.outerHTML = `<p>${e.textContent}</p>`
     }
   })
@@ -54,7 +53,7 @@ ipcRenderer.on("msg", (event, arg) => {
 function processmsg(arg) {
   let e;
   let hasmdlink = arg.msg.content.match(mdurlregex)
-  if(hasmdlink) {
+  if (hasmdlink) {
     console.log(hasmdlink)
   }
   gids[index].channels.forEach(o => {
@@ -111,7 +110,7 @@ function processmsg(arg) {
     if (lastmsg && lastmsg.getAttribute("uid") === arg.msg.author.id) {
       lastmsg.innerHTML += ct
     } else {
-      ul.innerHTML = useravatar+usertag+ct
+      ul.innerHTML = useravatar + usertag + ct
     }
     if (arg.msg.images) {
       isimg = true; // should be "ismedia" bc videos but im not gon change that rn
@@ -273,11 +272,11 @@ checkCached()
 
 const clearmodule = require("clear-module")
 
-function fillStatus(bot, presenceData=undefined) {
-  if(!bot) return;
+function fillStatus(bot, presenceData = undefined) {
+  if (!bot) return;
   clearmodule("./settings.json")
   let sett = require("./settings.json")
-  if(!sett.status) {
+  if (!sett.status) {
     id("userd").innerHTML = `<img class="statusd" src="${bot.pfp}">
     <div class="status-data">
     <p class="statusn">${bot.name}<span class="status-discrim"> #${bot.discrim}</span></p>
@@ -289,15 +288,15 @@ function fillStatus(bot, presenceData=undefined) {
   stattype = stattype.replace(stattype[0], stattype[0].toUpperCase());
   console.log(stattype)
   let statname = sett.status.activity.name.toLowerCase();
-  if(presenceData) {
+  if (presenceData) {
     stattype = presenceData.activity.type
     statname = presenceData.activity.name.toLowerCase();
     stattype = stattype.replace(stattype[0], stattype[0].toUpperCase());
     console.log(stattype)
   }
-  if(stattype === "Listening" || stattype === "LISTENING") stattype = "Listening to"
-  if(stattype === "PLAYING") stattype = "Playing"
-  if(stattype === "WATCHING") stattype = "Watching"
+  if (stattype === "Listening" || stattype === "LISTENING") stattype = "Listening to"
+  if (stattype === "PLAYING") stattype = "Playing"
+  if (stattype === "WATCHING") stattype = "Watching"
   // this is pain why do i have to write this out manually??? did the .replace() not work or smthn
   let template = `<img class="statusd" src="${bot.pfp}">
   <div class="status-data">
@@ -339,9 +338,9 @@ id('bs-btn').addEventListener("click", e => {
 
 let istyping = false;
 setInterval(() => {
-  if(currentchannel && Rsettings.typing && id("msgin").value === "") {
+  if (currentchannel && Rsettings.typing && id("msgin").value === "") {
     ipcRenderer.send("typing", {
-      stop:true,
+      stop: true,
       chid: currentchannel
     })
   }
@@ -355,10 +354,10 @@ id("msgin").addEventListener("keypress", e => {
     istyping = true
   }
   if (id("msgin").value === "") {
-      ipcRenderer.send("typing", {
-        stop: true,
-        chid: currentchannel
-      })
+    ipcRenderer.send("typing", {
+      stop: true,
+      chid: currentchannel
+    })
     istyping = false
   }
   if (e.keyCode !== 13) return;
@@ -424,7 +423,7 @@ id('clearcache').addEventListener("click", () => {
 })
 ipcRenderer.on("messagedeleted", (event, id) => {
   let messageElement = document.querySelector(`p[mid="${id}"]`)
-  if(messageElement) messageElement.innerHTML += `<span class="deleted-reminder">(deleted)</span>`
+  if (messageElement) messageElement.innerHTML += `<span class="deleted-reminder">(deleted)</span>`
 })
 id("custom-script-input").addEventListener("change", e => {
   scriptreader.processFiles(e)
