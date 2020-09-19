@@ -38,11 +38,11 @@
       <label for="cachedlength" style="display:inline;">messages initially loaded from a channel: </label>
       <input type="number" id="cachedlength" value="15" style="display:inline;" min="5" max="50"><br><br>
       <label for="devmode">Toggle developer mode: </label>
-      <input type="checkbox" id="devmode" style="display:inline;"><br>
-      <p title="one or more characters already typed">
+      <input type="checkbox" id="devmode" style="display:inline;"><br><br>
+      <!-- <p title="one or more characters already typed"> -->
         <label for="typingIndicator">Users can see when you're typing</label>
-        <input type="checkbox" id="typingIndicator" style="display:inline;">
-      </p>
+        <input type="checkbox" id="typingIndicator" style="display:inline;"><br><br>
+      <!-- </p> -->
       <label for="logfile">Log certain events to a file for scripting and debugging</label>
       <input type="checkbox" id="logfile" style="display:inline;"><input type="button" style="display:inline;"
         onclick="fs.writeFileSync('./logfile', '');" value="Clear logfile"><br><br>

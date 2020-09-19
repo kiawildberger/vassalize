@@ -386,7 +386,8 @@ id('topt').addEventListener('click', () => {
   document.querySelector('.container').style.display = 'none'
   id('options').style.display = "block"
   clearmodule("./settings.json")
-  Rsettings = require("./settings.json")
+  // Rsettings = require("./settings.json")
+  console.log(Rsettings)
   // populating settings with stored values
   if (Rsettings.cachedlength) id('cachedlength').value = Rsettings.cachedlength
   // remember, this does nothing because require() caches modules/json files, definitley need to change
@@ -398,7 +399,6 @@ id('topt').addEventListener('click', () => {
   id("typingIndicator").checked = Rsettings.typing
   id("logfile").checked = Rsettings.fileLogging
   id("scriptsenabled").checked = Rsettings.csenabled
-  console.log(Rsettings.minimize)
   id("minimizeWhenClosed").checked = Rsettings.minimize
 })
 id("leaveopts").addEventListener("click", () => { // write settings to settings.json
