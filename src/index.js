@@ -3,7 +3,12 @@ const { Tray, Menu } = remote;
 const readline = require("readline")
 const fs = require('fs')
 const ps = require("./ps.js"),
-  scriptreader = require("./scriptreader.js")
+  scriptreader = require("./scriptreader.js");
+const EmojiConverter = require("emoji-js")
+let emoji = new EmojiConverter();
+emoji.allow_caps = true;
+emoji.img_set = "twitter";
+emoji.replace_mode = "css";
 // require("dotenv").config()
 // let tenorkey = process.env.TENORKEY
 const titlebar = require("electron-titlebar")
@@ -35,7 +40,7 @@ let cdnUrl = /https?:\/\/cdn.discordapp.com\/attachments\/\d+\/\d+\/[a-zA-Z0-9_-
 // that is file extension 4head     bonk
 let tenorurl = /https:\/\/tenor.com\/view\/[a-z-]+\d+/g
 let urlregex = /https?:\/\/.*\..*/g
-let mdurlregex = /(\[.*\])(https?:\/\/.*)/
+let mdurlregex = /(\[.*\])(.*)/g
 let imagetypes = ["jpg", "JPG", 'png', 'PNG', 'gif', 'GIF', 'webp', 'WEBP', 'tiff', 'TIFF', 'jpeg', 'JPEG', 'svg', 'SVG']
 let vidtypes = ["mp4", "MP4", "webm", "WEBM", "mkv", "MKV", "ogg", "OGG", "ogv", "OGV", "avi", "AVI", "gifv", "GIFV", "mpeg", "MPEG"]
 let gids = [], index = 0, currentchannel;
@@ -44,7 +49,7 @@ ipcRenderer.on("msg", (event, arg) => {
 })
 
 function processmsg(arg) {
-  let e;
+  let e, link
   let hasmdlink = arg.msg.content.match(mdurlregex)
   if (hasmdlink) {
     console.log(hasmdlink)
@@ -78,10 +83,10 @@ function processmsg(arg) {
         // ct = ct.replace(e, elem)
       })
     }
-    // twemoji is pain
-    ct = require("snarkdown")(ct)
-    ct = `<p mid="${arg.msg.id}">${ct}</p>`
-    // going to have to remove this and parse it myself so everything is easier
+    
+
+
+    ct = `<p mid="${arg.msg.id}">${emoji.replace_colons(ct)}</p>`
     if (ct.includes("@everyone")) {
       ct = ct.replace("@everyone", `<span class="selfping">@everyone</span>`)
     }
@@ -410,12 +415,14 @@ id("leaveopts").addEventListener("click", () => { // write settings to settings.
 function refreshSettings() {
   clearmodule("./settings.json")
   Rsettings = require("./settings.json")
+  id('cachedlength').value = Rsettings.cachedlength
   id('devmode').checked = Rsettings.devmode
   id("typingIndicator").checked = Rsettings.typing
   id("logfile").checked = Rsettings.fileLogging
   id("scriptsenabled").checked = Rsettings.csenabled
   id("minimizeWhenClosed").checked = Rsettings.minimize
 }
+ipcRenderer.on("refreshSettings", () => refreshSettings())
 id("opt-restore-defaults").addEventListener("click", () => {
   ipcRenderer.send("confirm-restore-settings")
   refreshSettings();

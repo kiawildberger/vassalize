@@ -86,29 +86,25 @@ app.whenReady().then(() => {
   })
   ipcMain.on("confirm-restore-settings", (event, arg) => {
     fs.writeFileSync("./settings.json", JSON.stringify(require("./defaultsettings.json")))
+    win.webContents.send("refreshSettings")
   })
 })
 
 /*
 
 TODO:
- + keep bot online while app is closed (minimize to tray)
- + custom script editing while app is open (no restart required)
  - status polishing
- + default settings, can restore to defaults
  - timestamps, deleted messages, edits
   + deleted messages are marked as deleted
  - be able to send custom emojis
  - get non-custom emoji to look normal
- - load more messages as user scrolls up (button or auto)
-  + made it look a whole lot nicer
- - make message readability better (separation between)
- - open links externally (also autolink)
- - display embeds (yt videos, webpage metadata, just straight embeds)
+  + twemoji is pain, pls maybe library
+ - display embeds (just straight embeds)
  - server select div scroll on overflow
   - fuck that lmao
 
 MAYBE:
   - brute force fucker for bot tokens lmao
+  - send embeds
   - VOICE? bruh
 */
