@@ -93,6 +93,8 @@ app.whenReady().then(() => {
 /*
 
 TODO:
+  - view cached tokens
+  - access options before logging in
  - status polishing
  - timestamps, deleted messages, edits
   + deleted messages are marked as deleted
@@ -106,5 +108,5 @@ TODO:
 MAYBE:
   - brute force fucker for bot tokens lmao
   - send embeds
-  - VOICE? bruh
+  - voice bruh
 */

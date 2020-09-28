@@ -48,7 +48,7 @@ blockquote {
 #msgdisplay > ul:first-child {
     margin-left:0;
 }
-#msgdisplay img[alt="emoji"] { display: inline; }
+img.emoji { height:2em; width:2em; display:inline; }
 #msgin {
     position:absolute;
     right:6.3%;

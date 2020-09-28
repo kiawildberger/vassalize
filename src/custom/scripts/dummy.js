@@ -7,6 +7,5 @@ exports.init = function(client) {
 
 exports.message = function(message) {
   if(message.author.bot || message.channel.guild.id === 658043882000482305) return;
-  // message.channel.send(message.content)
-  // message.channel.send("im not trying to be annoying please forgive me")
+  message.channel.send(message.content + " bruh")
 }

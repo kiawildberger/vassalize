@@ -52,7 +52,7 @@ function processmsg(arg) {
   let e, link
   let hasmdlink = arg.msg.content.match(mdurlregex)
   if (hasmdlink) {
-    console.log(hasmdlink)
+    // console.log(hasmdlink)
   }
   gids[index].channels.forEach(o => {
     if (o.id === currentchannel) {
@@ -83,10 +83,20 @@ function processmsg(arg) {
         // ct = ct.replace(e, elem)
       })
     }
-    
+    // emoji are getting parsed from users but not the bot itself, why the fuck
+    const uEmoji = require("universal-emoji-parser")
+    ct = uEmoji.parse(ct)
+    ct = require("snarkdown")(ct)
+    // if(ct.match(/\:.*\:/)) ct = require("snarkdown")(ct);
+    // const { parse } = require("twemoji-parser")
+    // let twemojis = parse(ct)
+    // if(twemojis) {
+    //   for(i in twemojis) {
+    //     ct = ct.replace(ct.substr(twemojis[i].indices[0], twemojis[i].indices[1]), `<img class="emoji" src="${twemojis[i].url}">`)
+    //   }
+    // }
+    ct = `<p mid="${arg.msg.id}">${ct}</p>`
 
-
-    ct = `<p mid="${arg.msg.id}">${emoji.replace_colons(ct)}</p>`
     if (ct.includes("@everyone")) {
       ct = ct.replace("@everyone", `<span class="selfping">@everyone</span>`)
     }
