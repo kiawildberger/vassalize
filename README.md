@@ -6,18 +6,15 @@ It can read/send messages and view attachments (videos soon!), which is all disc
 
 ### Upcoming features:
 - [ ] add/update vassalize documentation
-- [ ] literally fixing code injection
+- [ ] prevent code injection
 - [ ] fix logfile to actually work
-- [ ] beautifying the way messages are displayed
-- [ ] videos
 - [ ] fixing minimize to tray because right now it's a buggy mess<sup>just like the rest of vassalize</sup>
 - [ ] view cached tokens
 - [ ] access options before logging in
 - [ ] status polishing
 - [ ] timestamps, deleted messages, edits
-  - [ ] deleted messages are marked as deleted
+  - [x] deleted messages are marked as deleted
 - [ ] be able to send custom emojis
-- [ ] get non-custom emoji to look normal
 - [ ] display embeds (just straight embeds)
 - [ ] server select div scroll on overflow
 
