@@ -1,16 +1,27 @@
-# Rubber
+# Vassalize
 
 Control <sup>(hijack)</sup> a discord bot!
 
 It can read/send messages and view attachments (videos soon!), which is all discord really does anyways.
 
 ### Upcoming features:
-- beautifying the way messages are displayed
-- videos
-- minimizing to tray to keep the bot online
-    - user can provide scripts for the bot
+- [ ] add/update vassalize documentation
+- [ ] literally fixing code injection
+- [ ] fix logfile to actually work
+- [ ] beautifying the way messages are displayed
+- [ ] videos
+- [ ] fixing minimize to tray because right now it's a buggy mess<sup>just like the rest of vassalize</sup>
+- [ ] view cached tokens
+- [ ] access options before logging in
+- [ ] status polishing
+- [ ] timestamps, deleted messages, edits
+  - [ ] deleted messages are marked as deleted
+- [ ] be able to send custom emojis
+- [ ] get non-custom emoji to look normal
+- [ ] display embeds (just straight embeds)
+- [ ] server select div scroll on overflow
 
-You can check src/app.js for a more frequently-updated todo list.
+You can check the bottom of src/app.js for a much more frequently-updated todo list.
 
 ---
 
