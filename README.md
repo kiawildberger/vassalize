@@ -8,7 +8,7 @@ It can read/send messages and view attachments (videos soon!), which is all disc
 - [ ] add/update vassalize documentation
 - [ ] prevent code injection
 - [ ] fix logfile to actually work
-- [ ] fixing minimize to tray because right now it's a buggy mess<sup>just like the rest of vassalize</sup>
+- [ ] fixing minimize to tray because right now it's a buggy mess <sup>just like the rest of vassalize</sup>
 - [ ] view cached tokens
 - [ ] access options before logging in
 - [ ] status polishing
