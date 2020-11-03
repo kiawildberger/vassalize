@@ -2,13 +2,11 @@
 
 Control <sup>(hijack)</sup> a discord bot!
 
-It can read/send messages and view attachments (videos soon!), which is all discord really does anyways.
+It can read/send messages and view attachments, which is all discord really does anyways.
 
 ### Upcoming features:
 - [ ] add/update vassalize documentation
-- [ ] prevent code injection
-- [ ] fix logfile to actually work
-- [ ] fixing minimize to tray because right now it's a buggy mess <sup>just like the rest of vassalize</sup>
+- [ ] fixing minimize to tray because right now it's a buggy mess <sup>just like the rest of it</sup>
 - [ ] view cached tokens
 - [ ] access options before logging in
 - [ ] status polishing
