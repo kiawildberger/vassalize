@@ -3,11 +3,10 @@ const {
   BrowserWindow,
   ipcMain,
   globalShortcut,
-  shell, dialog
+  shell
 } = require('electron')
 let ps = require("./ps.js")
 const fs = require("fs")
-const conf = require('./config.json')
 let settings = require("./settings.json")
 const clearmodule = require("clear-module")
 let win;
@@ -24,8 +23,9 @@ function childWindow(url) {
       nodeIntegration: true
     }
   })
-  // childwindow.webContents.openDevTools();
+  childwindow.webContents.openDevTools();
   childwindow.loadFile(url)
+  childwindow.on("close", () => win.show())
 }
 let fullyClose = false;
 
@@ -93,20 +93,19 @@ app.whenReady().then(() => {
 /*
 
 TODO:
+  - update server ui when join new server
   - view cached tokens
   - access options before logging in
  - status polishing
  - timestamps, deleted messages, edits
   + deleted messages are marked as deleted
  - be able to send custom emojis
- - get non-custom emoji to look normal
-  + twemoji is pain, pls maybe library
  - display embeds (just straight embeds)
  - server select div scroll on overflow
-  - fuck that lmao
+  - no
 
 MAYBE:
-  - brute force fucker for bot tokens lmao
+  - brute force thing for bot tokens probably
   - send embeds
   - voice bruh
 */

@@ -4,3 +4,4 @@
 /build/
 /vassalize-win32-x64
 /src/dist
+/src/cli/node_modules

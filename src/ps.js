@@ -8,11 +8,6 @@ if (!fs.existsSync("./config.json")) {
 }
 let Rsettings = require("./settings.json")
 require("dotenv").config()
-let settings = {
-  mode: "user", // define actions available (user is user-controlled)
-  defaultprefix: ".",
-  prefix: "."
-}
 const clearmodule = require("clear-module")
 let uinfo = {}
 let window;
@@ -32,18 +27,18 @@ function logFile(e) {
 
 exports.init = function (win, tok) {
   client = new Discord.Client()
-  ipcMain.on("refreshScripts", () => scripts = require("./scripts.json"))
   window = win;
   client.on("ready", () => {
     if (isLoggedIn) return;
     if(Rsettings.status) client.user.setPresence(Rsettings.status)
     if (enabledscripts.length > 0 && Rsettings.csenabled) {
-      window.webContents.send("refreshScript")
       enabledscripts.forEach(e => {
         try {
+          clearmodule(e.path)
           let script = require(e.path)
           if (script.init) var g = script.init(client)
           logFile("[Scripts] " + e.name + " started successfully")
+          console.log(`[Scripts] ${e.name} started successfully`)
           if (g) {
             logFile(e.name + " > " + g)
           }
@@ -95,8 +90,11 @@ exports.init = function (win, tok) {
       pfp: client.user.avatarURL(),
       guildNumber: client.guilds.cache.array().length
     }
-    if (conf) tokens = conf;
+    clearmodule("./config.json")
+    if (conf) tokens = require("./config.json")
     tokens[botuser] = tok
+    console.log(tok)
+    // only one token can be cached at once, plsfix also why
     fs.writeFileSync("./config.json", JSON.stringify(tokens));
     window.webContents.send("validtoken", {
       bot: uinfo,
@@ -183,6 +181,7 @@ exports.init = function (win, tok) {
           if (g) logFile(e.name + " > " + g)
         } catch(err) {
           logFile("[Scripts] " + e.name + " was unable to receive a message")
+          console.log(`[Scripts] ${e.name} was unable to receive a message`)
           throw err;
         }
       })

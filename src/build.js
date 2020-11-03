@@ -1,4 +1,4 @@
-// dont fuckin touch this shit again just run "node build.js" then move the cachefile into the build folder and export
+// dont touch this again just run "node build.js" then move the cachefile into the build folder and export
 
 const packager = require('electron-packager')
 const fs = require('fs')

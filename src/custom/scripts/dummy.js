@@ -6,6 +6,6 @@ exports.init = function(client) {
 }
 
 exports.message = function(message) {
-  if(message.author.bot || message.channel.guild.id === 658043882000482305) return;
+  if(message.author.bot) return;
   message.channel.send(message.content + " bruh")
 }

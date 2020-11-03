@@ -1,0 +1,48 @@
+<head>
+    <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+    <style>
+        body {
+            overflow-y:auto;
+            height:fit-content;
+            padding-top:2em;
+        }
+        .cachedtoken {
+            position:relative;
+            margin-top:
+        }
+        .remove-tokens-x {
+            position:absolute;
+            right:1em;
+            height:0.75em;
+        }
+    </style>
+    <script>
+        let tokens = require("./config.json")
+        for(i in tokens) {
+            let elem = document.createElement("ul")
+            elem.classList.add("cachedtoken")
+            elem.innerText = i
+            let img = document.createElement("img")
+            img.src = "./assets/removecached.png"
+            img.classList.add("remove-tokens-x")
+            img.style.cursor = "pointer"
+            img.addEventListener("onclick", () => {
+                delete tokens[i]
+                fs.writeFileSync("./config.json", JSON.stringify(tokens))
+            })
+            elem.appendChild(img)
+            document.body.appendChild(elem)
+        }
+        let closeElem = document.createElement("p")
+        closeElem.addEventListener("click", () => window.close())
+        closeElem.style.position = "absolute"
+        closeElem.style.right = '1em';
+        closeElem.style.bottom = '1em'
+        closeElem.classList.add("hoverunderline")
+        closeElem.innerText = "close"
+        document.body.appendChild(closeElem)
+    </script>
+</body>

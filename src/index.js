@@ -1,23 +1,13 @@
 const { ipcRenderer, shell, remote } = require("electron")
 const { Tray, Menu } = remote;
-const readline = require("readline")
 const fs = require('fs')
-const ps = require("./ps.js"),
-  scriptreader = require("./scriptreader.js");
-const EmojiConverter = require("emoji-js")
-let emoji = new EmojiConverter();
-emoji.allow_caps = true;
-emoji.img_set = "twitter";
-emoji.replace_mode = "css";
-// require("dotenv").config()
-// let tenorkey = process.env.TENORKEY
+const scriptreader = require("./scriptreader.js");
 const titlebar = require("electron-titlebar")
-let conf, confp;
+let conf
 if (!fs.existsSync("./config.json")) {
   fs.writeFileSync("./config.json", "{ }")
 } else {
   conf = require('./config.json')
-  confp = require.resolve("./config.json")
 }
 let Rsettings = require("./settings.json")
 let botActor;
@@ -79,22 +69,11 @@ function processmsg(arg) {
           url = gids[index].emoji[gids[index].emojiIds.indexOf(d)].url
         }
         let elem = `![emoji](${url})`
-        // make them bigger if message is *only* emojis
-        // ct = ct.replace(e, elem)
       })
     }
-    // emoji are getting parsed from users but not the bot itself, why the fuck
     const uEmoji = require("universal-emoji-parser")
     ct = uEmoji.parse(ct)
     ct = require("snarkdown")(ct)
-    // if(ct.match(/\:.*\:/)) ct = require("snarkdown")(ct);
-    // const { parse } = require("twemoji-parser")
-    // let twemojis = parse(ct)
-    // if(twemojis) {
-    //   for(i in twemojis) {
-    //     ct = ct.replace(ct.substr(twemojis[i].indices[0], twemojis[i].indices[1]), `<img class="emoji" src="${twemojis[i].url}">`)
-    //   }
-    // }
     ct = `<p mid="${arg.msg.id}">${ct}</p>`
 
     if (ct.includes("@everyone")) {
@@ -443,6 +422,9 @@ id('clearcache').addEventListener("click", () => {
   id("clearcache").setAttribute('title', 'no tokens to clear')
   document.querySelector("label[for='clearcache']").style.display = 'block'
   setTimeout(() => document.querySelector("label[for='clearcache']").style.display = 'none', 1500)
+})
+id('viewtokens').addEventListener('click', () => {
+  ipcRenderer.send('addwindow', {url: "cachedtokens.html"})
 })
 ipcRenderer.on("messagedeleted", (event, id) => {
   let messageElement = document.querySelector(`p[mid="${id}"]`)
