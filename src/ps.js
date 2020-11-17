@@ -88,13 +88,13 @@ exports.init = function (win, tok) {
       discrim: client.user.discriminator,
       full: botuser,
       pfp: client.user.avatarURL(),
-      guildNumber: client.guilds.cache.array().length
+      guildNumber: client.guilds.cache.array().length,
+      id: client.user.id
     }
     clearmodule("./config.json")
-    if (conf) tokens = require("./config.json")
+    tokens = require("./config.json")
+    console.log(tokens)
     tokens[botuser] = tok
-    console.log(tok)
-    // only one token can be cached at once, plsfix also why
     fs.writeFileSync("./config.json", JSON.stringify(tokens));
     window.webContents.send("validtoken", {
       bot: uinfo,
