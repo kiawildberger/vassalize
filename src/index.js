@@ -307,7 +307,7 @@ ipcRenderer.on("validtoken", (event, args) => { // the *one* ipc i will use
   setTimeout(() => {
     // id('userd').innerHTML = `acting as <span style="cursor:pointer;" onclick="ipcRenderer.send('addwindow', {url:'./status.html'})"><b>${args.bot.full}</b></span>`
     document.title = "vassalize: "+args.bot.full
-    id('titlebar-title').textContent = args.bot.full
+    id('titlebar-title').textContent = "vassalize: "+args.bot.full
     // id('titlebar-title').textContent = args.bot.full
     id('bs-helper').innerText = ''
     fillGuildSelect(args.guildInfo)

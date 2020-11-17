@@ -93,7 +93,6 @@ exports.init = function (win, tok) {
     }
     clearmodule("./config.json")
     tokens = require("./config.json")
-    console.log(tokens)
     tokens[botuser] = tok
     fs.writeFileSync("./config.json", JSON.stringify(tokens));
     window.webContents.send("validtoken", {
@@ -164,10 +163,11 @@ exports.init = function (win, tok) {
   ipcMain.on("msgin", (event, arg) => {
     if (arg.msg.toString().match(tagx)) { // is ping
       let un = arg.msg.toString().match(tagx)[0].toString().split("#")[0].replace("@", '')
-      let g = client.channels.cache.get(arg.channel).guild.members.cache.filter(x => x.user.username === un).array()
-      arg.msg = arg.msg.replace(tagx, g[0].user)
+      // let g = client.channels.cache.get(arg.channel).guild.members.cache.array();
+      let g = client.users.cache.find(x => x.username === un)
+      arg.msg = arg.msg.replace(tagx, g)
     }
-    if (arg.msg.toString().includes("/shrug")) arg.msg = arg.msg.replace("/shrug", "¯\_(ツ)_/¯")
+    if (arg.msg.toString().includes("/shrug")) arg.msg = arg.msg.replace(/\/shrug/g, "¯\_(ツ)_/¯")
     client.channels.cache.get(arg.channel).send(arg.msg)
   })
   function process(msg, iscached = false) {
