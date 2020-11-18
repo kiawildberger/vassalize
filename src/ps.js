@@ -14,8 +14,7 @@ let window;
 let lastmessage;
 let isLoggedIn = false
 let gids = []
-let cids = []
-let tagx = /.*#[0-9]{4}/;
+let cids = [];
 let uidx = /<@!\d+>/g;
 let client;
 let scripts = require("./scripts.json")
@@ -160,12 +159,13 @@ exports.init = function (win, tok) {
       }
     }
   })
+  let tagx = /@.*#[0-9]{4}/;
   ipcMain.on("msgin", (event, arg) => {
     if (arg.msg.toString().match(tagx)) { // is ping
       let un = arg.msg.toString().match(tagx)[0].toString().split("#")[0].replace("@", '')
-      // let g = client.channels.cache.get(arg.channel).guild.members.cache.array();
       let g = client.users.cache.find(x => x.username === un)
-      arg.msg = arg.msg.replace(tagx, g)
+      console.log(un, g)
+      arg.msg = arg.msg.replace(`@${g.username}#${g.discriminator}`, g)
     }
     if (arg.msg.toString().includes("/shrug")) arg.msg = arg.msg.replace(/\/shrug/g, "¯\_(ツ)_/¯")
     client.channels.cache.get(arg.channel).send(arg.msg)
