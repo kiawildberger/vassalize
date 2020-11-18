@@ -93,8 +93,7 @@ app.whenReady().then(() => {
 /*
 
 TODO:
-  - focus bar when selecting server/channel
-  - fix pings
+  - pinging multiple people at once
   - update server ui when join new server
   - view cached tokens
   - access options before logging in

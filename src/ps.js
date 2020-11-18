@@ -105,6 +105,9 @@ exports.init = function (win, tok) {
   client.on("messageDelete", message => {
     window.webContents.send("messagedeleted", message.id)
   });
+  client.on("messageUpdate", (oldMessage, newMessage) => {
+    window.webContents.send("messageupdated", {id: oldMessage.id, content: newMessage.content})
+  })
   client.login(tok)
     .catch(err => {
       window.webContents.send('invalidtoken')

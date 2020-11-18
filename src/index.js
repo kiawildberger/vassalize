@@ -189,7 +189,7 @@ function fillGuildSelect(arg) { // generates and populates guild list
   gids = arg
   let q = [...document.querySelectorAll('.serverlist-item')]
   q.forEach(e => {
-    e.addEventListener("click", () => {
+    e.addEventListener("click", () => { // handles selecting a server
       id('msgin').disabled = false
       if (q[q.indexOf(e)] != q) q.splice(q.indexOf(e), 1) // if this is duplicate of another one, should remove it
       id('msgdisplay').innerHTML = ''
@@ -208,13 +208,14 @@ function fillGuildSelect(arg) { // generates and populates guild list
         e.querySelector('.channel-triangle').style.top = tdistance
       }
       id('channellist').innerHTML = `<div class="channel-label">channels</div>`
+      id("msgin").focus();
       let server = gids[e.getAttribute('data-index')]
-      server.channels.forEach(e => { // server.channels.forEach
+      server.channels.forEach(e => {
         let elm = document.createElement("div")
         elm.classList.add("channel-item")
         elm.textContent = "#" + e.name
         elm.setAttribute('data-id', e.id)
-        elm.addEventListener("click", () => {
+        elm.addEventListener("click", () => { // handles selecting a channel?
           currentchannel = e.id
           q = [...document.querySelectorAll(".activechannel")]
           q.forEach(e => {
@@ -428,7 +429,17 @@ id('viewtokens').addEventListener('click', () => {
 })
 ipcRenderer.on("messagedeleted", (event, id) => {
   let messageElement = document.querySelector(`p[mid="${id}"]`)
-  if (messageElement) messageElement.innerHTML += `<span class="deleted-reminder">(deleted)</span>`
+  if (messageElement) messageElement.innerHTML += `<span class="message-reminder">(deleted)</span>`
+})
+ipcRenderer.on("messageupdated", (event, message) => {
+  let messageElement = document.querySelector(`p[mid="${message.id}"]`)
+  if(messageElement) {
+    let oldcontent = messageElement.innerText.replace("(edited, hover to see previous content)", '');
+    messageElement.innerText = message.content;
+    console.log(messageElement.innerHTML)
+    messageElement.innerHTML += `<span class="message-reminder" title="${oldcontent}">(edited, hover to see previous content)</span>`
+    console.log(messageElement.innerHTML)
+  }
 })
 id("custom-script-input").addEventListener("change", e => {
   scriptreader.processFiles(e)
