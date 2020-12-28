@@ -29,6 +29,7 @@ function traySettings(e, value) {
   refreshSettings();
 }
 
+let windowIsVisible = true;
 let tray = new Tray("./icon.ico"), contextMenu;
 function setTrayItems() {
   contextMenu = Menu.buildFromTemplate([
@@ -44,16 +45,31 @@ function setTrayItems() {
         {label:"clear cached tokens", click: () => id('clearcache').click()},
         {label:"restore default settings", click: () => id('opt-restore-defaults').click()}
       ]},
-    {label: "show window", click: () => ipcRenderer.send('show')},
-    {label: "hide window", click: () => ipcRenderer.send("hide")},
+    { label: "window visible", type:"checkbox", checked:windowIsVisible, click: () => toggleVisible() },
     { label: "quit", click: () => ipcRenderer.send("quit") }, // role: "quit" doesnt work here bc window is already hidden probably
-
   ])
   tray.on("click", () => ipcRenderer.send('show'))
   tray.setToolTip("vassalize")
   tray.setContextMenu(contextMenu);
 }
 setTrayItems();
+
+function toggleVisible() {
+  console.log(contextMenu.items[3])
+  if(windowIsVisible) {
+    ipcRenderer.send('hide')
+    windowIsVisible = false;
+    contextMenu.items[3].label = "show window"
+    let m = Menu.buildFromTemplate(contextMenu)
+    tray.setContextMenu(m)
+  } else if(!windowIsVisible) {
+    ipcRenderer.send('show')
+    windowIsVisible = true;
+    contextMenu.items[3].label = "hide window"
+    let m = Menu.buildFromTemplate(contextMenu)
+    tray.setContextMenu(m)
+  }
+}
 
 let loggedin = false;
 let cdnUrl = /https?:\/\/cdn.discordapp.com\/attachments\/\d+\/\d+\/[a-zA-Z0-9_-]+\.[a-zA-Z]{2,5}/g
