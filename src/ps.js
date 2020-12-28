@@ -212,9 +212,9 @@ exports.init = function (win, tok) {
         avatar: avatarURL
       },
       channel: msg.channel.id,
-      guild: msg.guild.id // what
+      guild: msg.guild.id, // what
+      time: msg.createdTimestamp
     }
-    // console.log(msg.mentions)
     if (msg.mentions.users.array().length != 0) {
       m.mentions = msg.mentions.users.array()
     }

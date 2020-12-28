@@ -11,8 +11,6 @@ function updateRefresh(e) {
     if(!fs.existsSync(q.opath)) return;
     let fullfile = fs.readFileSync(q.path, "utf-8"), ofile = fs.readFileSync(q.opath, "utf-8")
     // console.log((fullfile === ofile))
-    console.log(fullfile)
-    console.log(ofile)
     if(fullfile !== ofile) {
       fs.writeFileSync(q.path, ofile) // rewrites file in /scripts/ to match original
     }

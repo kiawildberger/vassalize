@@ -1,5 +1,5 @@
 //&name dummy
-//&desc literally bigass
+//&desc very large
 
 exports.init = function(client) {
   console.log("bro its "+client.user.username+"!")

@@ -35,11 +35,13 @@ function createWindow() {
     height: 600,
     frame: false,
     icon: "./icon.ico",
+    maximizable: false,
     webPreferences: {
       nodeIntegration: true,
       nativeWindowOpen: true
     }
   })
+  win.setResizable(false)
   win.loadFile('index.html')
   win.setMenu(null)
   globalShortcut.register("CommandOrControl+Shift+I", () => {
@@ -100,13 +102,14 @@ TODO:
  - status polishing
  - timestamps, deleted messages, edits
   + deleted messages are marked as deleted
+  + edited messages are shown
  - be able to send custom emojis
- - display embeds (just straight embeds)
+ - display embeds
  - server select div scroll on overflow
   - no
 
 MAYBE:
-  - brute force thing for bot tokens probably
   - send embeds
   - voice bruh
+  - "botcheck" scrapes discordjs dependencies for tokens and reminds them to not commit/push and purge after removing
 */

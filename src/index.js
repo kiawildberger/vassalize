@@ -99,6 +99,10 @@ function processmsg(arg) {
     } else {
       ul.innerHTML = useravatar + usertag + ct
     }
+    let ts = arg.msg.time;
+    let time = new Date(ts);
+    console.log(time.getDay())
+
     if (arg.msg.images) {
       isimg = true; // should be "ismedia" bc videos but im not gon change that rn
       arg.msg.images.forEach(q => {
@@ -230,8 +234,9 @@ function fillGuildSelect(arg) { // generates and populates guild list
       })
     })
   })
-  id('bs').style.display = "none"
-  document.querySelector('.container').style.display = "block"
+  // id('bs').style.display = "none"
+  id('bs').remove()
+  id("container").style.display = "block"
 }
 
 ipcRenderer.on("invalidtoken", () => {
@@ -250,6 +255,7 @@ async function checkCached() {
       r.classList.add("tcache")
       r.innerText = i;
       r.addEventListener("click", async () => {
+        setTimeout(() => r.setAttribute("state", "selected"), 200)
         ipcRenderer.send("startbot", conf[i])
       })
       id('cached').appendChild(r)
@@ -307,9 +313,8 @@ ipcRenderer.on("validtoken", (event, args) => { // the *one* ipc i will use
   fillStatus(args.bot);
   setTimeout(() => {
     // id('userd').innerHTML = `acting as <span style="cursor:pointer;" onclick="ipcRenderer.send('addwindow', {url:'./status.html'})"><b>${args.bot.full}</b></span>`
-    document.title = "vassalize: "+args.bot.full
-    id('titlebar-title').textContent = "vassalize: "+args.bot.full
-    // id('titlebar-title').textContent = args.bot.full
+    document.title = args.bot.full
+    id('titlebar-title').textContent = "vassalize: "+args.bot.full.toLowerCase()
     id('bs-helper').innerText = ''
     fillGuildSelect(args.guildInfo)
   }, 800)
@@ -319,10 +324,13 @@ id('bot-secret').addEventListener("keypress", e => {
   if (!e.target.value) return;
   ipcRenderer.send("startbot", e.target.value)
 })
-id('bs-btn').addEventListener("click", e => {
-  if (!id('bot-secret').value) return;
-  ipcRenderer.send("startbot", id("bot-secret").value)
-})
+// id('bot-secret').addEventListener("keypress", (e) => {
+//   if(id('cached').style.display === "block") {
+//     id('cached').style.animation = 'slideIn 0.1s ease'
+//     setTimeout(() => id('cached').style.display = "none", 90)
+//   }
+//   id('cached-btn').style.transform = "rotate(-90deg)"
+// })
 
 let istyping = false;
 setInterval(() => {
@@ -362,19 +370,33 @@ id("msgin").addEventListener("keypress", e => {
   })
   id('msgin').value = ""
 })
+if(Object.keys(require("./config.json")).length > 0) {
+  id('cached-btn').setAttribute('mode', 'cached')
+}
 id('cached-btn').addEventListener('click', () => {
-  if (id('cached').style.display == 'block') {
-    id('cached').style.display = "none"
-  } else {
-    id('cached').style.display = "block"
+  if(id('cached-btn').getAttribute("mode") === "cached") {
+    if (id('cached').style.display == 'block') {
+      id('cached').style.animation = 'slideIn 0.1s ease'
+      setTimeout(() => id('cached').style.display = "none", 90)
+    } else {
+      id('cached').style.animation = 'slideOut 0.1s ease'
+      id('cached').style.display = "block"
+    }
+  } else if(id('cached-btn').getAttribute("mode") === "submit") {
+    if (!id('bot-secret').value) return;
+    ipcRenderer.send("startbot", id("bot-secret").value)
   }
 })
 id('topt').addEventListener('click', () => {
-  document.querySelector('.container').style.display = 'none'
+  id("container").style.display = 'none'
+  id('container').style.filter = "blur(4px)"
+  id('topt').style.display = 'none'
+  if(id("bs") && id("bs").style.display === "block") { id('topt').setAttribute("returnTo", "bs") }
+  else if(id("container").style.display === "block") { id('topt').setAttribute("returnTo", "container") }
   id('options').style.display = "block"
   clearmodule("./settings.json")
   // Rsettings = require("./settings.json")
-  console.log(Rsettings)
+  // console.log(Rsettings)
   // populating settings with stored values
   if (Rsettings.cachedlength) id('cachedlength').value = Rsettings.cachedlength
   // remember, this does nothing because require() caches modules/json files, definitley need to change
@@ -390,7 +412,10 @@ id('topt').addEventListener('click', () => {
 })
 id("leaveopts").addEventListener("click", () => { // write settings to settings.json
   id('options').style.display = "none"
-  document.querySelector('.container').style.display = 'block'
+  id('topt').style.display = 'block'
+  if(id(id('topt').getAttribute('returnTo'))) id(id('topt').getAttribute('returnTo')).style.display = 'block'
+  id('container').style.display = 'default'
+  id('container').style.filter = "none"
   let settings = {
     cachedlength: id("cachedlength").value,
     devmode: id("devmode").checked,
