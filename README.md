@@ -6,12 +6,11 @@ It can read/send messages and view attachments, which is all discord really does
 
 ### Upcoming features:
 - [ ] add/update vassalize documentation
-- [ ] fixing minimize to tray because right now it's a buggy mess <sup>just like the rest of it</sup>
+- [x] minimize to tray isnt as buggy anymore
 - [ ] view cached tokens
-- [ ] access options before logging in
+- [x] access options before logging in
 - [ ] status polishing
-- [ ] timestamps, deleted messages, edits
-  - [x] deleted messages are marked as deleted
+- [x] timestamps, deleted messages, edits
 - [ ] be able to send custom emojis
 - [ ] display embeds (just straight embeds)
 - [ ] server select div scroll on overflow
@@ -19,6 +18,12 @@ It can read/send messages and view attachments, which is all discord really does
 You can check the bottom of src/app.js for a much more frequently-updated todo list.
 
 ---
+
+## Notable features
+
+- Replaces **every appearance** of `/shrug` with `¯\_(ツ)_/¯` in outgoing messages.
+- Allows for quick automation with [scripts](#Scripts).
+- Can be used as a bot hosting method with scripts and auto-start enabled.
 
 ### Scripts
 
@@ -33,10 +38,10 @@ exports.message = function(message, currentchannel) {
   // code here
 }
 ```
-The script can have as much or as little code as you need, but as long as the `&name`, `&desc`, `init` and `message` properties are present, vassalize will accept it as a script.
-The `client` and `message` arguments to `init` and `message` respectively are straight from discord.js. Refer to the [documentation](https://discord.js.org/#/docs/main/stable/general/welcome) for details on discord.js.
+The script can have as much or as little code as you need, but as long as the `&name`, `&desc`, `init` and `message` properties are present, vassalize will accept it as a script. Only single-line comments will work with the &name and &desc properties for the time being.
+The `client` and `message` arguments to `init` and `message` respectively are directly from discord.js. Refer to the [documentation](https://discord.js.org/#/docs/main/stable/general/welcome) for details on discord.js.
 
-To run the script, make sure the "Allow custom scripts to run" option is checked, import your file, and enable it. After reloading the app, it should run.
+To run the script, make sure the "Allow custom scripts to run" option is checked, import your file, and enable it.
 
 Custom scripts log messages to the system console, so users who wish to see console messages will have to run via `npm start` rather than the executable. The return values of all functions are displayed in `src/logfile` This might change in the future.
 
