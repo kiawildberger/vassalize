@@ -6,10 +6,10 @@
 
 <body>
   <div id="electron-titlebar" style="z-index:100;" class="drag">
-    <div id="titlebar-title" style="width: 100%; height: 100%; text-align: center; line-height: 40px; font-size:14px; opacity:0.5;">siGn in</div>
+    <div id="titlebar-title" style="width: 100%; height: 100%; color:black; text-align: center; line-height: 40px; font-size:14px; opacity:0.5; font-style:oblique;">siGn in</div>
   </div>
   <div>
-    <div id="options-container">
+    <!-- <div id="options-container"> -->
       <div id="options" style="display:none;">
         <div style="position:sticky; top:0; float:right; ">
           <input type="button" id="leaveopts" value="save & return">
@@ -31,8 +31,8 @@
         <input type="checkbox" id="scriptsenabled" style="display:inline;">
 
         <br><br><label for="logfile">Log certain events to a file for scripting and debugging</label>
-        <input type="checkbox" id="logfile" style="display:inline;"><br><input type="button" style="margin-left:1.5em;"
-          onclick="fs.writeFileSync('./logfile', '');" value="Clear logfile">
+        <input type="checkbox" id="logfile" style="display:inline;"><br><input id="clearlogfile" type="button" style="margin-left:1.5em;"
+          onclick="require('fs').writeFileSync('./logfile', '');" value="Clear logfile">
 
         <br><br><label for="devmode">Toggle developer mode: </label>
         <input type="checkbox" id="devmode" style="display:inline;"><br><br>
@@ -44,21 +44,21 @@
         <label for="clearcache" style="display:none;">tokens cleared!</label><br>
         <input type="button" id="opt-restore-defaults" value="restore defaults"/>
         <br>
-        <h2 style="width:fit-content; padding-bottom:0.3em; padding-right:2em; border-bottom:1.5px solid black;">Advanced
+        <h2 style="width:fit-content; padding:0 0.3em 0.3em 0; margin-left:1em; border-bottom:1.5px solid black;">Advanced
         </h2>
-        <div>
-          <label for="enter-script-button">Add a custom script <a href="https://github.com/kiawildberger/vassalize/blob/master/README.md" target="_blank">Learn more</a>&nbsp;&nbsp;</label>
+        <div style="margin-left:1.5em;">
+          <label for="enter-script-button">Add a custom script <a href="https://github.com/kiawildberger/vassalize/blob/master/README.md#Scripts" target="_blank">Learn more</a>&nbsp;&nbsp;</label>
           <input type="button" onclick="document.getElementById('custom-script-input').click()"
-            value="select files"><input type="button" onclick="ipcRenderer.send('restart')" title="requires sign-in"
+            value="select files"><input type="button" title="requires sign-in"
             value="Reload window">
           <input type="file" multiple accept="text/javascript" id="custom-script-input" style="display:none;">
         </div>
         <ul id="cscript-list"></ul>
       </div>
-    </div>
-    <img id="topt" src="assets/settingsicon.svg">
+    <!-- </div> -->
+    <img id="topt" src="assets/settingsicon.svg" returnTo="bs">
+    <img id="loginbg" style="width:100%; height:100%; position:absolute; z-index:-1;" draggable="false" src="assets/login-background.jpg">
     <div id="bs">
-      <img style="width:100%; height:100%; position:absolute;" draggable="false" src="assets/login-background.jpg">
       <div id="bs-helper"></div>
       <div class="bs-input-container">
         <input id="bot-secret" type="password" placeholder="enter a bot token"><span id="bs-btn">GO</span><span id="bs-btn-arrow">&gt;</span>

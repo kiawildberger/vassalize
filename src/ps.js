@@ -30,19 +30,21 @@ exports.init = function (win, tok) {
   client.on("ready", () => {
     if (isLoggedIn) return;
     if(Rsettings.status) client.user.setPresence(Rsettings.status)
+    clearmodule("./settings.json");
+    Rsettings = require("./settings.json")
     if (enabledscripts.length > 0 && Rsettings.csenabled) {
       enabledscripts.forEach(e => {
         try {
           clearmodule(e.path)
           let script = require(e.path)
           if (script.init) var g = script.init(client)
-          logFile("[Scripts] " + e.name + " started successfully")
-          console.log(`[Scripts] ${e.name} started successfully`)
+          logFile("[Script] " + e.name + " started successfully")
+          console.log(`[Script] ${e.name} started successfully`)
           if (g) {
-            logFile(e.name + " > " + g)
+            logFile('[Script]'+e.name + " > " + g)
           }
         } catch (err) {
-          logFile("[Scripts] " + e.name + " failed to start")
+          logFile("[Script] " + e.name + " failed to start")
           throw err;
         }
       })
@@ -174,6 +176,8 @@ exports.init = function (win, tok) {
     client.channels.cache.get(arg.channel).send(arg.msg)
   })
   function process(msg, iscached = false) {
+    clearmodule("./settings.json");
+    Rsettings = require("./settings.json")
     if (Rsettings.csenabled && !iscached) {
       window.webContents.send("refreshScript")
       enabledscripts.forEach(e => {
@@ -183,8 +187,8 @@ exports.init = function (win, tok) {
           var g = script.message(msg)
           if (g) logFile(e.name + " > " + g)
         } catch(err) {
-          logFile("[Scripts] " + e.name + " was unable to receive a message")
-          console.log(`[Scripts] ${e.name} was unable to receive a message`)
+          logFile("[Script] " + e.name + " was unable to receive a message")
+          console.log(`[Script] ${e.name} was unable to receive a message`)
           throw err;
         }
       })

@@ -69,13 +69,13 @@ img.emoji { height:2em; width:2em; display:inline; }
 #msgin:disabled { opacity:0.5; }
 .ping { color:#FA9A4B; }
 .selfping { color:#FA001A; background:#C5F9FA; }
-#bs {
-    /* width:100%;
+/* #bs {
+    width:100%;
     height:50%;
     padding-left:5em;
     padding-top:2em;
-    background-color:#4A4D5D; */
-}
+    background-color:#4A4D5D;
+} */
 #bot-secret { /* text input box for bot secret */
     width:100%;
     position:absolute;
@@ -159,7 +159,7 @@ img.emoji { height:2em; width:2em; display:inline; }
 }
 .tcache:hover::after { margin-left:2em; opacity:1; }
 /* .tache:active::after { animation:arrowSlideOut 0.2s ease; } */
-.tcache[state="selected"]::after { animation:arrowSlideOut 0.8s ease; animation-fill-mode: forwards; }
+.tcache[state="selected"]::after { opacity:1; animation:arrowSlideOut 0.8s ease; animation-fill-mode: forwards; }
 #topt {
     position:absolute;
     bottom:1em;
@@ -189,6 +189,7 @@ a:visited {
 }
 /* #userd { position:absolute; bottom:0.2em; right:0.2em; } */
 #errout{ color:red; font-size:14px; }
+#cscript-list { height:50%; }
 .customscript-ul {
   margin-bottom:0.8em;
   width:65%;
@@ -285,9 +286,9 @@ select { width:10em; }
 .user-video { outline:none; margin-top:0; }
 /* #topt { position:absolute; bottom: 0; left:8px; cursor:pointer; padding-bottom:6px; background-color:#4A4D5D; }
 #topt:hover {text-decoration:underline;} */
-#options-container { position:absolute; top:15%; left:10%; overflow-y:auto; height:100%; width:80%; z-index:1; }
-#options-container::-webkit-scrollbar-thumb { background:transparent; }
-#options { padding:0.5em; background:#60A892; border-radius:8px; position:relative; }
+#options-container { position:absolute; top:15%; left:10%; overflow-y:auto; height:100%; width:80%; z-index:1; pointer-events:none; }
+#options::-webkit-scrollbar-thumb { opacity:0.3; }
+#options { padding:0.5em; background:#60A892; border-radius:8px; position:absolute; top:15%; left:10%; height:100%; width:80%; z-index:2; overflow-y:auto; }
 /* #leaveopts { position:absolute; right:0; bottom:0; } */
 /* #opt-restore-defaults { position:absolute; bottom:0; right:7em; margin:0.5em; } */
 #options>label { margin-left:1em; }

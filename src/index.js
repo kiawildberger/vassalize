@@ -1,5 +1,5 @@
-const { ipcRenderer, shell, remote } = require("electron")
-const { Tray, Menu } = remote;
+const { ipcRenderer, shell } = require("electron")
+const { Tray, Menu } = require("@electron/remote");
 const fs = require('fs')
 const scriptreader = require("./scriptreader.js");
 const titlebar = require("electron-titlebar")
@@ -16,13 +16,44 @@ function id(e) {
   return document.getElementById(e)
 }
 
-let tray = new Tray("./icon.ico");
-let contextMenu = Menu.buildFromTemplate([
-  { label: "quit", click: () => ipcRenderer.send("quit") }
-])
-tray.on("click", () => ipcRenderer.send('show'))
-tray.setToolTip("vassalize")
-tray.setContextMenu(contextMenu);
+function traySettings(e, value) {
+  let settings = Rsettings;
+  settings[e] = value;
+  Rsettings = settings;
+  let corr = {
+    devmode: "devmode",
+    typing: "typingIndicator",
+  }
+  fs.writeFileSync("./settings.json", JSON.stringify(settings))
+
+  refreshSettings();
+}
+
+let tray = new Tray("./icon.ico"), contextMenu;
+function setTrayItems() {
+  contextMenu = Menu.buildFromTemplate([
+    {label: "vassalize", enabled: false },
+    {type:"separator"},
+    {type:"submenu", label: "options",
+      submenu: [
+        {label: "developer mode", type:"checkbox", checked:Rsettings.devmode, click: () => { traySettings("devmode", !Rsettings.devmode) }},
+        {label: "users can see when you're typing", type:"checkbox", checked:Rsettings.typing, click: () => { traySettings("typing", !Rsettings.typing)}},
+        {label: "allow custom scripts to run", type:"checkbox", checked:Rsettings.csenabled, click: () => { traySettings("csenabled", !Rsettings.csenabled)}},
+        {label: "log to file", type:"checkbox", checked:Rsettings.fileLogging, click: () => { traySettings("fileLogging", !Rsettings.fileLogging)}},
+        {label: "clear logfile", click: () => id("clearlogfile").click()},
+        {label:"clear cached tokens", click: () => id('clearcache').click()},
+        {label:"restore default settings", click: () => id('opt-restore-defaults').click()}
+      ]},
+    {label: "show window", click: () => ipcRenderer.send('show')},
+    {label: "hide window", click: () => ipcRenderer.send("hide")},
+    { label: "quit", click: () => ipcRenderer.send("quit") }, // role: "quit" doesnt work here bc window is already hidden probably
+
+  ])
+  tray.on("click", () => ipcRenderer.send('show'))
+  tray.setToolTip("vassalize")
+  tray.setContextMenu(contextMenu);
+}
+setTrayItems();
 
 let loggedin = false;
 let cdnUrl = /https?:\/\/cdn.discordapp.com\/attachments\/\d+\/\d+\/[a-zA-Z0-9_-]+\.[a-zA-Z]{2,5}/g
@@ -57,6 +88,11 @@ function processmsg(arg) {
     let ct = arg.msg.content
     let mt = arg.msg.mentions
 
+    let ts = arg.msg.time, days = ["Sun", "Mon", "Tues", 'Wed', 'Thurs', 'Fri', 'Sat'], months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sept', "Oct", 'Nov', 'Dec'],
+      time = new Date(ts), month = months[time.getMonth()], weekday = days[time.getDay()], day = time.getDate(), year = time.getFullYear(),
+      times = `${time.getHours()}:${(time.getMinutes() < 10) ? "0"+time.getMinutes() : time.getMinutes()}`,
+      fulltime = `${weekday}, ${month} ${day} ${year}, at ${times}`;
+
     // custom emoji
     // let pemojis = ct.match(/<:[a-zA-Z0-9]+:\d+>/g)
     let pemojis;
@@ -74,7 +110,7 @@ function processmsg(arg) {
     const uEmoji = require("universal-emoji-parser")
     ct = uEmoji.parse(ct)
     ct = require("snarkdown")(ct)
-    ct = `<p mid="${arg.msg.id}">${ct}</p>`
+    ct = `<p mid="${arg.msg.id}" title="${fulltime}">${ct}</p>`
 
     if (ct.includes("@everyone")) {
       ct = ct.replace("@everyone", `<span class="selfping">@everyone</span>`)
@@ -99,9 +135,6 @@ function processmsg(arg) {
     } else {
       ul.innerHTML = useravatar + usertag + ct
     }
-    let ts = arg.msg.time;
-    let time = new Date(ts);
-    console.log(time.getDay())
 
     if (arg.msg.images) {
       isimg = true; // should be "ismedia" bc videos but im not gon change that rn
@@ -234,9 +267,10 @@ function fillGuildSelect(arg) { // generates and populates guild list
       })
     })
   })
-  // id('bs').style.display = "none"
-  id('bs').remove()
+  id('bs').style.display = "none"
   id("container").style.display = "block"
+  id('topt').setAttribute("returnTo", "container")
+  id('loginbg').style.display = 'none'
 }
 
 ipcRenderer.on("invalidtoken", () => {
@@ -274,8 +308,9 @@ function fillStatus(bot, presenceData = undefined) {
     id("userd").innerHTML = `<img class="statusd" src="${bot.pfp}">
     <div class="status-data">
     <p class="statusn">${bot.name}<span class="status-discrim"> #${bot.discrim}</span></p>
-    <p class="status-pres hoverunderline" onclick="ipcRenderer.send('addwindow', {url:'./status.html'})">Set a status</p>
+    <p class="status-pres hoverunderline" id="openstat">Set a status</p>
     </div>`
+    id('openstat').addEventListener("click", () => { ipcRenderer.send("addwindow", {url:"./status.html"}) })
     return;
   }
   let stattype = sett.status.activity.type.toLowerCase()
@@ -388,11 +423,13 @@ id('cached-btn').addEventListener('click', () => {
   }
 })
 id('topt').addEventListener('click', () => {
-  id("container").style.display = 'none'
-  id('container').style.filter = "blur(4px)"
+  // id("container").style.display = 'none'
+  contextMenu.items[2].enabled = false;
+  tray.setContextMenu(contextMenu)
+  id('container').style.filter = "blur(2px)"
+  id('bs').style.filter = "blur(2px)"
   id('topt').style.display = 'none'
-  if(id("bs") && id("bs").style.display === "block") { id('topt').setAttribute("returnTo", "bs") }
-  else if(id("container").style.display === "block") { id('topt').setAttribute("returnTo", "container") }
+  id('bs').style.display = 'none';
   id('options').style.display = "block"
   clearmodule("./settings.json")
   // Rsettings = require("./settings.json")
@@ -400,6 +437,7 @@ id('topt').addEventListener('click', () => {
   // populating settings with stored values
   if (Rsettings.cachedlength) id('cachedlength').value = Rsettings.cachedlength
   // remember, this does nothing because require() caches modules/json files, definitley need to change
+  clearmodule("./config.json")
   if (!Object.keys(require("./config.json"))) {
     id("clearcache").disabled = true;
     id("clearcache").setAttribute('title', 'no tokens to clear')
@@ -411,9 +449,13 @@ id('topt').addEventListener('click', () => {
   id("minimizeWhenClosed").checked = Rsettings.minimize
 })
 id("leaveopts").addEventListener("click", () => { // write settings to settings.json
+  setTrayItems(); // for updating the options menu in the tray
   id('options').style.display = "none"
+  let returnto = id('topt').getAttribute("returnTo")
+  if(returnto === "bs") { id('bs').style.display = "block" }
   id('topt').style.display = 'block'
-  if(id(id('topt').getAttribute('returnTo'))) id(id('topt').getAttribute('returnTo')).style.display = 'block'
+  id('bs').style.filter = "none"
+  id('container').style.filter = "none"
   id('container').style.display = 'default'
   id('container').style.filter = "none"
   let settings = {
@@ -424,10 +466,21 @@ id("leaveopts").addEventListener("click", () => { // write settings to settings.
     csenabled: id("scriptsenabled").checked,
     minimize: id("minimizeWhenClosed").checked
   }
+  let t = contextMenu.items[2].submenu.items;
+  t[0].checked = settings.devmode;
+  t[1].checked = settings.typing;
+  t[2].checked = settings.csenabled;
+  t[3].checked = settings.fileLogging;
+  contextMenu.items[2].enabled = true;
+  tray.setContextMenu(contextMenu)
   Rsettings = settings
   fs.writeFileSync("./settings.json", JSON.stringify(settings))
 })
+/**
+ * @desc Sets the elements in #options to the correct values
+ */
 function refreshSettings() {
+  setTrayItems()
   clearmodule("./settings.json")
   Rsettings = require("./settings.json")
   id('cachedlength').value = Rsettings.cachedlength
@@ -440,7 +493,6 @@ function refreshSettings() {
 ipcRenderer.on("refreshSettings", () => refreshSettings())
 id("opt-restore-defaults").addEventListener("click", () => {
   ipcRenderer.send("confirm-restore-settings")
-  refreshSettings();
 })
 id('clearcache').addEventListener("click", () => {
   fs.writeFileSync("./config.json", "{ }")

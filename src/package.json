@@ -23,10 +23,11 @@
     "bot"
   ],
   "dependencies": {
+    "@electron/remote": "^1.0.2",
     "clear-module": "^4.1.1",
     "discord.js": "^12.1.1",
     "dotenv": "^8.2.0",
-    "electron": "^9.3.1",
+    "electron": "^11.1.1",
     "electron-titlebar": "0.0.3",
     "snarkdown": "^2.0.0",
     "universal-emoji-parser": "^0.5.28"

@@ -38,7 +38,8 @@ function createWindow() {
     maximizable: false,
     webPreferences: {
       nodeIntegration: true,
-      nativeWindowOpen: true
+      nativeWindowOpen: true,
+      enableRemoteModule: true
     }
   })
   win.setResizable(false)
@@ -75,7 +76,7 @@ function createWindow() {
 
 app.whenReady().then(() => {
   createWindow();
-  
+  require("@electron/remote/main").initialize()
   ipcMain.on("startbot", (event, tok) => {
     ps.init(win, tok)
   })
@@ -98,11 +99,9 @@ TODO:
   - pinging multiple people at once
   - update server ui when join new server
   - view cached tokens
-  - access options before logging in
+  + access options before logging in
  - status polishing
- - timestamps, deleted messages, edits
-  + deleted messages are marked as deleted
-  + edited messages are shown
+ + timestamps, deleted messages, edits
  - be able to send custom emojis
  - display embeds
  - server select div scroll on overflow

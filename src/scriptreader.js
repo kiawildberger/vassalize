@@ -1,4 +1,5 @@
 const fs = require("fs");
+let Rsettings = require("./settings.json")
 const {
   ipcRenderer
 } = require("electron")
@@ -19,6 +20,7 @@ function updateRefresh(e) {
   ipcRenderer.send("refreshScripts")
 }
 exports.update = updateRefresh
+require("clear-module")("./settings.json"); Rsettings = require("./settings.json")
 function logFile(e) {if (Rsettings.fileLogging) fs.appendFile("./logfile", e + "\n", () => {})}
 
 function refreshJSONFromFile(script) {
