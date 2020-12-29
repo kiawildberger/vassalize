@@ -388,12 +388,12 @@ ipcRenderer.on("validtoken", (event, args) => { // the *one* ipc i will use
     fillGuildSelect(args.guildInfo)
   }, 800)
 })
-id('bot-secret').addEventListener("keypress", e => {
+id("bot-secret").addEventListener("keypress", e => {
   if (e.code != "Enter") return; // keyCode is apparently deprecated?
   if (!e.target.value) return;
   ipcRenderer.send("startbot", e.target.value)
 })
-id('bot-secret').addEventListener("keydown", (e) => {
+id("bot-secret").addEventListener("keydown", (e) => {
   if(e.key === "Backspace" && e.target.value.length <= 1) {
     id('cached-btn').style.transform = "rotate(0deg)"
     id('cached-btn').setAttribute("mode", "cached")
@@ -402,7 +402,7 @@ id('bot-secret').addEventListener("keydown", (e) => {
     id('cached-btn').setAttribute("mode", "submit")
   }
 })
-id('bot-secret').addEventListener('keyup', () => { if(id('bot-secret').value === "") id('cached-btn').style.transform = "rotate(0deg)" })
+id("bot-secret").addEventListener('keyup', () => { if(id("bot-secret").value === "") id('cached-btn').style.transform = "rotate(0deg)" })
 
 let istyping = false;
 setInterval(() => {
@@ -455,7 +455,7 @@ id('cached-btn').addEventListener('click', () => {
       id('cached').style.display = "block"
     }
   } else if(id('cached-btn').getAttribute("mode") === "submit") {
-    if (!id('bot-secret').value) return;
+    if (!id("bot-secret").value) return;
     ipcRenderer.send("startbot", id("bot-secret").value)
   }
 })
