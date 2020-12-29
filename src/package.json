@@ -5,8 +5,9 @@
   "main": "app.js",
   "scripts": {
     "start": "electron .",
-    "dist": "electron-builder --linux snap",
-    "test": "node ./tester/app.js"
+    "build": "electron-packager . vassalize --platform win32 --arch x64 --out dist/ --icon=./icon.ico --overwrite",
+    "setup": "electron-installer-windows --src dist/vassalize-win32-x64/ --dest dist/installers/",
+    "build-win": "(npm run build && npm run setup)"
   },
   "repository": "https://github.com/kiawildberger/vassalize",
   "author": "kiawildberger",
@@ -33,6 +34,7 @@
     "universal-emoji-parser": "^0.5.28"
   },
   "devDependencies": {
+    "electron-installer-windows": "^3.0.0",
     "electron-packager": "^15.1.0"
   }
 }

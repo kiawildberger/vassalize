@@ -129,7 +129,7 @@ img.emoji { height:2em; width:2em; display:inline; }
 @keyframes slideIn {
     0% { height:9em; overflow-y:hidden; }
     50% { height:5em; }
-    100% { height:0em; overflow-y:scroll; }
+    100% { height:0em; overflow-y:scroll; display:none; }
 }
 #cached::-webkit-scrollbar-thumb { background:transparent; }
 #cached {
@@ -137,7 +137,7 @@ img.emoji { height:2em; width:2em; display:inline; }
     padding-bottom:1em;
     background:#5D79DE;
     border-radius:2px;
-    height:10em;
+    height:120%;
     overflow-y: auto;
 }
 @keyframes arrowSlideOut { 100% { margin-left:15em; opacity:0; } }
@@ -158,7 +158,7 @@ img.emoji { height:2em; width:2em; display:inline; }
     font-weight:bold;
 }
 .tcache:hover::after { margin-left:2em; opacity:1; }
-/* .tache:active::after { animation:arrowSlideOut 0.2s ease; } */
+.tcache[state="pending"] { opacity:1; display:block; }
 .tcache[state="selected"]::after { opacity:1; animation:arrowSlideOut 0.8s ease; animation-fill-mode: forwards; }
 #topt {
     position:absolute;

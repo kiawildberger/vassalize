@@ -17,27 +17,44 @@ function id(e) {
 }
 
 function traySettings(e, value) {
-  let settings = Rsettings;
-  settings[e] = value;
-  Rsettings = settings;
-  let corr = {
-    devmode: "devmode",
+  // let settings = Rsettings;
+  // settings[e] = value;
+  // Rsettings = settings;
+  // fs.writeFileSync("./settings.json", JSON.stringify(settings))
+  let corresponding = {
+    cachetokens: "cachetokens",
+    cachedlength: "cachedlength",
+    minimize: "minimizeWhenClosed",
     typing: "typingIndicator",
+    csenabled: "scriptsenabled",
+    fileLogging: "logfile",
+    devmode: "devmode"
   }
+  id(corresponding[e]).click()
+  let settings = {
+    cachedlength: id("cachedlength").value,
+    devmode: id("devmode").checked,
+    typing: id("typingIndicator").checked,
+    fileLogging: id("logfile").checked,
+    csenabled: id("scriptsenabled").checked,
+    minimize: id("minimizeWhenClosed").checked,
+    cachetokens: id('cachetokens').checked
+  }
+  Rsettings = settings
   fs.writeFileSync("./settings.json", JSON.stringify(settings))
-
-  refreshSettings();
 }
 
 let windowIsVisible = true;
-let tray = new Tray("./icon.ico"), contextMenu;
+let tray = new Tray(require('path').join(__dirname, "icon.ico")), contextMenu;
 function setTrayItems() {
   contextMenu = Menu.buildFromTemplate([
     {label: "vassalize", enabled: false },
     {type:"separator"},
     {type:"submenu", label: "options",
       submenu: [
-        {label: "developer mode", type:"checkbox", checked:Rsettings.devmode, click: () => { traySettings("devmode", !Rsettings.devmode) }},
+        // ideally these would all interact properly with the options menu and i *had it working* but its broken now
+        {label: "store tokens in cache", type:"checkbox", checked:Rsettings.cachetokens, click: () => { traySettings("cachetokens", !Rsettings.cachetokens)}},
+        {label: "developer mode", type:"checkbox", checked:Rsettings.devmode, click: () => { traySettings("devmode", !Rsettings.devmode)}},
         {label: "users can see when you're typing", type:"checkbox", checked:Rsettings.typing, click: () => { traySettings("typing", !Rsettings.typing)}},
         {label: "allow custom scripts to run", type:"checkbox", checked:Rsettings.csenabled, click: () => { traySettings("csenabled", !Rsettings.csenabled)}},
         {label: "log to file", type:"checkbox", checked:Rsettings.fileLogging, click: () => { traySettings("fileLogging", !Rsettings.fileLogging)}},
@@ -45,10 +62,10 @@ function setTrayItems() {
         {label:"clear cached tokens", click: () => id('clearcache').click()},
         {label:"restore default settings", click: () => id('opt-restore-defaults').click()}
       ]},
-    { label: "window visible", type:"checkbox", checked:windowIsVisible, click: () => toggleVisible() },
+    // { label: "window visible", type:"checkbox", checked:windowIsVisible, click: () => toggleVisible() },
     { label: "quit", click: () => ipcRenderer.send("quit") }, // role: "quit" doesnt work here bc window is already hidden probably
   ])
-  tray.on("click", () => ipcRenderer.send('show'))
+  tray.on("click", () => toggleVisible())
   tray.setToolTip("vassalize")
   tray.setContextMenu(contextMenu);
 }
@@ -305,7 +322,8 @@ async function checkCached() {
       r.classList.add("tcache")
       r.innerText = i;
       r.addEventListener("click", async () => {
-        setTimeout(() => r.setAttribute("state", "selected"), 200)
+        r.setAttribute('state', "pending")
+        setTimeout(() => r.setAttribute("state", "selected"), 100)
         ipcRenderer.send("startbot", conf[i])
       })
       id('cached').appendChild(r)
@@ -375,13 +393,16 @@ id('bot-secret').addEventListener("keypress", e => {
   if (!e.target.value) return;
   ipcRenderer.send("startbot", e.target.value)
 })
-// id('bot-secret').addEventListener("keypress", (e) => {
-//   if(id('cached').style.display === "block") {
-//     id('cached').style.animation = 'slideIn 0.1s ease'
-//     setTimeout(() => id('cached').style.display = "none", 90)
-//   }
-//   id('cached-btn').style.transform = "rotate(-90deg)"
-// })
+id('bot-secret').addEventListener("keydown", (e) => {
+  if(e.key === "Backspace" && e.target.value.length <= 1) {
+    id('cached-btn').style.transform = "rotate(0deg)"
+    id('cached-btn').setAttribute("mode", "cached")
+  } else {
+    id('cached-btn').style.transform = "rotate(-90deg)"
+    id('cached-btn').setAttribute("mode", "submit")
+  }
+})
+id('bot-secret').addEventListener('keyup', () => { if(id('bot-secret').value === "") id('cached-btn').style.transform = "rotate(0deg)" })
 
 let istyping = false;
 setInterval(() => {
@@ -440,7 +461,7 @@ id('cached-btn').addEventListener('click', () => {
 })
 id('topt').addEventListener('click', () => {
   // id("container").style.display = 'none'
-  contextMenu.items[2].enabled = false;
+  // contextMenu.items[2].enabled = false;
   tray.setContextMenu(contextMenu)
   id('container').style.filter = "blur(2px)"
   id('bs').style.filter = "blur(2px)"
@@ -463,6 +484,7 @@ id('topt').addEventListener('click', () => {
   id("logfile").checked = Rsettings.fileLogging
   id("scriptsenabled").checked = Rsettings.csenabled
   id("minimizeWhenClosed").checked = Rsettings.minimize
+  id("cachetokens").checked = Rsettings.cachetokens
 })
 id("leaveopts").addEventListener("click", () => { // write settings to settings.json
   setTrayItems(); // for updating the options menu in the tray
@@ -480,13 +502,15 @@ id("leaveopts").addEventListener("click", () => { // write settings to settings.
     typing: id("typingIndicator").checked,
     fileLogging: id("logfile").checked,
     csenabled: id("scriptsenabled").checked,
-    minimize: id("minimizeWhenClosed").checked
+    minimize: id("minimizeWhenClosed").checked,
+    cachetokens: id('cachetokens').checked
   }
   let t = contextMenu.items[2].submenu.items;
-  t[0].checked = settings.devmode;
-  t[1].checked = settings.typing;
-  t[2].checked = settings.csenabled;
-  t[3].checked = settings.fileLogging;
+  t[0].checked = settings.cachetokens;
+  t[1].checked = settings.devmode;
+  t[2].checked = settings.typing;
+  t[3].checked = settings.csenabled;
+  t[4].checked = settings.fileLogging;
   contextMenu.items[2].enabled = true;
   tray.setContextMenu(contextMenu)
   Rsettings = settings
@@ -496,7 +520,7 @@ id("leaveopts").addEventListener("click", () => { // write settings to settings.
  * @desc Sets the elements in #options to the correct values
  */
 function refreshSettings() {
-  setTrayItems()
+  // setTrayItems()
   clearmodule("./settings.json")
   Rsettings = require("./settings.json")
   id('cachedlength').value = Rsettings.cachedlength
@@ -505,6 +529,7 @@ function refreshSettings() {
   id("logfile").checked = Rsettings.fileLogging
   id("scriptsenabled").checked = Rsettings.csenabled
   id("minimizeWhenClosed").checked = Rsettings.minimize
+  id('cachetokens').checked = Rsettings.cachetokens
 }
 ipcRenderer.on("refreshSettings", () => refreshSettings())
 id("opt-restore-defaults").addEventListener("click", () => {
@@ -512,6 +537,7 @@ id("opt-restore-defaults").addEventListener("click", () => {
 })
 id('clearcache').addEventListener("click", () => {
   fs.writeFileSync("./config.json", "{ }")
+  Array.from(document.querySelectorAll(".tcache")).forEach(e => e.remove())
   id('clearcache').disabled = true
   id("clearcache").setAttribute('title', 'no tokens to clear')
   document.querySelector("label[for='clearcache']").style.display = 'block'
@@ -527,10 +553,10 @@ ipcRenderer.on("messagedeleted", (event, id) => {
 ipcRenderer.on("messageupdated", (event, message) => {
   let messageElement = document.querySelector(`p[mid="${message.id}"]`)
   if(messageElement) {
-    let oldcontent = messageElement.innerText.replace("(edited, hover to see previous content)", '');
+    let oldcontent = messageElement.innerText.replace("(edited, hover here to see previous content)", '');
     messageElement.innerText = message.content;
     console.log(messageElement.innerHTML)
-    messageElement.innerHTML += `<span class="message-reminder" title="${oldcontent}">(edited, hover to see previous content)</span>`
+    messageElement.innerHTML += `<span class="message-reminder" title="${oldcontent}">(edited, hover here to see previous content)</span>`
     console.log(messageElement.innerHTML)
   }
 })

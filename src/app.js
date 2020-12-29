@@ -5,13 +5,9 @@ const {
   globalShortcut,
   shell
 } = require('electron')
-let ps = require("./ps.js")
-const fs = require("fs")
-let settings = require("./settings.json")
-const clearmodule = require("clear-module")
-let win;
-
-ipcMain.on("addwindow", (event, arg) => childWindow(arg.url))
+const clearmodule = require("clear-module"), fs = require("fs");
+let settings = require("./settings.json"), win, ps = require("./ps.js");
+ipcMain.on("addwindow", (event, arg) => childWindow(arg.url));
 
 function childWindow(url) {
   let childwindow = new BrowserWindow({

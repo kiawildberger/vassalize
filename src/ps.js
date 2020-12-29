@@ -93,9 +93,11 @@ exports.init = function (win, tok) {
       id: client.user.id
     }
     clearmodule("./config.json")
+    clearmodule("./settings.json")
+    Rsettings = require("./settings.json")
     tokens = require("./config.json")
     tokens[botuser] = tok
-    fs.writeFileSync("./config.json", JSON.stringify(tokens));
+    if(Rsettings.cachetokens) fs.writeFileSync("./config.json", JSON.stringify(tokens));
     window.webContents.send("validtoken", {
       bot: uinfo,
       guildInfo: gids
