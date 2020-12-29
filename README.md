@@ -2,7 +2,7 @@
 
 Control <sup>(hijack)</sup> a discord bot!
 
-It can read/send messages and view attachments, which is all discord really does anyways.
+**I'm not stealing bot tokens, go dig through the code if you don't trust me. Look for appearances of "./config.json" and id("bot-secret")**
 
 ### Features:
 - minimize to tray for cleanliness
