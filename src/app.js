@@ -76,6 +76,8 @@ app.whenReady().then(() => {
   ipcMain.on("startbot", (event, tok) => {
     ps.init(win, tok)
   })
+  ipcMain.on("clearstatus", () => win.webContents.send("clearstatus"))
+  ipcMain.on("statusEntered", (e, arg) => win.webContents.send("statusentered", arg))
   ipcMain.on("show", () => win.show())
   ipcMain.on("hide", () => win.hide())
   ipcMain.on("quit", () => { fullyClose = true; app.quit() })
@@ -92,19 +94,17 @@ app.whenReady().then(() => {
 /*
 
 TODO:
+  - test literally everything after joining index and ps.js
   - pinging multiple people at once
   - update server ui when join new server
   - view cached tokens
-  + access options before logging in
- - status polishing
- + timestamps, deleted messages, edits
- - be able to send custom emojis
- - display embeds
- - server select div scroll on overflow
-  - no
+  - status polishing
+  - be able to send custom emojis
+  - display embeds
+  - server select div scroll on overflow
+  + channel list shows server name
 
 MAYBE:
   - send embeds
   - voice bruh
-  - "botcheck" scrapes discordjs dependencies for tokens and reminds them to not commit/push and purge after removing
 */

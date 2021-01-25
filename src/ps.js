@@ -51,12 +51,18 @@ exports.init = function (win, tok) {
     }
     client.guilds.cache.array().forEach(t => {
       let channels = [],
+        vchannels = [],
         msgcontent = [],
         emojis = [],
         emojids = [];
       t.channels.cache.array().forEach(e => {
-        if (e.type === "text") {
+        if (e.type === "text" || e.type === "news") {
           channels.push({
+            name: e.name,
+            id: e.id
+          })
+        } else if(e.type === "voice") {
+          vchannels.push({
             name: e.name,
             id: e.id
           })

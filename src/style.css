@@ -238,8 +238,10 @@ div.serverlist-item > p {
 }
 .serverlist-item:hover, .serverlist-active { border-radius:35%; }
 #channellist {
-    background:#404040;
-    width:15%;
+    background:#0B3542;
+    border-radius:2px;
+    width:20%;
+    box-shadow:1px 1px 3px rgb(70, 70, 70);
     padding:4px;
     max-width: 15%;
     word-wrap:break-word;
@@ -259,16 +261,18 @@ div.serverlist-item > p {
     border-right:0.5em solid #404040;
 }
 img { user-select:none; }
-.channel-label {
+#channel-label {
     font-size:1.2em;
     margin-bottom:4px;
     padding:4px;
+    color:#AEB2B3;
     padding-bottom:6px;
-    border-bottom:1px solid black;
+    border-bottom:2px solid #787b7c;
 }
 .channel-item {
     font-size:1em;
     margin-bottom:2px;
+    color:#525657;
     cursor:pointer;
 }
 .channel-item:hover { font-weight:bold; }

@@ -62,7 +62,7 @@
     <div id="bs">
       <div id="bs-helper"></div>
       <div class="bs-input-container">
-        <input id="bot-secret" type="password" placeholder="enter a bot token"><span id="bs-btn">GO</span><span id="bs-btn-arrow">&gt;</span>
+        <input id="bot-secret" type="password" placeholder="enter a bot token"><span id="bs-btn-arrow">&gt;</span>
         <img id="cached-btn" src="assets/arrow-down.svg" mode="submit">
         <!-- <img id="cached-btn" src="assets/cached-arrow.svg"> -->
         <div id="cached" style="display:none;">
@@ -75,7 +75,7 @@
         <div class="serverlist-label">servers</div>
       </div>
       <div id="channellist" style="display:none;">
-        <div class="channel-label">channels</div>
+        <div id="channel-label">channels</div>
       </div>
       <span id="errout"></span>
       <div id="msgdisplay" class="collection"></div>
@@ -83,5 +83,6 @@
       <div id="userd"></div>
     </div>
   </div>
+  <div id="eventlistener" style="display:none;"></div> <!-- i listen for events here -->
   <script src="index.js" type="module"></script>
 </body>
