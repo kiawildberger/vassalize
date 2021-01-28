@@ -62,10 +62,21 @@ exports.init = function (win, tok) {
             id: e.id
           })
         } else if(e.type === "voice") {
-          vchannels.push({
+          let data = {
             name: e.name,
-            id: e.id
+            id: e.id,
+            members: []
+          }
+          let m = e.members.array()
+          m.forEach(e => {
+            data.members.push({
+              id: e.user.id,
+              username: e.user.username,
+              discriminator: e.user.discriminator,
+              avatar: e.user.avatar
+            })
           })
+          vchannels.push(data)
         }
       })
       t.emojis.cache.array().forEach(e => {
@@ -80,6 +91,7 @@ exports.init = function (win, tok) {
         name: t.name,
         id: t.id,
         channels: channels,
+        vchannels: vchannels,
         emoji: emojis,
         emojiIds: emojids
       }
@@ -109,6 +121,23 @@ exports.init = function (win, tok) {
       guildInfo: gids
     })
   });
+
+  // discordjs voice here
+  let vcchannel;
+  ipcMain.on("voiceConnect", async (e, arg) => { // arg is channel id to connect to
+    await client.channels.cache.get(arg).join();
+    vcchannel = arg.toString();
+    // start transmitting voice data from mic
+  })
+  ipcMain.on("vc-dc", async (e, a) => {
+    await client.channels.cache.get(a).leave()
+    vcchannel = null;
+  })
+  win.on("close", () => {
+    if(vcchannel) {
+      client.channels.cache.get(vcchannel).leave()
+    }
+  })
   client.on("message", (message) => {
     process(message)
   });
@@ -117,6 +146,26 @@ exports.init = function (win, tok) {
   });
   client.on("messageUpdate", (oldMessage, newMessage) => {
     window.webContents.send("messageupdated", {id: oldMessage.id, content: newMessage.content})
+  })
+  client.on("voiceStateUpdate", async (old, news) => {
+    let update = {
+      channelID: news.channelID,
+      serverID:  news.guild.id,
+      type: null
+    }
+    let user = await client.users.cache.get(news.id);
+    update.user = {
+      id: user.id,
+      username: user.username,
+      discriminator: user.discriminator,
+      avatar: `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`
+    }
+    if(!old.channelID && !!news.channelID) { // js be wacc
+      update.type = "join"
+    } else if(!!old.channelID && !news.channelID) {
+      update.type = "leave"
+    }
+    window.webContents.send("voiceupdate", update);
   })
   client.login(tok)
     .catch(err => {

@@ -13,12 +13,7 @@ if (!fs.existsSync("./config.json")) {
   conf = require('./config.json')
 }
 function id(e) { return document.getElementById(e) }
-const eventlistener = id("eventlistener") // instead of ipc
-// k hopefully the voice stuff goes here
-
-function voiceConnect(cid) {
-
-}
+let isVoiceConnected = false;
 
 function traySettings(e, value) {
   // let settings = Rsettings;
@@ -101,7 +96,7 @@ let urlregex = /https?:\/\/.*\..*/g
 let mdurlregex = /(\[.*\])(.*)/g
 let imagetypes = ["jpg", "JPG", 'png', 'PNG', 'gif', 'GIF', 'webp', 'WEBP', 'tiff', 'TIFF', 'jpeg', 'JPEG', 'svg', 'SVG']
 let vidtypes = ["mp4", "MP4", "webm", "WEBM", "mkv", "MKV", "ogg", "OGG", "ogv", "OGV", "avi", "AVI", "gifv", "GIFV", "mpeg", "MPEG"]
-let gids = [], index = 0, currentchannel;
+let gids = [], index = 0, currentchannel, currentserver;
 ipcRenderer.on("msg", (e, arg) => {
   processmsg(arg);
 })
@@ -284,12 +279,14 @@ function fillGuildSelect(arg) { // generates and populates guild list
       id('channellist').innerHTML = `<div id="channel-label">channels</div>`
       id("msgin").focus();
       let server = gids[e.getAttribute('data-index')]
+      currentserver = server;
       id("channel-label").innerText = server.name
       server.channels.forEach(e => {
         let elm = document.createElement("div")
         elm.classList.add("channel-item")
-        elm.textContent = "#" + e.name
+        elm.textContent = "# " + e.name
         elm.setAttribute('data-id', e.id)
+        elm.setAttribute("data-type", "text")
         elm.addEventListener("click", () => { // handles selecting a channel
           currentchannel = e.id
           q = [...document.querySelectorAll(".activechannel")]
@@ -304,16 +301,51 @@ function fillGuildSelect(arg) { // generates and populates guild list
         if (server.channels.indexOf(e) === 0) elm.dispatchEvent(new Event('click'))
       })
       // for voice channels, maybe i shouldnt copy code like this but whatever
-      // server.vchannels.forEach(e => {
-      //   let elm = document.createElement("div")
-      //   elm.classList.add("channel-item")
-      //   elm.textContent = "#" + e.name
-      //   elm.setAttribute('data-id', e.id)
-      //   elm.addEventListener("click", () => { // handles selecting a channel
-      //     voiceConnect(e.id); // connect to voice
-      //   })
-      //   id("channellist").appendChild(elm)
-      // })
+      server.vchannels.forEach(e => {
+        let elm = document.createElement("div")
+        elm.classList.add("channel-item")
+        let name = e.name.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        // this image NEEDS to be redone in xd or smthn, fit the style better
+        elm.innerHTML = '< '+name;
+        elm.setAttribute('data-id', e.id)
+        elm.setAttribute("data-type", "voice")
+        let users = document.createElement("div")
+        elm.addEventListener("click", () => { // handles selecting a channel
+          ipcRenderer.send("voiceConnect", e.id); // connect to voice
+          isVoiceConnected = e.id;
+          id("voicestate").style.display = "block";
+        })
+        users.classList.add("vc-users")
+        users.setAttribute("id", "vcusers")
+        ipcRenderer.on("voiceupdate", (a, update) => {
+          console.log(update)
+          if(update.type === "join") {
+            let e = update.user;
+            let userimg = document.createElement("img")
+            userimg.setAttribute("data-id", e.id)
+            userimg.src = e.avatar;
+            userimg.classList.add("vc-userimg");
+            userimg.title = e.username+"#"+e.discriminator
+            users.appendChild(userimg);
+          } else if(update.type === "leave") {
+            let user = document.querySelector(`img[data-id="${update.user.id}"`)
+            console.log(user)
+            user.remove();
+          }
+        })
+        e.members.forEach(e => {
+          console.log(e)
+          users.innerHTML = ""
+          let userimg = document.createElement("img")
+          userimg.setAttribute("data-id", e.id)
+          userimg.src = "https://cdn.discordapp.com/avatars/"+e.id+"/"+e.avatar+".png";
+          userimg.classList.add("vc-userimg");
+          userimg.title = e.username+"#"+e.discriminator
+          users.appendChild(userimg);
+        })
+        elm.appendChild(users)
+        id("channellist").appendChild(elm) // i want to categorize text/voice channels into seperate divs but... the html isnt updating?? idk
+      })
     })
   })
   id('bs').style.display = "none"
@@ -321,6 +353,16 @@ function fillGuildSelect(arg) { // generates and populates guild list
   id('topt').setAttribute("returnTo", "container")
   id('loginbg').style.display = 'none'
 }
+
+id("vc-dc").addEventListener("click", () => {
+  if(isVoiceConnected) ipcRenderer.send("vc-dc", isVoiceConnected)
+  id("voicestate").style.display = "block";
+})
+
+// setInterval(() => {
+//   if(!currentserver) return;
+//   ipcRenderer.send("requestvcusersupdate", currentserver.id);
+// }, 500)
 
 ipcRenderer.on("invalidtoken", () => {
   id('bs-helper').style.color = 'red'

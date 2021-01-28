@@ -39,7 +39,7 @@ function createWindow() {
     }
   })
   win.setResizable(false)
-  win.loadFile('index.html')
+  win.loadFile('./index.html')
   win.setMenu(null)
   globalShortcut.register("CommandOrControl+Shift+I", () => {
     clearmodule("./settings.json")
@@ -80,7 +80,7 @@ app.whenReady().then(() => {
   ipcMain.on("statusEntered", (e, arg) => win.webContents.send("statusentered", arg))
   ipcMain.on("show", () => win.show())
   ipcMain.on("hide", () => win.hide())
-  ipcMain.on("quit", () => { fullyClose = true; app.quit() })
+  ipcMain.on("quit", () => { fullyClose = true; app.quit(); })
   ipcMain.on("restart", () => {
     app.relaunch()
     app.exit()
@@ -94,7 +94,10 @@ app.whenReady().then(() => {
 /*
 
 TODO:
-  - test literally everything after joining index and ps.js
+  - voice:
+    - ui: why do people not show up sometimes (need to test with dandan + ori)
+    - ui: add icons for mute/dc instead of text
+    - ui: add some ui indicator to tell user that they're connected, and where
   - pinging multiple people at once
   - update server ui when join new server
   - view cached tokens

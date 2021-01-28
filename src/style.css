@@ -252,6 +252,27 @@ div.serverlist-item > p {
     left:5.25em;
     overflow-y: auto;
 }
+#textchannels::after {
+    content: "text channels";
+    font-variant:small-caps;
+}
+#voicechannels::after {
+    content: "voice channels";
+    font-variant:small-caps;
+}
+.vc-users {
+    margin-top:0.2em;
+    margin-left:1em;
+}
+.vc-userimg {
+    height:1.25em;
+    border-radius:50%;
+    margin:4px;
+}
+#vc-mute, #vc-dc { display:inline; }
+#vc-dc {}
+#vc-mute {}
+#voicestate { width:fit-content; position:absolute; right:1em; bottom:1.5em; font-size:14px; }
 .channel-triangle {
     /* is little mf triangle */
     position:absolute;
