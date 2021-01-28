@@ -47,7 +47,7 @@ function createWindow() {
     if(settings.devmode) {
       if(win.webContents.isDevToolsOpened()) {
         win.webContents.closeDevTools()
-      } else {
+      } else if(win.isVisible()) {
         win.webContents.openDevTools()
       }
     }
@@ -98,8 +98,11 @@ TODO:
     - ui: why do people not show up sometimes (need to test with dandan + ori)
     - ui: add icons for mute/dc instead of text
     - ui: add some ui indicator to tell user that they're connected, and where
+  - ctrl+shift+i opens vassalize devtools no matter the visibility/active state of vassalize
   - pinging multiple people at once
-  - update server ui when join new server
+  - update server/channel ui when updated
+    - joined server
+    - channels updated
   - view cached tokens
   - status polishing
   - be able to send custom emojis

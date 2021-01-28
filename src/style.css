@@ -270,9 +270,9 @@ div.serverlist-item > p {
     margin:4px;
 }
 #vc-mute, #vc-dc { display:inline; }
-#vc-dc {}
-#vc-mute {}
-#voicestate { width:fit-content; position:absolute; right:1em; bottom:1.5em; font-size:14px; }
+#vc-dc { height:2em; cursor:pointer; margin-left:0.5em;}
+#vc-mute { height:2em; cursor:pointer; }
+#voicestate { width:fit-content; position:absolute; right:1em; bottom:1.5em; font-size:14px; background:black; border-radius:4px; padding:1em; }
 .channel-triangle {
     /* is little mf triangle */
     position:absolute;

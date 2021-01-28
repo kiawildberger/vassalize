@@ -68,12 +68,13 @@ exports.init = function (win, tok) {
             members: []
           }
           let m = e.members.array()
-          m.forEach(e => {
+          m.forEach(user => {
+            user = user.user
             data.members.push({
-              id: e.user.id,
-              username: e.user.username,
-              discriminator: e.user.discriminator,
-              avatar: e.user.avatar
+              id: user.id,
+              username: user.username,
+              discriminator: user.discriminator,
+              avatar: `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`
             })
           })
           vchannels.push(data)
@@ -162,10 +163,21 @@ exports.init = function (win, tok) {
     }
     if(!old.channelID && !!news.channelID) { // js be wacc
       update.type = "join"
+      window.webContents.send("voiceupdate", update);
     } else if(!!old.channelID && !news.channelID) {
       update.type = "leave"
+      window.webContents.send("voiceupdate", update);
+    } else if(!!old.channelID && !!news.channelID) {
+      // update.type = "switch" // user connected directly to another vc without explicitly disconnecting
+      update.type = "leave"
+      update.channelID = old.channelID
+      console.log(update)
+      window.webContents.send("voiceupdate", update); // leave first one
+      update.type = "join"
+      update.channelID = news.channelID
+      console.log(update)
+      window.webContents.send("voiceupdate", update) // join new one
     }
-    window.webContents.send("voiceupdate", update);
   })
   client.login(tok)
     .catch(err => {

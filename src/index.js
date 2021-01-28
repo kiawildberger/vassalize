@@ -224,6 +224,7 @@ function processmsg(arg) {
   }
 }
 
+let firstrun = true;
 function fillGuildSelect(arg) { // generates and populates guild list
   if (!loggedin) return;
   arg.forEach(e => {
@@ -301,48 +302,54 @@ function fillGuildSelect(arg) { // generates and populates guild list
         if (server.channels.indexOf(e) === 0) elm.dispatchEvent(new Event('click'))
       })
       // for voice channels, maybe i shouldnt copy code like this but whatever
-      server.vchannels.forEach(e => {
+      server.vchannels.forEach(vc => {
         let elm = document.createElement("div")
         elm.classList.add("channel-item")
-        let name = e.name.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        let name = vc.name.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
         // this image NEEDS to be redone in xd or smthn, fit the style better
         elm.innerHTML = '< '+name;
-        elm.setAttribute('data-id', e.id)
+        elm.setAttribute('data-id', vc.id)
         elm.setAttribute("data-type", "voice")
         let users = document.createElement("div")
-        elm.addEventListener("click", () => { // handles selecting a channel
-          ipcRenderer.send("voiceConnect", e.id); // connect to voice
-          isVoiceConnected = e.id;
+        elm.addEventListener("click", () => { // handles selecting a vc
+          ipcRenderer.send("voiceConnect", vc.id); // connect to voice
+          id("vcchannel").innerText = "connected to: "+server.name + "/"+vc.name;
+          isVoiceConnected = vc.id;
           id("voicestate").style.display = "block";
         })
         users.classList.add("vc-users")
-        users.setAttribute("id", "vcusers")
-        ipcRenderer.on("voiceupdate", (a, update) => {
-          console.log(update)
-          if(update.type === "join") {
-            let e = update.user;
-            let userimg = document.createElement("img")
-            userimg.setAttribute("data-id", e.id)
-            userimg.src = e.avatar;
-            userimg.classList.add("vc-userimg");
-            userimg.title = e.username+"#"+e.discriminator
-            users.appendChild(userimg);
-          } else if(update.type === "leave") {
-            let user = document.querySelector(`img[data-id="${update.user.id}"`)
-            console.log(user)
-            user.remove();
-          }
-        })
-        e.members.forEach(e => {
-          console.log(e)
+        // users.setAttribute("id", "vcusers")
+        vc.members.forEach(e => {
           users.innerHTML = ""
           let userimg = document.createElement("img")
           userimg.setAttribute("data-id", e.id)
-          userimg.src = "https://cdn.discordapp.com/avatars/"+e.id+"/"+e.avatar+".png";
+          userimg.src = e.avatar
           userimg.classList.add("vc-userimg");
           userimg.title = e.username+"#"+e.discriminator
           users.appendChild(userimg);
         })
+        if(firstrun) { // otherwise "possible eventemitter memory leak detected"
+          ipcRenderer.setMaxListeners(0) // im pretty sure this is bad but i think i need it
+          ipcRenderer.on("voiceupdate", (a, update) => {
+            console.log(update.type)
+            if(update.type === "join") {
+              let e = update.user;
+              vc.members.push(e)
+              let userimg = document.createElement("img")
+              userimg.setAttribute("data-id", e.id)
+              userimg.src = e.avatar;
+              userimg.classList.add("vc-userimg");
+              userimg.title = e.username+"#"+e.discriminator
+              document.querySelector(`div[data-id="${update.channelID}"]`).appendChild(userimg);
+              console.log(update)
+            } else if(update.type === "leave") {
+              let user = document.querySelector(`img[data-id="${update.user.id}"`)
+              // sometimes user is null? means that the icon isnt being created after the first time
+              user.remove();
+            }
+          })
+          firstrun = false;
+        }
         elm.appendChild(users)
         id("channellist").appendChild(elm) // i want to categorize text/voice channels into seperate divs but... the html isnt updating?? idk
       })
@@ -356,7 +363,7 @@ function fillGuildSelect(arg) { // generates and populates guild list
 
 id("vc-dc").addEventListener("click", () => {
   if(isVoiceConnected) ipcRenderer.send("vc-dc", isVoiceConnected)
-  id("voicestate").style.display = "block";
+  id("voicestate").style.display = "none";
 })
 
 // setInterval(() => {
