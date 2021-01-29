@@ -30,6 +30,9 @@
         <label for="typingIndicator">Users can see when you're typing</label>
         <input type="checkbox" id="typingIndicator" style="display:inline;"><br><br>
 
+        <label for="viewperms">Only show channels with "view" permissions:</label>
+        <input type="checkbox" id="viewperms" style="display:inline;"><br><br>
+
         <label for="scriptsenabled">Allow custom scripts to run</label>
         <input type="checkbox" id="scriptsenabled" style="display:inline;"><br><br>
 
@@ -86,6 +89,9 @@
       </div>
       <span id="errout"></span>
       <div id="msgdisplay" class="collection"></div>
+      <div id="cantviewchannel" style="display:none;">bot doesnt have permission to view this channel<br>
+        <p style="font-size:0.8em;">you can change the visibility of these channels in the <span class="hoverunderline" style="text-decoration:underline;" onclick="document.getElementById('topt').click()">options</span></p>
+      </div>
       <input id="msgin" type="text" disabled="true">
       <div id="userd"></div>
     </div>

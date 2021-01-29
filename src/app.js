@@ -95,9 +95,10 @@ app.whenReady().then(() => {
 
 TODO:
   - voice:
-    - ui: why do people not show up sometimes (need to test with dandan + ori)
-    - ui: add icons for mute/dc instead of text
-    - ui: add some ui indicator to tell user that they're connected, and where
+    + ui: why do people not show up sometimes (need to test with dandan + ori)
+    + ui: add icons for mute/dc instead of text
+    + ui: add some ui indicator to tell user that they're connected, and where
+      + make it look better
   - ctrl+shift+i opens vassalize devtools no matter the visibility/active state of vassalize
   - pinging multiple people at once
   - update server/channel ui when updated

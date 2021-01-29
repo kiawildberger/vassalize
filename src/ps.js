@@ -57,9 +57,14 @@ exports.init = function (win, tok) {
         emojids = [];
       t.channels.cache.array().forEach(e => {
         if (e.type === "text" || e.type === "news") {
+          let perms = e.guild.members.cache.filter(x => x.user.id===client.user.id).array()[0].permissionsIn(e) // there *has* to be a simpler way
+          let canreadmsg = perms.any("VIEW_CHANNEL")
+          let sendmsg = perms.any("SEND_MESSAGES")
           channels.push({
             name: e.name,
-            id: e.id
+            id: e.id,
+            viewchannel: canreadmsg,
+            sendmsg: sendmsg
           })
         } else if(e.type === "voice") {
           let data = {
@@ -161,7 +166,7 @@ exports.init = function (win, tok) {
       discriminator: user.discriminator,
       avatar: `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`
     }
-    if(!old.channelID && !!news.channelID) { // js be wacc
+    if(!old.channelID && !!news.channelID) { // bools be wacc
       update.type = "join"
       window.webContents.send("voiceupdate", update);
     } else if(!!old.channelID && !news.channelID) {

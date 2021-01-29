@@ -282,6 +282,7 @@ div.serverlist-item > p {
     border-right:0.5em solid #404040;
 }
 img { user-select:none; }
+#cantviewchannel { position:absolute; left:35%; top:50%; }
 #channel-label {
     font-size:1.2em;
     margin-bottom:4px;
@@ -297,6 +298,7 @@ img { user-select:none; }
     cursor:pointer;
 }
 .channel-item:hover { font-weight:bold; }
+.channel-item[data-view="false"] { display:none; }
 .activechannel {
     font-weight:bold;
     color:rgb(185, 185, 185);

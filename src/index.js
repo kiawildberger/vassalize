@@ -27,8 +27,10 @@ function traySettings(e, value) {
     typing: "typingIndicator",
     csenabled: "scriptsenabled",
     fileLogging: "logfile",
-    devmode: "devmode"
+    devmode: "devmode",
+    viewperms: "viewperms"
   }
+  // change options here
   id(corresponding[e]).click()
   let settings = {
     cachedlength: id("cachedlength").value,
@@ -37,7 +39,8 @@ function traySettings(e, value) {
     fileLogging: id("logfile").checked,
     csenabled: id("scriptsenabled").checked,
     minimize: id("minimizeWhenClosed").checked,
-    cachetokens: id('cachetokens').checked
+    cachetokens: id('cachetokens').checked,
+    viewperms: id('viewperms').checked
   }
   Rsettings = settings
   fs.writeFileSync("./settings.json", JSON.stringify(settings))
@@ -56,6 +59,7 @@ function setTrayItems() {
         {label: "developer mode", type:"checkbox", checked:Rsettings.devmode, click: () => { traySettings("devmode", !Rsettings.devmode)}},
         {label: "users can see when you're typing", type:"checkbox", checked:Rsettings.typing, click: () => { traySettings("typing", !Rsettings.typing)}},
         {label: "allow custom scripts to run", type:"checkbox", checked:Rsettings.csenabled, click: () => { traySettings("csenabled", !Rsettings.csenabled)}},
+        {label: "only show channels with \"view\" permissions", type:"checkbox", checked:Rsettings.viewperms, click: () => { traySettings("viewperms"), !Rsettings.viewperms}},
         {label: "log to file", type:"checkbox", checked:Rsettings.fileLogging, click: () => { traySettings("fileLogging", !Rsettings.fileLogging)}},
         {label: "clear logfile", click: () => id("clearlogfile").click()},
         {label:"clear cached tokens", click: () => id('clearcache').click()},
@@ -290,9 +294,18 @@ function fillGuildSelect(arg) { // generates and populates guild list
         elm.classList.add("channel-item")
         elm.textContent = "# " + e.name
         elm.setAttribute('data-id', e.id)
+        if(Rsettings.viewperms) elm.setAttribute('data-view', e.viewchannel);
         elm.setAttribute("data-type", "text")
         elm.addEventListener("click", () => { // handles selecting a channel
+          id("cantviewchannel").style.display = 'none'
+          id("msgin").disabled = false
+          id("msgin").setAttribute("placeholder", "")
           currentchannel = e.id
+          if(!e.viewchannel) { // joined sendmsg and viewchannel, because if bot cant view channel, bot cant send messages
+            id("cantviewchannel").style.display = 'block' // cannot view channel, read msg, read msg history, etc
+            id("msgin").disabled = true; id("msgin").setAttribute("placeholder", "bot doesnt have permission to send messages") // cant send messages
+          }
+          if(e.sendmsg) id('msgin').setAttribute("placeholder", "")
           q = [...document.querySelectorAll(".activechannel")]
           q.forEach(e => {
             e.classList.remove("activechannel")
@@ -543,12 +556,15 @@ id('topt').addEventListener('click', () => {
     id("clearcache").disabled = true;
     id("clearcache").setAttribute('title', 'no tokens to clear')
   }
+  // options change here
   id('devmode').checked = Rsettings.devmode
   id("typingIndicator").checked = Rsettings.typing
   id("logfile").checked = Rsettings.fileLogging
   id("scriptsenabled").checked = Rsettings.csenabled
+  id("viewperms").checked = Rsettings.viewperms
   id("minimizeWhenClosed").checked = Rsettings.minimize
   id("cachetokens").checked = Rsettings.cachetokens
+  id("viewperms").checked = Rsettings.viewperms
 })
 id("leaveopts").addEventListener("click", () => { // write settings to settings.json
   setTrayItems(); // for updating the options menu in the tray
@@ -567,14 +583,16 @@ id("leaveopts").addEventListener("click", () => { // write settings to settings.
     fileLogging: id("logfile").checked,
     csenabled: id("scriptsenabled").checked,
     minimize: id("minimizeWhenClosed").checked,
-    cachetokens: id('cachetokens').checked
+    cachetokens: id('cachetokens').checked,
+    viewperms: id("viewperms").checked
   }
   let t = contextMenu.items[2].submenu.items;
   t[0].checked = settings.cachetokens;
   t[1].checked = settings.devmode;
   t[2].checked = settings.typing;
   t[3].checked = settings.csenabled;
-  t[4].checked = settings.fileLogging;
+  t[4].checked = settings.viewperms
+  t[5].checked = settings.fileLogging;
   contextMenu.items[2].enabled = true;
   tray.setContextMenu(contextMenu)
   Rsettings = settings
@@ -593,7 +611,8 @@ function refreshSettings() {
   id("logfile").checked = Rsettings.fileLogging
   id("scriptsenabled").checked = Rsettings.csenabled
   id("minimizeWhenClosed").checked = Rsettings.minimize
-  id('cachetokens').checked = Rsettings.cachetokens
+  id('cachetokens').checked = Rsettings.cachetokens,
+  id('viewperms').checked = Rsettings.viewperms
 }
 ipcRenderer.on("refreshSettings", () => refreshSettings())
 id("opt-restore-defaults").addEventListener("click", () => {
