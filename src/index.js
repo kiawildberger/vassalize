@@ -597,6 +597,8 @@ id("leaveopts").addEventListener("click", () => { // write settings to settings.
   tray.setContextMenu(contextMenu)
   Rsettings = settings
   fs.writeFileSync("./settings.json", JSON.stringify(settings))
+  console.log(currentchannel)
+  document.querySelector('.serverlist-active').click()
 })
 /**
  * @desc Sets the elements in #options to the correct values
