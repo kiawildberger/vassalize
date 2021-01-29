@@ -13,7 +13,7 @@ if (!fs.existsSync("./config.json")) {
   conf = require('./config.json')
 }
 function id(e) { return document.getElementById(e) }
-let isVoiceConnected = false;
+let isVoiceConnected = {id:false,server:false};
 
 function traySettings(e, value) {
   // let settings = Rsettings;
@@ -96,7 +96,7 @@ let urlregex = /https?:\/\/.*\..*/g
 let mdurlregex = /(\[.*\])(.*)/g
 let imagetypes = ["jpg", "JPG", 'png', 'PNG', 'gif', 'GIF', 'webp', 'WEBP', 'tiff', 'TIFF', 'jpeg', 'JPEG', 'svg', 'SVG']
 let vidtypes = ["mp4", "MP4", "webm", "WEBM", "mkv", "MKV", "ogg", "OGG", "ogv", "OGV", "avi", "AVI", "gifv", "GIFV", "mpeg", "MPEG"]
-let gids = [], index = 0, currentchannel, currentserver;
+let gids = [], index = 0, currentchannel, currentserver, gidsobj = {};
 ipcRenderer.on("msg", (e, arg) => {
   processmsg(arg);
 })
@@ -107,7 +107,8 @@ function processmsg(arg) {
   if (hasmdlink) {
     // console.log(hasmdlink)
   }
-  gids[index].channels.forEach(o => {
+  if(!currentserver) return;
+  gidsobj[currentserver].channels.forEach(o => { // sets "e" to currentchannel if the current channel is in current server (i think)
     if (o.id === currentchannel) {
       e = currentchannel
     }
@@ -133,8 +134,8 @@ function processmsg(arg) {
         let d = e.split(":")[2].replace(">", ''),
           name = e.split(":")[1],
           url;
-        if (gids[index].emojiIds.includes(d)) {
-          url = gids[index].emoji[gids[index].emojiIds.indexOf(d)].url
+        if (gidsobj[currentserver].emojiIds.includes(d)) {
+          url = gidsobj[currentserver].emoji[gidsobj[currentserver].emojiIds.indexOf(d)].url
         }
         let elem = `![emoji](${url})`
       })
@@ -228,6 +229,7 @@ let firstrun = true;
 function fillGuildSelect(arg) { // generates and populates guild list
   if (!loggedin) return;
   arg.forEach(e => {
+    if(!e) return;
     if (!e.abbr) {
       let div = document.createElement('div')
       let opt = document.createElement("img")
@@ -236,6 +238,7 @@ function fillGuildSelect(arg) { // generates and populates guild list
       div.appendChild(opt)
       opt.setAttribute("src", e.icon)
       opt.title = e.name
+      opt.setAttribute("data-id", e.id)
       let tri = document.createElement("div")
       tri.classList.add("channel-triangle")
       div.appendChild(tri)
@@ -245,6 +248,7 @@ function fillGuildSelect(arg) { // generates and populates guild list
       let opt = document.createElement('div')
       opt.setAttribute("data-index", arg.indexOf(e))
       opt.classList.add("serverlist-item")
+      opt.setAttribute("data-id", e.id)
       let text = document.createElement("p")
       text.textContent = e.abbr
       opt.title = e.abbr
@@ -256,7 +260,6 @@ function fillGuildSelect(arg) { // generates and populates guild list
       id('serverlist').appendChild(opt)
     }
   })
-  gids = arg
   let q = [...document.querySelectorAll('.serverlist-item')]
   q.forEach(e => {
     e.addEventListener("click", () => { // handles selecting a server
@@ -279,8 +282,8 @@ function fillGuildSelect(arg) { // generates and populates guild list
       }
       id('channellist').innerHTML = `<div id="channel-label">channels</div>`
       id("msgin").focus();
-      let server = gids[e.getAttribute('data-index')]
-      currentserver = server;
+      let server = gidsobj[e.getAttribute('data-id')]
+      currentserver = server.id;
       id("channel-label").innerText = server.name
       server.channels.forEach(e => {
         let elm = document.createElement("div")
@@ -302,25 +305,26 @@ function fillGuildSelect(arg) { // generates and populates guild list
         if (server.channels.indexOf(e) === 0) elm.dispatchEvent(new Event('click'))
       })
       // for voice channels, maybe i shouldnt copy code like this but whatever
-      server.vchannels.forEach(vc => {
+      for(let i in gidsobj[currentserver].vchannels) {
+        let vc = gidsobj[currentserver].vchannels[i]
         let elm = document.createElement("div")
         elm.classList.add("channel-item")
         let name = vc.name.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
         // this image NEEDS to be redone in xd or smthn, fit the style better
-        elm.innerHTML = '< '+name;
+        elm.innerText = '< '+name;
         elm.setAttribute('data-id', vc.id)
         elm.setAttribute("data-type", "voice")
         let users = document.createElement("div")
         elm.addEventListener("click", () => { // handles selecting a vc
           ipcRenderer.send("voiceConnect", vc.id); // connect to voice
           id("vcchannel").innerText = "connected to: "+server.name + "/"+vc.name;
-          isVoiceConnected = vc.id;
+          isVoiceConnected.id = vc.id;
+          isVoiceConnected.server = server.id;
           id("voicestate").style.display = "block";
         })
         users.classList.add("vc-users")
-        // users.setAttribute("id", "vcusers")
-        vc.members.forEach(e => {
-          users.innerHTML = ""
+        gidsobj[server.id].vchannels[vc.id].members.forEach(e => {
+          // users.innerHTML = ""
           let userimg = document.createElement("img")
           userimg.setAttribute("data-id", e.id)
           userimg.src = e.avatar
@@ -328,31 +332,9 @@ function fillGuildSelect(arg) { // generates and populates guild list
           userimg.title = e.username+"#"+e.discriminator
           users.appendChild(userimg);
         })
-        if(firstrun) { // otherwise "possible eventemitter memory leak detected"
-          ipcRenderer.setMaxListeners(0) // im pretty sure this is bad but i think i need it
-          ipcRenderer.on("voiceupdate", (a, update) => {
-            console.log(update.type)
-            if(update.type === "join") {
-              let e = update.user;
-              vc.members.push(e)
-              let userimg = document.createElement("img")
-              userimg.setAttribute("data-id", e.id)
-              userimg.src = e.avatar;
-              userimg.classList.add("vc-userimg");
-              userimg.title = e.username+"#"+e.discriminator
-              document.querySelector(`div[data-id="${update.channelID}"]`).appendChild(userimg);
-              console.log(update)
-            } else if(update.type === "leave") {
-              let user = document.querySelector(`img[data-id="${update.user.id}"`)
-              // sometimes user is null? means that the icon isnt being created after the first time
-              user.remove();
-            }
-          })
-          firstrun = false;
-        }
         elm.appendChild(users)
         id("channellist").appendChild(elm) // i want to categorize text/voice channels into seperate divs but... the html isnt updating?? idk
-      })
+      }
     })
   })
   id('bs').style.display = "none"
@@ -361,8 +343,38 @@ function fillGuildSelect(arg) { // generates and populates guild list
   id('loginbg').style.display = 'none'
 }
 
+ipcRenderer.on("voiceupdate", (a, update) => {
+  if(update.type === "join") {
+    let e = update.user;
+    let userimg = document.createElement("img")
+    gidsobj[update.serverID].vchannels[update.channelID].members.push(update.user);
+    userimg.setAttribute("data-id", e.id)
+    userimg.src = e.avatar;
+    userimg.classList.add("vc-userimg");
+    userimg.title = e.username+"#"+e.discriminator
+    // need to only update elements when the current server is the server that received the update
+    if(currentserver === update.serverID) document.querySelector(`div[data-id="${update.channelID}"]`).appendChild(userimg);
+  } else if(update.type === "leave") {
+    let user = document.querySelector(`img[data-id="${update.user.id}"`)
+    let members = gidsobj[update.serverID].vchannels[update.channelID].members
+      members.forEach(e => {
+        if(e.id === update.user.id) {
+          gidsobj[update.serverID].vchannels[update.channelID].members.splice(members.indexOf(e), 1)
+        }
+      })
+    // if another server is selected, user is null
+    if(user) user.remove();
+  }
+})
+
 id("vc-dc").addEventListener("click", () => {
-  if(isVoiceConnected) ipcRenderer.send("vc-dc", isVoiceConnected)
+  if(!!isVoiceConnected.id) ipcRenderer.send("vc-dc", isVoiceConnected.id)
+  let members = gidsobj[isVoiceConnected.server].vchannels[isVoiceConnected.id].members
+  members.forEach(e => {
+    if(e.id === botActor.id) {
+      gidsobj[isVoiceConnected.server].vchannels[isVoiceConnected.id].members.splice(members.indexOf(e), 1)
+    }
+  })
   id("voicestate").style.display = "none";
 })
 
@@ -436,8 +448,9 @@ ipcRenderer.on("statusUpdate", (event, arg) => fillStatus(botActor, arg.presence
 ipcRenderer.on("validtoken", (event, args) => { // the *one* ipc i will use
   let { bot, guildInfo } = args;
   if (bot && guildInfo) {
-    botActor = bot, gids = guildInfo
-    document.querySelector(".serverlist-label").innerHTML += `<span> (${gids.length})</span>`;
+    botActor = bot;
+    guildInfo.forEach(e => gidsobj[e.id] = e ) // object of guilds mapped by id
+    document.querySelector(".serverlist-label").innerHTML += `<span> (${Object.keys(gidsobj).length})</span>`;
   }
   id('bs-helper').innerText = "success!"
   id("bs-helper").style.color = "green"

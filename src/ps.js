@@ -70,14 +70,14 @@ exports.init = function (win, tok) {
           let m = e.members.array()
           m.forEach(user => {
             user = user.user
-            data.members.push({
+            data.members[user.id] = {
               id: user.id,
               username: user.username,
               discriminator: user.discriminator,
               avatar: `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`
-            })
+            }
           })
-          vchannels.push(data)
+          vchannels[e.id] = data
         }
       })
       t.emojis.cache.array().forEach(e => {
@@ -150,7 +150,7 @@ exports.init = function (win, tok) {
   })
   client.on("voiceStateUpdate", async (old, news) => {
     let update = {
-      channelID: news.channelID,
+      channelID: news.channelID || old.channelID,
       serverID:  news.guild.id,
       type: null
     }
@@ -171,11 +171,9 @@ exports.init = function (win, tok) {
       // update.type = "switch" // user connected directly to another vc without explicitly disconnecting
       update.type = "leave"
       update.channelID = old.channelID
-      console.log(update)
       window.webContents.send("voiceupdate", update); // leave first one
       update.type = "join"
       update.channelID = news.channelID
-      console.log(update)
       window.webContents.send("voiceupdate", update) // join new one
     }
   })
