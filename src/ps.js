@@ -6,6 +6,7 @@ if (!fs.existsSync("./config.json")) {
   fs.writeFileSync("./config.json", "{ }")
   conf = require("./config.json")
 }
+// const { OpusEncoder } = require("@discordjs/opus")
 let Rsettings = require("./settings.json")
 require("dotenv").config()
 const clearmodule = require("clear-module")
@@ -129,15 +130,26 @@ exports.init = function (win, tok) {
   });
 
   // discordjs voice here
-  let vcchannel;
+  let vcchannel, voicestate;
+  // let Speaker = require("audio-speaker/stream")
+  
   ipcMain.on("voiceConnect", async (e, arg) => { // arg is channel id to connect to
-    await client.channels.cache.get(arg).join();
+    await client.channels.cache.get(arg).join().then(connection => {
+      console.log("connection made")
+      let receiver = connection.receiver;
+      client.channels.cache.get(arg).members.array().forEach(e => { // i have to create a stream for each individual user
+        receiver.createStream(e, { mode: "pcm" }).pipe(Speaker)
+      })
+    })
     vcchannel = arg.toString();
     // start transmitting voice data from mic
   })
   ipcMain.on("vc-dc", async (e, a) => {
     await client.channels.cache.get(a).leave()
     vcchannel = null;
+  })
+  ipcMain.on("vc-muted", async (e, a) => {
+    await client
   })
   win.on("close", () => {
     if(vcchannel) {

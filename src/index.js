@@ -100,7 +100,7 @@ let urlregex = /https?:\/\/.*\..*/g
 let mdurlregex = /(\[.*\])(.*)/g
 let imagetypes = ["jpg", "JPG", 'png', 'PNG', 'gif', 'GIF', 'webp', 'WEBP', 'tiff', 'TIFF', 'jpeg', 'JPEG', 'svg', 'SVG']
 let vidtypes = ["mp4", "MP4", "webm", "WEBM", "mkv", "MKV", "ogg", "OGG", "ogv", "OGV", "avi", "AVI", "gifv", "GIFV", "mpeg", "MPEG"]
-let gids = [], index = 0, currentchannel, currentserver, gidsobj = {};
+let gids = [], index = 0, currentchannel, currentserver, gidsobj = {}, muted = true;
 ipcRenderer.on("msg", (e, arg) => {
   processmsg(arg);
 })
@@ -328,25 +328,26 @@ function fillGuildSelect(arg) { // generates and populates guild list
         elm.setAttribute('data-id', vc.id)
         elm.setAttribute("data-type", "voice")
         let users = document.createElement("div")
-        elm.addEventListener("click", () => { // handles selecting a vc
-          ipcRenderer.send("voiceConnect", vc.id); // connect to voice
-          id("vcchannel").innerText = "connected to: "+server.name + "/"+vc.name;
-          isVoiceConnected.id = vc.id;
-          isVoiceConnected.server = server.id;
-          id("voicestate").style.display = "block";
-        })
         users.classList.add("vc-users")
-        gidsobj[server.id].vchannels[vc.id].members.forEach(e => {
-          // users.innerHTML = ""
+        for(let e in gidsobj[server.id].vchannels[vc.id].members) {
+          e = gidsobj[server.id].vchannels[vc.id].members[e]
           let userimg = document.createElement("img")
           userimg.setAttribute("data-id", e.id)
           userimg.src = e.avatar
           userimg.classList.add("vc-userimg");
           userimg.title = e.username+"#"+e.discriminator
           users.appendChild(userimg);
-        })
+        }
         elm.appendChild(users)
         id("channellist").appendChild(elm) // i want to categorize text/voice channels into seperate divs but... the html isnt updating?? idk
+        elm.addEventListener("click", () => { // handles selecting a vc
+          // @discordjs/opus WILL NOT WORK, voice is on hold til that works
+          // ipcRenderer.send("voiceConnect", vc.id); // connect to voice
+          id("vcchannel").innerText = "connected to: "+server.name + "/"+vc.name;
+          isVoiceConnected.id = vc.id;
+          isVoiceConnected.server = server.id;
+          id("voicestate").style.display = "block";
+        })
       }
     })
   })
@@ -389,6 +390,16 @@ id("vc-dc").addEventListener("click", () => {
     }
   })
   id("voicestate").style.display = "none";
+})
+id('vc-mute').addEventListener("click", () => {
+  if(muted) {
+    id('vc-mute').src = "./assets/unmuted.png"
+    muted = false;
+  } else {
+    id('vc-mute').src = "./assets/muted.png"
+    muted = true;
+  }
+  ipcRenderer.send("vc-mute")
 })
 
 // setInterval(() => {

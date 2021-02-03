@@ -95,11 +95,10 @@ app.whenReady().then(() => {
 
 TODO:
   - voice:
-    + ui: why do people not show up sometimes (need to test with dandan + ori)
-    + ui: add icons for mute/dc instead of text
+    - @discordjs/opus actually refuses to work this time
+    - find and reproduce wacky bug where something changes with voice in a server and the user appears in the wrong place (seems to be rare but i'm not sure)
     + ui: add some ui indicator to tell user that they're connected, and where
       + make it look better
-  - ctrl+shift+i opens vassalize devtools no matter the visibility/active state of vassalize
   - pinging multiple people at once
   - update server/channel ui when updated
     - joined server
@@ -113,5 +112,4 @@ TODO:
 
 MAYBE:
   - send embeds
-  - voice bruh
 */

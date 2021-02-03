@@ -241,16 +241,17 @@ div.serverlist-item > p {
     background:#0B3542;
     border-radius:2px;
     width:20%;
+    height:85%;
     box-shadow:1px 1px 3px rgb(70, 70, 70);
     padding:4px;
     max-width: 15%;
     word-wrap:break-word;
     min-height:65%;
-    height:fit-content;
+    height:80%;
     position:absolute;
     top:3em;
     left:5.25em;
-    overflow-y: auto;
+    overflow-y: scroll;
 }
 #textchannels::after {
     content: "text channels";
