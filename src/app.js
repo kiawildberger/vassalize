@@ -94,9 +94,10 @@ app.whenReady().then(() => {
 /*
 
 TODO:
+  - order channels correctly (like they are in discord)
   - voice:
     - @discordjs/opus actually refuses to work this time
-    - find and reproduce wacky bug where something changes with voice in a server and the user appears in the wrong place (seems to be rare but i'm not sure)
+    + find and reproduce wacky bug where something changes with voice in a server and the user appears in the wrong place (seems to be rare but i'm not sure)
     + ui: add some ui indicator to tell user that they're connected, and where
       + make it look better
   - pinging multiple people at once
