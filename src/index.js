@@ -343,10 +343,10 @@ function fillGuildSelect(arg) { // generates and populates guild list
         elm.addEventListener("click", () => { // handles selecting a vc
           // @discordjs/opus WILL NOT WORK, voice is on hold til that works
           // ipcRenderer.send("voiceConnect", vc.id); // connect to voice
-          id("vcchannel").innerText = "connected to: "+server.name + "/"+vc.name;
-          isVoiceConnected.id = vc.id;
-          isVoiceConnected.server = server.id;
-          id("voicestate").style.display = "block";
+          // id("vcchannel").innerText = "connected to: "+server.name + "/"+vc.name;
+          // isVoiceConnected.id = vc.id;
+          // isVoiceConnected.server = server.id;
+          // id("voicestate").style.display = "block";
         })
       }
     })

@@ -108,8 +108,11 @@ TODO:
   - status polishing
   - be able to send custom emojis
   - display embeds
-  - server select div scroll on overflow
+  - server select div scroll on overflow [i believe i fixed this but im not sure]
   + channel list shows server name
+  - replies
+  - send files (images, etc)
+
 
 MAYBE:
   - send embeds

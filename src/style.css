@@ -270,6 +270,9 @@ div.serverlist-item > p {
     border-radius:50%;
     margin:4px;
 }
+
+.channel-item[data-type="voice"] { cursor:not-allowed; } /* letting people know that voice doesnt work */
+
 #vc-mute, #vc-dc { display:inline; }
 #vc-dc { height:2em; cursor:pointer; margin-left:0.5em;}
 #vc-mute { height:2em; cursor:pointer; }
