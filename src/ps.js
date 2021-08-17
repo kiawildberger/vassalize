@@ -149,7 +149,16 @@ exports.init = function (win, tok) {
     vcchannel = null;
   })
   ipcMain.on("vc-muted", async (e, a) => {
-    await client
+    await client // lmao
+  })
+
+  // this is file send after staging
+  ipcMain.on("file", (e, data) => {
+    if(data.message) {
+      client.channels.cache.get(data.channel).send(data.message, {files: [data.file]})
+    } else {
+      client.channels.cache.get(data.channel).send({files:[data.file]})
+    }
   })
   win.on("close", () => {
     if(vcchannel) {

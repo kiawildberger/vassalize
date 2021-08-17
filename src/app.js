@@ -111,7 +111,11 @@ TODO:
   - server select div scroll on overflow [i believe i fixed this but im not sure]
   + channel list shows server name
   - replies
-  - send files (images, etc)
+  + send files (images, etc)
+    - check for 8mb limit
+    - display files (name, size, ???)
+    - dont immediately send, have a "staging area" like real discord, which probably means i need a real send button
+      - yeah you can send files now but as soon as a file is selected it is sent with or without the message. is confusing and weird but im the only one who uses vassalize so its ok
 
 
 MAYBE:

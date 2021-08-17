@@ -4,7 +4,8 @@ const { ipcRenderer, shell } = require("electron"),
   fs = require('fs'),
   clearmodule = require("clear-module"),
   scriptreader = require("./scriptreader.js"),
-  titlebar = require("electron-titlebar");
+  titlebar = require("electron-titlebar"),
+  process = require("child_process");
 let conf, botActor, Rsettings = require("./settings.json")
 if (!fs.existsSync("./config.json")) {
   fs.writeFileSync("./config.json", "{ }")
@@ -268,6 +269,7 @@ function fillGuildSelect(arg) { // generates and populates guild list
   q.forEach(e => {
     e.addEventListener("click", () => { // handles selecting a server
       id('msgin').disabled = false
+      id('selectfile').style.display = 'block';
       if (q[q.indexOf(e)] != q) q.splice(q.indexOf(e), 1) // if this is duplicate of another one, should remove it
       id('msgdisplay').innerHTML = ''
       if (id('channellist').style.display === "none") id('channellist').style.display = 'block'
@@ -657,4 +659,13 @@ function messageUpdate(id, content) {
 }
 id("custom-script-input").addEventListener("change", e => {
   scriptreader.processFiles(e)
+})
+
+// file uploads
+id('fileupload').addEventListener('change', () => {
+  let file = id('fileupload').files[0]
+  if(!file) return;
+  let size = file.size/1024
+  ipcRenderer.send("file", {message: id("msgin").value || null, file: file.path, channel:currentchannel})
+  id("msgin").value = '';
 })
