@@ -29,7 +29,7 @@
     "clear-module": "^4.1.1",
     "discord.js": "^12.1.1",
     "dotenv": "^8.2.0",
-    "electron": "^11.1.1",
+    "electron": "^11.5.0",
     "electron-titlebar": "0.0.3",
     "snarkdown": "^2.0.0",
     "universal-emoji-parser": "^0.5.28"
